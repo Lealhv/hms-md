@@ -167,26 +167,26 @@
     <div class="container">
         <h2>Welcome Back</h2>
         <div id="error-message" class="error"></div>
-        
+
         <div class="input-group">
             <i class="fas fa-user"></i>
             <input type="text" id="username" placeholder="Username" required>
         </div>
-        
+
         <div class="input-group">
             <i class="fas fa-lock"></i>
             <input type="password" id="password" placeholder="Password" required>
         </div>
-        
+
         <div class="input-group">
             <i class="fas fa-key"></i>
             <input type="text" id="code" placeholder="Verification Code" required>
         </div>
-        
+
         <button class="btn btn-primary" onclick="login()">
             <i class="fas fa-sign-in-alt"></i> Login
         </button>
-        
+
         <div class="button-group">
             <button class="btn btn-secondary" onclick="clearFields()">
                 <i class="fas fa-redo"></i> Clear
@@ -222,6 +222,7 @@
                             errorElement.classList.add("active");
                             verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Resend verification code
                             alert(`New verification code sent: ${verificationCode}`);
+                            attempts++; // Increment attempts on invalid code
                         }
                     }
                 } else {

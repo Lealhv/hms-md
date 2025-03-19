@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="services/employee.server.js"></script>
+
 </head>
 
 <body>
@@ -263,8 +265,49 @@
         }
 
         function saveData() {
-            showNotification('Data saved successfully!', 'success');
+            const data = {
+                recordNumber: document.getElementById('record-number').value,
+                timestamp: document.getElementById('timestamp').value,
+                department: document.getElementById('department').value,
+                supplierName: document.getElementById('supplier-name').value,
+                amount: document.getElementById('amount').value,
+                vat: document.getElementById('vat').value,
+                totalAmount: document.getElementById('total-amount').value,
+                deliveryLocation: document.getElementById('delivery-location').value,
+                contactName: document.getElementById('contact-name').value,
+                contactPhone: document.getElementById('contact-phone').value,
+                contactEmail: document.getElementById('contact-email').value,
+                projectName: document.getElementById('project-name').value,
+                agentNumber: document.getElementById('agent-number').value,
+                budgetItem: document.getElementById('budget-item').value
+            };
+            if (sendReshumaToServer(data) == false) {
+                showNotification('Error saving Reshuma!', 'error');
+            }
+            else {
+                showNotification('Reshuma saved successfully!', 'success');
+                clearFields(); // Clear fields after saving
+            }
         }
+
+            // Send data to the backend
+            // fetch('https://your-backend-url.com/api/records', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify(data)
+            // })
+            // .then(response => response.json())
+            // .then(data => {
+            //     showNotification('Data saved successfully!', 'success');
+            //     clearFields(); // Clear fields after saving
+            // })
+            // .catch((error) => {
+            //     console.error('Error:', error);
+            //     showNotification('Error saving data!', 'error');
+            // });
+        
 
         function printData() {
             window.print();
@@ -341,6 +384,8 @@
                 };
                 reader.readAsText(file);
             }
+            // Reset the file input to allow re-uploading the same file
+            event.target.value = '';
         }
 
         function exitPage() {

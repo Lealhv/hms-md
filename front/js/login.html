@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 90%;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #4a4a4a;
+            font-size: 28px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            border-radius: 3px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #764ba2;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: none;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.3);
+            border-color: #764ba2;
+            background-color: #fff;
+        }
+
+        input::placeholder {
+            color: #aaa;
+        }
+
+        .btn {
+            padding: 15px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-danger {
+            background-color: #f5f5f5;
+            color: #e74c3c;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #5a71d6, #6a4294);
+        }
+
+        .btn-secondary:hover {
+            background-color: #eaeaea;
+        }
+
+        .btn-danger:hover {
+            background-color: #eaeaea;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Welcome Back</h2>
+        <div id="error-message" class="error"></div>
+        
+        <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" placeholder="Username" required>
+        </div>
+        
+        <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Password" required>
+        </div>
+        
+        <div class="input-group">
+            <i class="fas fa-key"></i>
+            <input type="text" id="code" placeholder="Verification Code" required>
+        </div>
+        
+        <button class="btn btn-primary" onclick="login()">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+        
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="clearFields()">
+                <i class="fas fa-redo"></i> Clear
+            </button>
+            <button class="btn btn-danger" onclick="exit()">
+                <i class="fas fa-times"></i> Exit
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const validUser = { username: "user", password: "123" };
+        let attempts = 0;
+        let verificationCode = "";
+
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const code = document.getElementById("code").value;
+            const errorElement = document.getElementById("error-message");
+
+            if (username === validUser.username && password === validUser.password) {
+                if (attempts < 6) {
+                    if (verificationCode === "") {
+                        verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a random 6-digit code
+                        alert(`Verification code sent: ${verificationCode}`); // Simulate sending SMS
+                        attempts++;
+                    } else {
+                        if (code === verificationCode) {
+                            window.location.href = "employee.html"; // Redirect to employee page
+                        } else {
+                            errorElement.innerText = "Invalid verification code. A new code has been sent.";
+                            errorElement.classList.add("active");
+                            verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Resend verification code
+                            alert(`New verification code sent: ${verificationCode}`);
+                        }
+                    }
+                } else {
+                    errorElement.innerText = "Too many attempts. Please wait 10 minutes.";
+                    errorElement.classList.add("active");
+                }
+            } else {
+                errorElement.innerText = "Invalid username or password.";
+                errorElement.classList.add("active");
+            }
+        }
+
+        function clearFields() {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("code").value = "";
+            document.getElementById("error-message").innerText = "";
+            document.getElementById("error-message").classList.remove("active");
+            verificationCode = ""; // Reset verification code
+            attempts = 0; // Reset attempts
+        }
+
+        function exit() {
+            window.close(); // Close the window
+        }
+    </script>
+
+</body>
+
+</html>

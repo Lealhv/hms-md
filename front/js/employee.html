@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee and Manager Access Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Purchase Request System</h1>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span id="user-name">Employee</span>
+            </div>
+        </header>
+        <div class="card" id="input-area">
+            <h2><i class="fas fa-file-invoice"></i> Purchase Request Form</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="record-number">Record Number</label>
+                    <input type="text" id="record-number" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="timestamp">Timestamp</label>
+                    <input type="text" id="timestamp" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" placeholder="Enter department">
+                </div>
+                <div class="form-group">
+                    <label for="supplier-name">Supplier Name</label>
+                    <select id="supplier-name">
+                        <option value="">-- Select Supplier --</option>
+                        <option value="Supplier1">Supplier 1</option>
+                        <option value="Supplier2">Supplier 2</option>
+                        <option value="Supplier3">Supplier 3</option>
+                        <option value="Supplier4">Supplier 4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount ($)</label>
+                    <input type="number" id="amount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="vat">VAT ($)</label>
+                    <input type="number" id="vat" readonly placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="total-amount">Total Amount ($)</label>
+                    <input type="number" id="total-amount" readonly placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="delivery-location">Delivery Location</label>
+                    <input type="text" id="delivery-location" placeholder="Enter delivery location">
+                </div>
+                <div class="form-group">
+                    <label for="contact-name">Contact Name</label>
+                    <input type="text" id="contact-name" placeholder="Enter contact name">
+                </div>
+                <div class="form-group">
+                    <label for="contact-phone">Contact Phone</label>
+                    <input type="tel" id="contact-phone" placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label for="contact-email">Contact Email</label>
+                    <input type="email" id="contact-email" placeholder="Enter email address">
+                </div>
+                <div class="form-group">
+                    <label for="project-name">Project Name</label>
+                    <input type="text" id="project-name" placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label for="agent-number">Agent Number</label>
+                    <input type="text" id="agent-number" placeholder="Enter agent number">
+                </div>
+                <div class="form-group">
+                    <label for="budget-item">Budget Item</label>
+                    <input type="text" id="budget-item" placeholder="Enter budget item">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="saveData()"><i class="fas fa-save"></i> Save Data</button>
+                <button class="btn-secondary" onclick="document.getElementById('file-input').click();"><i
+                        class="fas fa-upload"></i> Upload Documents</button>
+                <button class="btn-secondary" onclick="printData()"><i class="fas fa-print"></i> Print</button>
+                <button class="btn-secondary" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Export to
+                    PDF</button>
+                <button class="btn-secondary" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Export to
+                    Excel</button>
+                <button class="btn-secondary" onclick="clearFields()"><i class="fas fa-eraser"></i> Clear
+                    Fields</button>
+                <button class="btn-danger" onclick="exitPage()"><i class="fas fa-sign-out-alt"></i> Exit</button>
+            </div>
+        </div>
+        <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)">
+
+        <div class="card" id="documents-area">
+            <h2><i class="fas fa-folder-open"></i> Associated Documents</h2>
+            <table id="documents-table">
+                <thead>
+                    <tr>
+                        <th>Document Name</th>
+                        <th>Date Added</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="documents-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card hidden" id="document-display-area">
+            <h2><i class="fas fa-file-alt"></i> Document Preview</h2>
+            <iframe id="document-viewer" width="100%" height="500px"></iframe>
+        </div>
+    </div>
+    <script>
+        const documents = [
+            { name: "Document 1", date: "2023-10-01", notes: "First document" },
+            { name: "Document 2", date: "2023-10-02", notes: "Second document" },
+            { name: "Document 3", date: "2023-10-03", notes: "Third document" }
+        ];
+
+        function loadDocuments() {
+            const tableBody = document.getElementById('documents-body');
+            if (!tableBody) {
+                console.error("Could not find documents-body element");
+                return;
+            }
+            tableBody.innerHTML = '';
+
+            if (!documents || documents.length === 0) {
+                const row = tableBody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 4;
+                cell.style.textAlign = 'center';
+                cell.textContent = 'No documents available';
+                return;
+            }
+
+            documents.forEach(doc => {
+                const row = tableBody.insertRow();
+                const nameCell = row.insertCell(0);
+                nameCell.textContent = doc.name;
+                const dateCell = row.insertCell(1);
+                dateCell.textContent = doc.date;
+                const notesCell = row.insertCell(2);
+                notesCell.textContent = doc.notes;
+
+                const actionsCell = row.insertCell(3);
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'action-btn';
+                viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                viewBtn.title = 'View Document';
+                viewBtn.onclick = function () {
+                    document.getElementById('document-display-area').classList.remove('hidden');
+                    const viewer = document.getElementById('document-viewer');
+                    document.querySelector('#document-display-area h2').innerHTML =
+                        `<i class="fas fa-file-alt"></i> Document Preview: ${doc.name}`;
+                };
+                actionsCell.appendChild(viewBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'action-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.title = 'Delete Document';
+                deleteBtn.onclick = function () {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const index = documents.indexOf(doc);
+                            if (index > -1) {
+                                documents.splice(index, 1);
+                                loadDocuments();
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your document has been deleted.',
+                                    'success'
+                                );
+                            }
+                        }
+                    });
+                };
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDocuments();
+        });
+
+        const reshumotData = [
+            {
+                Rsh_id: 1,
+                Rsh_date: '2023-10-01 10:00:00',
+                Rsh_mchlaka: 'Dept1',
+                Rsh_sapak: 'Supplier1',
+                Rsh_schoom: 100,
+                Rsh_maam: 20,
+                Rsh_schmaam: 80,
+                Rsh_schtotal: 100,
+                Rsh_pratim: 'Details about the transaction',
+                Rsh_proyktnam: 'Project A',
+                Rsh_status: 1,
+                Rsh_sochen: 'Author1',
+                Rsh_takziv: 123,
+                Rsh_cname: 'Client1',
+                Rsh_cnametl: 'Client1 TL',
+                Rsh_cemail: 'client1@example.com'
+            },
+        ];
+
+        function populateFields() {
+            document.getElementById('record-number').value = reshumotData[0].Rsh_id;
+            document.getElementById('timestamp').value = reshumotData[0].Rsh_date;
+            document.getElementById('department').value = reshumotData[0].Rsh_mchlaka;
+            document.getElementById('supplier-name').value = reshumotData[0].Rsh_sapak;
+            document.getElementById('amount').value = reshumotData[0].Rsh_schoom;
+            document.getElementById('vat').value = reshumotData[0].Rsh_maam;
+            document.getElementById('total-amount').value = reshumotData[0].Rsh_schmaam;
+            document.getElementById('delivery-location').value = reshumotData[0].Rsh_pratim;
+            document.getElementById('contact-name').value = reshumotData[0].Rsh_cname;
+            document.getElementById('contact-phone').value = reshumotData[0].Rsh_takziv;
+            document.getElementById('contact-email').value = reshumotData[0].Rsh_cemail;
+            document.getElementById('project-name').value = reshumotData[0].Rsh_proyktnam;
+            document.getElementById('agent-number').value = '';
+            document.getElementById('budget-item').value = '';
+        }
+
+        function clearFields() {
+            document.getElementById('record-number').value = '';
+            document.getElementById('timestamp').value = '';
+            document.getElementById('department').value = '';
+            document.getElementById('supplier-name').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('vat').value = '';
+            document.getElementById('total-amount').value = '';
+            document.getElementById('delivery-location').value = '';
+            document.getElementById('contact-name').value = '';
+            document.getElementById('contact-phone').value = '';
+            document.getElementById('contact-email').value = '';
+            document.getElementById('project-name').value = '';
+            document.getElementById('agent-number').value = '';
+            document.getElementById('budget-item').value = '';
+        }
+
+        function saveData() {
+            showNotification('Data saved successfully!', 'success');
+        }
+
+        function printData() {
+            window.print();
+        }
+
+        function showNotification(message, type = 'info') {
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.remove();
+            });
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            let icon = 'info-circle';
+            if (type === 'success') {
+                icon = 'check-circle';
+            } else if (type === 'error') {
+                icon = 'exclamation-circle';
+            }
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="notification-message">${message}</div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const content = e.target.result;
+                    const rows = content.split('\n').map(row => row.split(','));
+                    const headers = rows[0].map(header => header.trim());
+                    const data = rows[1].map(value => value.trim());
+
+                    const expectedFields = [
+                        "Record Number", "Timestamp", "Department", "Supplier Name", "Amount",
+                        "VAT", "Total Amount", "Delivery Location", "Contact Name",
+                        "Contact Phone", "Contact Email", "Project Name", "Agent Number", "Budget Item"
+                    ];
+
+                    if (headers.length !== expectedFields.length) {
+                        showNotification("The uploaded file does not match the required fields.", 'error');
+                        return;
+                    }
+
+                    for (let i = 0; i < headers.length; i++) {
+                        const fieldId = headers[i].toLowerCase().replace(/ /g, '-');
+                        if (document.getElementById(fieldId)) {
+                            document.getElementById(fieldId).value = data[i];
+                        }
+                    }
+
+                    showNotification("File uploaded and data imported successfully!", 'success');
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function exitPage() {
+            window.location.href = 'login.html';
+        }
+
+        function exportToPDF() {
+            const element = document.querySelector('.container');
+            html2pdf()
+                .from(element)
+                .save('purchase_request.pdf')
+                .then(() => {
+                    showNotification('PDF exported successfully!', 'success');
+                });
+        }
+
+        function exportToExcel() {
+            const data = [
+                ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Amount', 'VAT', 'Total Amount', 'Delivery Location', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Agent Number', 'Budget Item'],
+                [
+                    document.getElementById('record-number').value,
+                    document.getElementById('timestamp').value,
+                    document.getElementById('department').value,
+                    document.getElementById('supplier-name').value,
+                    document.getElementById('amount').value,
+                    document.getElementById('vat').value,
+                    document.getElementById('total-amount').value,
+                    document.getElementById('delivery-location').value,
+                    document.getElementById('contact-name').value,
+                    document.getElementById('contact-phone').value,
+                    document.getElementById('contact-email').value,
+                    document.getElementById('project-name').value,
+                    document.getElementById('agent-number').value,
+                    document.getElementById('budget-item').value
+                ]
+            ];
+
+            let csvContent = "data:text/csv;charset=utf-8,"
+                + data.map(e => e.join(",")).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "purchase_request.csv");
+            document.body.appendChild(link);
+            link.click();
+
+            showNotification('Data exported to Excel successfully!', 'success');
+        }
+
+        let timeout;
+        function resetTimer() {
+            clearTimeout(timeout);
+            timeout = setTimeout(exitPage, 600000);
+        }
+        document.onload = resetTimer();
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        window.onload = populateFields;
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permission Page</title>
+    <script>
+        let timeout;
+        const sessionTimeout = 10 * 60 * 1000; // 10 minutes
+        const userPermissions = { level: 1 }; // Example user permission level
+
+        function checkSession() {
+            clearTimeout(timeout);
+            timeout = setTimeout(logout, sessionTimeout);
+        }
+
+        function logout() {
+            alert("You have been logged out due to inactivity.");
+            window.location.href = "login.html"; // Redirect to login page
+        }
+
+        function navigateToNextPage() {
+            if (userPermissions.level >= 2) {
+                window.location.href = "page2.html"; // Redirect to page 2
+            } else {
+                alert("You do not have permission to access this page.");
+            }
+        }
+
+        function clearFields() {
+            document.getElementById("form").reset();
+        }
+
+        function loadLastRecord() {
+            // Simulate loading the last record
+            const lastRecord = { name: "John Doe", age: 30 };
+            document.getElementById("name").value = lastRecord.name;
+            document.getElementById("age").value = lastRecord.age;
+        }
+
+        function browseRecords() {
+            // Simulate browsing records
+            alert("Browsing through records...");
+        }
+
+        window.onload = function() {
+            checkSession();
+            document.addEventListener('mousemove', checkSession);
+            document.addEventListener('keypress', checkSession);
+        };
+    </script>
+</head>
+<body>
+    <h1>Welcome to the Permission Page</h1>
+    <form id="form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age"><br>
+        <button type="button" onclick="clearFields()">Clear Fields</button>
+        <button type="button" onclick="loadLastRecord()">Load Last Record</button>
+        <button type="button" onclick="browseRecords()">Browse Records</button>
+        <button type="button" onclick="navigateToNextPage()">Go to Next Page</button>
+        <button type="button" onclick="logout()">Logout</button>
+    </form>
+</body>
+</html>

@@ -1,6 +1,6 @@
 <?php
 $servername = "localhost";
-$username = "root'@'localhost";
+$username = "root";
 $password = "new_password";
 $dbname = "isgulaorg_101";
 

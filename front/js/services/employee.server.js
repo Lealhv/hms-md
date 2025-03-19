@@ -23,4 +23,26 @@ function sendReshumaToServer(data) {
     });
 }
 
+function updateUser(id, userData) {
+    fetch(`PartialUpdateUser.php?id=${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('User updated successfully:', data);
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+}
+window.updateUser = updateUser;
 window.sendReshumaToServer = sendReshumaToServer;

@@ -276,6 +276,22 @@
     </div>
 
     <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            updateUser(localStorage.getItem('userId'),
+        {
+            Lg_timestmpin:new Date().toISOString(),
+            Lg_status: 1
+        });
+        });
+
+        window.addEventListener('beforeunload', function () {
+            updateUser(localStorage.getItem('userId'),
+            {
+                Lg_timestmpiout:new Date().toISOString(),
+                Lg_status: 0
+            }
+        );
+        });
         let inactivityTime = function () {
             let timer;
             window.onload = resetTimer;

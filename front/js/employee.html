@@ -14,6 +14,7 @@
 </head>
 
 <body>
+
     <div class="container">
         <header>
             <h1>Purchase Request System</h1>
@@ -207,6 +208,20 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             loadDocuments();
+            updateUser(localStorage.getItem('userId'),
+        {
+            Lg_timestmpin:new Date().toISOString(),
+            Lg_status: 1
+        });
+        });
+
+        window.addEventListener('beforeunload', function () {
+            updateUser(localStorage.getItem('userId'),
+            {
+                Lg_timestmpiout:new Date().toISOString(),
+                Lg_status: 0
+            }
+        );
         });
 
         const reshumotData = [
@@ -290,24 +305,24 @@
             }
         }
 
-            // Send data to the backend
-            // fetch('https://your-backend-url.com/api/records', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify(data)
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     showNotification('Data saved successfully!', 'success');
-            //     clearFields(); // Clear fields after saving
-            // })
-            // .catch((error) => {
-            //     console.error('Error:', error);
-            //     showNotification('Error saving data!', 'error');
-            // });
-        
+        // Send data to the backend
+        // fetch('https://your-backend-url.com/api/records', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify(data)
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //     showNotification('Data saved successfully!', 'success');
+        //     clearFields(); // Clear fields after saving
+        // })
+        // .catch((error) => {
+        //     console.error('Error:', error);
+        //     showNotification('Error saving data!', 'error');
+        // });
+
 
         function printData() {
             window.print();

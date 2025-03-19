@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <script src="services/login.server.js" defer></script> 
+    <script src="services/login.server.js" defer></script>
     <style>
         * {
             box-sizing: border-box;
@@ -210,7 +210,7 @@
             const errorElement = document.getElementById("error-message");
             debugger
             const validUser = fetchData(password);
-            
+
             if (username === validUser.EU_Name && password === validUser.EU_PW) {
                 if (attempts < 6) {
                     if (verificationCode === "") {
@@ -221,17 +221,19 @@
                         if (code === verificationCode) {
                             const PR = validUser.EU_PR;
                             console.log(PR);
-                            if(PR == 1)
-                            window.location.href = "employee.html"; // Redirect to employee page
-                            else
-                            window.location.href = "admin.html"; // Redirect to manager page
+                            if (PR == 1) {
+                                localStorage.setItem('userId', validUser.EU_ID);
+                                window.location.href = "employee.html";  
+                            } else {
+                                localStorage.setItem('userId', validUser.EU_ID);
+                                window.location.href = "admin.html"; 
+                            }
 
                         } else {
                             errorElement.innerText = "Invalid verification code. A new code has been sent.";
                             errorElement.classList.add("active");
                             verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Resend verification code
                             alert(`New verification code sent: ${verificationCode}`);
-                            attempts++; // Increment attempts on invalid code
                         }
                     }
                 } else {

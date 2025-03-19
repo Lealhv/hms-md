@@ -202,6 +202,20 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             loadDocuments();
+            updateUser(localStorage.getItem('userId'),
+        {
+            Lg_timestmpin:new Date().toISOString(),
+            Lg_status: 1
+        });
+        });
+
+        window.addEventListener('beforeunload', function () {
+            updateUser(localStorage.getItem('userId'),
+            {
+                Lg_timestmpiout:new Date().toISOString(),
+                Lg_status: 0
+            }
+        );
         });
 
         function clearFields() {

@@ -3,7 +3,7 @@
 header("Content-Type: application/json");
 
 require '../models/EndUser.php';
-require '../config/Database.php'; // זה יכלול את הקובץ ויצור את $conn
+require '../config/database.php'; // זה יכלול את הקובץ ויצור את $conn
 
 class EndUserController {
     private $conn;

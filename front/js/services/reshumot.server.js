@@ -1,4 +1,3 @@
-const apiUrl = 'http://localhost/project/hms-md/Back/controller/reshumotController.php';
 
 // Create
 // async function createReshumot(data) {
@@ -37,7 +36,7 @@ const apiUrl = 'http://localhost/project/hms-md/Back/controller/reshumotControll
 // }
 
 
-window.createReshumot = createReshumot;
+// window.createReshumot = createReshumot;
 
 // // Read
 // export async function readReshumot(Rsh_id) {
@@ -65,8 +64,22 @@ window.createReshumot = createReshumot;
 //     return response.ok;
 // }
 
-// List all
-export async function listAllReshumot() {
-    const response = await fetch(`${apiUrl}/listAll`);
-    return response.json();
+// List allexport
+  async function listAllReshumot() {
+    const apiUrl = 'http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumots';
+    console.log('Calling API to list all Reshumot...');
+    try {
+        const response = await fetch(`${apiUrl}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Received data:', data);
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch data:', error);
+    }
 }
+
+
+window.listAllReshumot = listAllReshumot;

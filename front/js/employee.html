@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="services/reshumot.server.js" defer></script>
-    <script type="module" src="services/mnilvim.server.js"></script>
-    <script type="module" src="services/maam.server.js"></script>
 </head>
 
 <body>
@@ -128,95 +126,22 @@
             <h2><i class="fas fa-file-alt"></i> Document Preview</h2>
             <iframe id="document-viewer" width="100%" height="500px"></iframe>
         </div>
+
+        <div class="card" id="record-list-area">
+            <h2><i class="fas fa-list"></i> Record List</h2>
+            <ul id="record-list"></ul>
+        </div>
     </div>
     <script>
         const documents = [];
 
-        function loadDocuments() {
-            fetch('services/mnilvim.server.js') // Fetch documents from the server
-                .then(response => response.json())
-                .then(data => {
-                    documents.push(...data);
-                    const tableBody = document.getElementById('documents-body');
-                    tableBody.innerHTML = '';
-                    if (!documents || documents.length === 0) {
-                        const row = tableBody.insertRow();
-                        const cell = row.insertCell(0);
-                        cell.colSpan = 4;
-                        cell.style.textAlign = 'center';
-                        cell.textContent = 'No documents available';
-                        return;
-                    }
-                    documents.forEach(doc => {
-                        const row = tableBody.insertRow();
-                        const nameCell = row.insertCell(0);
-                        nameCell.textContent = doc.name;
-                        const dateCell = row.insertCell(1);
-                        dateCell.textContent = doc.date;
-                        const notesCell = row.insertCell(2);
-                        notesCell.textContent = doc.notes;
-                        const actionsCell = row.insertCell(3);
-                        const viewBtn = document.createElement('button');
-                        viewBtn.className = 'action-btn';
-                        viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
-                        viewBtn.title = 'View Document';
-                        viewBtn.onclick = function () {
-                            document.getElementById('document-display-area').classList.remove('hidden');
-                            const viewer = document.getElementById('document-viewer');
-                            document.querySelector('#document-display-area h2').innerHTML =
-                                `<i class="fas fa-file-alt"></i> Document Preview: ${doc.name}`;
-                        };
-                        actionsCell.appendChild(viewBtn);
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'action-btn';
-                        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                        deleteBtn.title = 'Delete Document';
-                        deleteBtn.onclick = function () {
-                            Swal.fire({
-                                title: 'Are you sure?',
-                                text: "You won't be able to revert this!",
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#d33',
-                                cancelButtonColor: '#3085d6',
-                                confirmButtonText: 'Yes, delete it!'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    const index = documents.indexOf(doc);
-                                    if (index > -1) {
-                                        documents.splice(index, 1);
-                                        loadDocuments();
-                                        Swal.fire(
-                                            'Deleted!',
-                                            'Your document has been deleted.',
-                                            'success'
-                                        );
-                                    }
-                                }
-                            });
-                        };
-                        actionsCell.appendChild(deleteBtn);
-                    });
-                })
-                .catch(error => console.error('Error fetching documents:', error));
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            loadDocuments();
-            updateUser(localStorage.getItem('userId'),
-        {
-            Lg_timestmpin:new Date().toISOString(),
-            Lg_status: 1
-        });
-        });
-
         window.addEventListener('beforeunload', function () {
             updateUser(localStorage.getItem('userId'),
-            {
-                Lg_timestmpiout:new Date().toISOString(),
-                Lg_status: 0
-            }
-        );
+                {
+                    Lg_timestmpiout: new Date().toISOString(),
+                    Lg_status: 0
+                }
+            );
         });
 
         function clearFields() {
@@ -235,7 +160,6 @@
             document.getElementById('agent-number').value = '';
             document.getElementById('budget-item').value = '';
         }
-
 
         async function saveData() {
             const data = {
@@ -263,12 +187,12 @@
                 const response = await createReshumot(data);
                 showNotification('Reshuma saved successfully!', 'success');
                 clearFields(); // Clear fields after saving
+                listAllReshumot(); // Refresh the record list
             } catch (error) {
                 console.error('Error saving Reshuma:', error);
                 showNotification('Error saving Reshuma!', 'error');
             }
         }
-
 
         function printData() {
             window.print();
@@ -342,7 +266,6 @@
                 };
                 reader.readAsText(file);
             }
-            // Reset the file input to allow re-uploading the same file
             event.target.value = '';
         }
 
@@ -394,17 +317,141 @@
             showNotification('Data exported to Excel successfully!', 'success');
         }
 
+        function listAllReshumot() {
+            // Fetch records and populate the record list
+            fetch('services/reshumot.server.js')
+                .then(response => response.json())
+                .then(records => {
+                    const recordList = document.getElementById('record-list');
+                    recordList.innerHTML = '';
+                    records.forEach(record => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Record ID: ${record.Rsh_id}, Date: ${record.Rsh_date}, Department: ${record.Rsh_mchlaka}, Supplier: ${record.Rsh_sapak}, Amount: ${record.Rsh_schoom}, VAT: ${record.Rsh_maam}, Total: ${record.Rsh_schmaam}, Delivery: ${record.Rsh_schtotal}, Contact: ${record.Rsh_pratim}, Project: ${record.Rsh_proyktnam}, Status: ${record.Rsh_status}, Phone: ${record.Rsh_sochen}, Agent: ${record.Rsh_takziv}, Budget: ${record.Rsh_cname}`;
+                        listItem.onclick = () => editRecord(record);
+                        recordList.appendChild(listItem);
+                    });
+                });
+        }
+
+        function editRecord(record) {
+            document.getElementById('record-number').value = record.Rsh_id;
+            document.getElementById('timestamp').value = record.Rsh_date;
+            document.getElementById('department').value = record.Rsh_mchlaka;
+            document.getElementById('supplier-name').value = record.Rsh_sapak;
+            document.getElementById('amount').value = record.Rsh_schoom;
+            document.getElementById('vat').value = record.Rsh_maam;
+            document.getElementById('total-amount').value = record.Rsh_schmaam;
+            document.getElementById('delivery-location').value = record.Rsh_schtotal;
+            document.getElementById('contact-name').value = record.Rsh_pratim;
+            document.getElementById('contact-phone').value = record.Rsh_sochen;
+            document.getElementById('contact-email').value = record.Rsh_cemail;
+            document.getElementById('project-name').value = record.Rsh_proyktnam;
+            document.getElementById('agent-number').value = record.Rsh_takziv;
+            document.getElementById('budget-item').value = record.Rsh_cname;
+        }
+
         let timeout;
         function resetTimer() {
             clearTimeout(timeout);
             timeout = setTimeout(exitPage, 600000);
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            listAllReshumot().then(records => {
+                const recordList = document.getElementById('record-list');
+                recordList.innerHTML = ''; // Clear existing list
+                records.forEach(record => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Record ID: ${record.Rsh_id}, Date: ${record.Rsh_date}, Department: ${record.Rsh_mchlaka}, Supplier: ${record.Rsh_sapak}, Amount: ${record.Rsh_schoom}, VAT: ${record.Rsh_maam}, Total: ${record.Rsh_schmaam}, Delivery: ${record.Rsh_schtotal}, Contact: ${record.Rsh_pratim}, Project: ${record.Rsh_proyktnam}, Status: ${record.Rsh_status}, Phone: ${record.Rsh_sochen}, Agent: ${record.Rsh_takziv}, Budget: ${record.Rsh_cname}`;
+                    listItem.onclick = () => editRecord(record);
+                    recordList.appendChild(listItem);
+                });
+            });
+        });
+
         document.onload = resetTimer();
         document.onmousemove = resetTimer;
         document.onkeypress = resetTimer;
-        // window.onload = loadDocuments; // Load documents on window load
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 
 </html>
+<!-- 
+// function loadDocuments() {
+    //     fetch('services/mnilvim.server.js') // Fetch documents from the server
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             documents.push(...data);
+    //             const tableBody = document.getElementById('documents-body');
+    //             tableBody.innerHTML = '';
+    //             if (!documents || documents.length === 0) {
+    //                 const row = tableBody.insertRow();
+    //                 const cell = row.insertCell(0);
+    //                 cell.colSpan = 4;
+    //                 cell.style.textAlign = 'center';
+    //                 cell.textContent = 'No documents available';
+    //                 return;
+    //             }
+    //             documents.forEach(doc => {
+    //                 const row = tableBody.insertRow();
+    //                 const nameCell = row.insertCell(0);
+    //                 nameCell.textContent = doc.name;
+    //                 const dateCell = row.insertCell(1);
+    //                 dateCell.textContent = doc.date;
+    //                 const notesCell = row.insertCell(2);
+    //                 notesCell.textContent = doc.notes;
+    //                 const actionsCell = row.insertCell(3);
+    //                 const viewBtn = document.createElement('button');
+    //                 viewBtn.className = 'action-btn';
+    //                 viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
+    //                 viewBtn.title = 'View Document';
+    //                 viewBtn.onclick = function () {
+    //                     document.getElementById('document-display-area').classList.remove('hidden');
+    //                     const viewer = document.getElementById('document-viewer');
+    //                     document.querySelector('#document-display-area h2').innerHTML =
+    //                         `<i class="fas fa-file-alt"></i> Document Preview: ${doc.name}`;
+    //                 };
+    //                 actionsCell.appendChild(viewBtn);
+    //                 const deleteBtn = document.createElement('button');
+    //                 deleteBtn.className = 'action-btn';
+    //                 deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+    //                 deleteBtn.title = 'Delete Document';
+    //                 deleteBtn.onclick = function () {
+    //                     Swal.fire({
+    //                         title: 'Are you sure?',
+    //                         text: "You won't be able to revert this!",
+    //                         icon: 'warning',
+    //                         showCancelButton: true,
+    //                         confirmButtonColor: '#d33',
+    //                         cancelButtonColor: '#3085d6',
+    //                         confirmButtonText: 'Yes, delete it!'
+    //                     }).then((result) => {
+    //                         if (result.isConfirmed) {
+    //                             const index = documents.indexOf(doc);
+    //                             if (index > -1) {
+    //                                 documents.splice(index, 1);
+    //                                 loadDocuments();
+    //                                 Swal.fire(
+    //                                     'Deleted!',
+    //                                     'Your document has been deleted.',
+    //                                     'success'
+    //                                 );
+    //                             }
+    //                         }
+    //                     });
+    //                 };
+    //                 actionsCell.appendChild(deleteBtn);
+    //             });
+    //         })
+    //         .catch(error => console.error('Error fetching documents:', error));
+    // }
+
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     // loadDocuments();
+    //     updateUser(localStorage.getItem('userId'),
+    // {
+    //     Lg_timestmpin:new Date().toISOString(),
+    //     Lg_status: 1
+    // });
+    // }); -->

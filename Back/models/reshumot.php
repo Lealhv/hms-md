@@ -19,3 +19,4 @@ class Reshumot {
     public $Rsh_cemail;
 
 }
+?>

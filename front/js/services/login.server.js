@@ -17,29 +17,69 @@
 //             console.error('There was a problem with the fetch operation:', error);
 //         });
 // }
-
 async function fetchData(userId) {
+    debugger;
+    console.log("!!!!!!!!!!!!")
+
     const url = `http://localhost/project/hms-md/Back/controller/EndUserController.php/user/${userId}`;
+    console.log(`Fetching data from URL: ${url}`); // לוג של ה-URL
+
     try {
-        const response = await fetch(url);
+        const response = await fetch(`${url}`);
+        console.log("!!!!!!!!!!!!")
+        console.log(`Response status: ${response.status}`); // לוג של סטטוס התגובה
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
         }
-        
-        // Log the raw response text to see what's being returned
-        const responseText = await response.text();
-        console.log('Raw response:', responseText);
-        
-        // Only try to parse as JSON if there's content
-        if (responseText.trim()) {
-            return JSON.parse(responseText);
-        } else {
-            throw new Error('Empty response received from server');
-        }
+        const data = await response.json();
+        console.log('Fetched data:', data); // לוג של הנתונים שהתקבלו
+        return data;
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
         throw error; // Re-throw to allow handling by the caller
     }
 }
 
-    window.fetchData = fetchData;
+// async function listAllReshumot() {
+//     const apiUrl = 'http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumots';
+//     console.log('Calling API to list all Reshumot...');
+//     try {
+//         const response = await fetch(`${apiUrl}`);
+//         if (!response.ok) {
+//             throw new Error('Network response was not ok');
+//         }
+//         const data = await response.json();
+//         console.log('Received data:', data);
+//         return data;
+//     } catch (error) {
+//         console.error('Failed to fetch data:', error);
+//     }
+// }
+
+
+// window.listAllReshumot = listAllReshumot;
+
+
+async function fetchWithTimeout(url, options, timeout = 5000) {
+    return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), timeout))
+    ]);
+}
+
+async function getAll() {
+    debugger
+    fetch('http://localhost/project/hms-md/Back/controller/EndUserController.php/users')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.error('There was a problem with the fetch operation:', error));
+}
+
+
+window.fetchData = fetchData;
+window.getAll = getAll;

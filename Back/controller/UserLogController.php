@@ -1,71 +1,90 @@
 <?php
+header("Content-Type: application/json");
+
+require '../models/UserLog.php';
+require '../config/Database.php'; // This will include the file and create $conn
 
 class UserLogController {
-    private $userLogList = [];
-
-    // Create
-    public function createLog($Lg_user, $Lg_status, $Lg_timestmpin, $Lg_timestmpiout) {
-        $userLog = new UserLog();
-        $userLog->Lg_user = $Lg_user;
-        $userLog->Lg_status = $Lg_status;
-        $userLog->Lg_timestmpin = $Lg_timestmpin;
-        $userLog->Lg_timestmpiout = $Lg_timestmpiout;
-        $this->userLogList[] = $userLog;
-        return $userLog;
-    }
-
-    // Read
-    public function readLog($index) {
-        if (isset($this->userLogList[$index])) {
-            $data = $this->userLogList[$index];
-            echo json_encode($data);
-        } else {
-            echo json_encode(null);
-        }
-    }
-    // Update
-    public function updateLog($index, $Lg_user, $Lg_status, $Lg_timestmpin, $Lg_timestmpiout) {
-        if (isset($this->userLogList[$index])) {
-            $this->userLogList[$index]->Lg_user = $Lg_user;
-            $this->userLogList[$index]->Lg_status = $Lg_status;
-            $this->userLogList[$index]->Lg_timestmpin = $Lg_timestmpin;
-            $this->userLogList[$index]->Lg_timestmpiout = $Lg_timestmpiout;
-            return $this->userLogList[$index];
-        }
-        return null;
-    }
-    // Update partial
-    public function updatePartialLog($index, $Lg_user = null, $Lg_status = null, $Lg_timestmpin = null, $Lg_timestmpiout = null) {
-        if (isset($this->userLogList[$index])) {
-            if ($Lg_user !== null) {
-                $this->userLogList[$index]->Lg_user = $Lg_user;
-            }
-            if ($Lg_status !== null) {
-                $this->userLogList[$index]->Lg_status = $Lg_status;
-            }
-            if ($Lg_timestmpin !== null) {
-                $this->userLogList[$index]->Lg_timestmpin = $Lg_timestmpin;
-            }
-            if ($Lg_timestmpiout !== null) {
-                $this->userLogList[$index]->Lg_timestmpiout = $Lg_timestmpiout;
-            }
-            return $this->userLogList[$index];
-        }
-        return null;
+    private $conn;
+    
+    public function __construct() {
+        global $conn; // Use the connection created in Database.php
+        $this->conn = $conn;
     }
     
-    // Delete
-    public function deleteLog($index) {
-        if (isset($this->userLogList[$index])) {
-            unset($this->userLogList[$index]);
-            return true;
+    public function getAllLogs() {
+        $query = "SELECT * FROM userlog"; // Adjust the table name according to your database
+        $result = $this->conn->query($query);
+        
+        $logs = [];
+        while ($row = $result->fetch_assoc()) {
+            $logs[] = $row;
         }
-        return false;
+        
+        echo json_encode($logs);
     }
+    
+    public function readLog($Lg_user) {
+        $query = "SELECT * FROM userlog WHERE Lg_user = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("s", $Lg_user);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $log = $result->fetch_assoc();
+            echo json_encode($log);
+        } else {
+            echo json_encode(["error" => "Log not found"]);
+        }
+    }
+    
+    public function addLog() {
+        $input = json_decode(file_get_contents("php://input"), true);
+        if (!isset($input['Lg_user'], $input['Lg_status'], $input['Lg_timestmpin'], $input['Lg_timestmpiout'])) {
+            echo json_encode(["error" => "Missing parameters"]);
+            return;
+        }
+        
+        $query = "INSERT INTO userlog (Lg_user, Lg_status, Lg_timestmpin, Lg_timestmpiout) VALUES (?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ssss", 
+            $input['Lg_user'], 
+            $input['Lg_status'], 
+            $input['Lg_timestmpin'], 
+            $input['Lg_timestmpiout']
+        );
+        
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Log added successfully"]);
+        } else {
+            echo json_encode(["error" => "Failed to add log: " . $stmt->error]);
+        }
+    }
+}
 
-    // List all
-    public function listAllLogs() {
-        return $this->userLogList;
+// Improved routing
+$requestUri = $_SERVER['REQUEST_URI'];
+$requestUri = str_replace('/UserLogController.php', '', $requestUri);
+
+$basePath = '/project/hms-md/Back/controller'; // Adjust to your project's base path
+
+$requestUri = str_replace($basePath, '', $requestUri);
+$requestUri = explode("/", trim($requestUri, "/"));
+
+$controller = new UserLogController();
+
+if (count($requestUri) >= 1) {
+    if ($requestUri[0] === "log" && $_SERVER['REQUEST_METHOD'] === "GET" && isset($requestUri[1])) {
+        $controller->readLog($requestUri[1]); // GET /log/{user}
+    } elseif ($requestUri[0] === "logs" && $_SERVER['REQUEST_METHOD'] === "GET") {
+        $controller->getAllLogs(); // GET /logs
+    } elseif ($requestUri[0] === "log" && $_SERVER['REQUEST_METHOD'] === "POST") {
+        $controller->addLog(); // POST /log
+    } else {
+        echo json_encode(["error" => "Invalid endpoint: " . implode('/', $requestUri)]);
     }
+} else {
+    echo json_encode(["error" => "Invalid request"]);
 }
 ?>

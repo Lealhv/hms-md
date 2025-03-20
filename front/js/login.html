@@ -210,7 +210,7 @@
             const errorElement = document.getElementById("error-message");
             debugger
             const validUser = fetchData(password);
-
+            debugger
             if (username === validUser.EU_Name && password === validUser.EU_PW) {
                 if (attempts < 6) {
                     if (verificationCode === "") {
@@ -223,10 +223,10 @@
                             console.log(PR);
                             if (PR == 1) {
                                 localStorage.setItem('userId', validUser.EU_ID);
-                                window.location.href = "employee.html";  
+                                window.location.href = "employee.html";
                             } else {
                                 localStorage.setItem('userId', validUser.EU_ID);
-                                window.location.href = "admin.html"; 
+                                window.location.href = "admin.html";
                             }
 
                         } else {
@@ -259,6 +259,7 @@
         function exit() {
             window.close(); // Close the window
         }
+
     </script>
 
 </body>

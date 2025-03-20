@@ -6,3 +6,4 @@ class Mnilvim {
     public $MN_location;
 
 }
+?>

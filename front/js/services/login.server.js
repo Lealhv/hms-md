@@ -17,11 +17,11 @@
 //             console.error('There was a problem with the fetch operation:', error);
 //         });
 // }
-async function fetchData(userId) {
+async function fetchData(passId) {
     debugger;
     console.log("!!!!!!!!!!!!")
 
-    const url = `http://localhost/project/hms-md/Back/controller/EndUserController.php/user/${userId}`;
+    const url = `http://localhost/project/hms-md/Back/controller/EndUserController.php/user/${passId}`;
     console.log(`Fetching data from URL: ${url}`); // לוג של ה-URL
 
     try {

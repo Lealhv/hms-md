@@ -25,10 +25,10 @@ class EndUserController {
         echo json_encode($users);
     }
     
-    public function readUser($EU_ID) {
-        $query = "SELECT * FROM enduser WHERE EU_ID = ?";
+    public function readUser($EU_PW) {
+        $query = "SELECT * FROM enduser WHERE EU_PW = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $EU_ID);
+        $stmt->bind_param("s", $EU_PW);
         $stmt->execute();
         $result = $stmt->get_result();
         

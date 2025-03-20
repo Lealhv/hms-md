@@ -1,42 +1,69 @@
-const apiUrl = 'http://localhost/project/hms-md/Back/controller/reshumot.php'; 
+const apiUrl = 'http://localhost/project/hms-md/Back/controller/reshumotController.php';
 
 // Create
-export async function createReshumot(Rsh_id, Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_pratim, Rsh_proyktnam, Rsh_status, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) {
-    const response = await fetch(`${apiUrl}/create`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ Rsh_id, Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_pratim, Rsh_proyktnam, Rsh_status, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail })
-    });
-    return response.json();
-}
+// async function createReshumot(data) {
+//     console.log('Sending data to the API:', data);
+//     const response = await fetch(`${apiUrl}/create`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(data)
+//     });
 
-// Read
-export async function readReshumot(Rsh_id) {
-    const response = await fetch(`${apiUrl}/read/${Rsh_id}`);
-    return response.json();
-}
+//     // Check if the response is not empty
+//     if (response.ok) {
+//         const text = await response.text();
+//         console.log('Raw response text:', text);
 
-// Update
-export async function updateReshumot(Rsh_id, Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_pratim, Rsh_proyktnam, Rsh_status, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) {
-    const response = await fetch(`${apiUrl}/update/${Rsh_id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_pratim, Rsh_proyktnam, Rsh_status, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail })
-    });
-    return response.json();
-}
+//         // If the text is not empty, try to parse it as JSON
+//         if (text) {
+//             try {
+//                 const result = JSON.parse(text);
+//                 console.log('Request succeeded:', result);
+//                 return result;
+//             } catch (error) {
+//                 console.error('Error parsing JSON:', error);
+//                 throw new Error('Invalid JSON response');
+//             }
+//         } else {
+//             console.error('Response is empty');
+//             throw new Error('Response is empty');
+//         }
+//     } else {
+//         console.error('Request failed:', response.status, response.statusText);
+//         throw new Error(`Request failed with status ${response.status}`);
+//     }
+// }
 
-// Delete
-export async function deleteReshumot(Rsh_id) {
-    const response = await fetch(`${apiUrl}/delete/${Rsh_id}`, {
-        method: 'DELETE'
-    });
-    return response.ok;
-}
+
+window.createReshumot = createReshumot;
+
+// // Read
+// export async function readReshumot(Rsh_id) {
+//     const response = await fetch(`${apiUrl}/read/${Rsh_id}`);
+//     return response.json();
+// }
+
+// // Update
+// export async function updateReshumot(Rsh_id, data) {
+//     const response = await fetch(`${apiUrl}/update/${Rsh_id}`, {
+//         method: 'PUT',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(data)
+//     });
+//     return response.json();
+// }
+
+// // Delete
+// export async function deleteReshumot(Rsh_id) {
+//     const response = await fetch(`${apiUrl}/delete/${Rsh_id}`, {
+//         method: 'DELETE'
+//     });
+//     return response.ok;
+// }
 
 // List all
 export async function listAllReshumot() {

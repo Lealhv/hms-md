@@ -1,22 +1,52 @@
 <?php
 
-class ReshumotController {
+class ReshumotController
+{
     private $reshumotList = [];
 
-    // Create
-    public function create($Rsh_id, $Rsh_date, $Rsh_mchlaka, $Rsh_sapak, $Rsh_schoom, $Rsh_maam, $Rsh_schmaam, $Rsh_schtotal, $Rsh_pratim, $Rsh_proyktnam, $Rsh_status, $Rsh_sochen, $Rsh_takziv, $Rsh_cname, $Rsh_cnametl, $Rsh_cemail) {
-        $reshumot = new Reshumot($Rsh_id, $Rsh_date, $Rsh_mchlaka, $Rsh_sapak, $Rsh_schoom, $Rsh_maam, $Rsh_schmaam, $Rsh_schtotal, $Rsh_pratim, $Rsh_proyktnam, $Rsh_status, $Rsh_sochen, $Rsh_takziv, $Rsh_cname, $Rsh_cnametl, $Rsh_cemail);
-        $this->reshumotList[$Rsh_id] = $reshumot; 
-        return $reshumot;
+    public function create()
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        // Check if all required keys exist
+        if (!isset(
+            $data['Rsh_id'],
+            $data['Rsh_date'],
+            $data['Rsh_mchlaka'],
+            $data['Rsh_sapak'],
+            $data['Rsh_schoom'],
+            $data['Rsh_maam'],
+            $data['Rsh_schmaam'],
+            $data['Rsh_schtotal'],
+            $data['Rsh_pratim'],
+            $data['Rsh_proyktnam'],
+            $data['Rsh_status'],
+            $data['Rsh_sochen'],
+            $data['Rsh_takziv'],
+            $data['Rsh_cname'],
+            $data['Rsh_cnametl'],
+            $data['Rsh_cemail']
+        )) {
+            http_response_code(400); // Return 400 error code
+            return json_encode(['error' => 'Missing required parameters']);
+        }
+
+        // Create the Reshumot object
+        $reshumot = new Reshumot($data);
+        $this->reshumotList[$data['Rsh_id']] = $reshumot;
+
+        return json_encode($reshumot); // Return the result as JSON
     }
 
     // Read
-    public function read($Rsh_id) {
+    public function read($Rsh_id)
+    {
         return isset($this->reshumotList[$Rsh_id]) ? $this->reshumotList[$Rsh_id] : null;
     }
 
     // Update
-    public function update($Rsh_id, $Rsh_date, $Rsh_mchlaka, $Rsh_sapak, $Rsh_schoom, $Rsh_maam, $Rsh_schmaam, $Rsh_schtotal, $Rsh_pratim, $Rsh_proyktnam, $Rsh_status, $Rsh_sochen, $Rsh_takziv, $Rsh_cname, $Rsh_cnametl, $Rsh_cemail) {
+    public function update($Rsh_id, $Rsh_date, $Rsh_mchlaka, $Rsh_sapak, $Rsh_schoom, $Rsh_maam, $Rsh_schmaam, $Rsh_schtotal, $Rsh_pratim, $Rsh_proyktnam, $Rsh_status, $Rsh_sochen, $Rsh_takziv, $Rsh_cname, $Rsh_cnametl, $Rsh_cemail)
+    {
         if (isset($this->reshumotList[$Rsh_id])) {
             $this->reshumotList[$Rsh_id]->Rsh_date = $Rsh_date;
             $this->reshumotList[$Rsh_id]->Rsh_mchlaka = $Rsh_mchlaka;
@@ -39,7 +69,8 @@ class ReshumotController {
     }
 
     // Delete
-    public function delete($Rsh_id) {
+    public function delete($Rsh_id)
+    {
         if (isset($this->reshumotList[$Rsh_id])) {
             unset($this->reshumotList[$Rsh_id]);
             return true;
@@ -48,7 +79,9 @@ class ReshumotController {
     }
 
     // List all
-    public function listAll() {
+    public function listAll()
+    {
+        echo "List all Reshumot:";
         return $this->reshumotList;
     }
 }

@@ -29,13 +29,14 @@ async function fetchData(userId) {
         console.log("!!!!!!!!!!!!")
         console.log(`Response status: ${response.status}`); // לוג של סטטוס התגובה
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         console.log('Fetched data:', data); // לוג של הנתונים שהתקבלו
         return data;
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
+        throw error; // Re-throw to allow handling by the caller
     }
 }
 

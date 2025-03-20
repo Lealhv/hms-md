@@ -16,6 +16,15 @@ class MnilvimController {
         $query = "SELECT * FROM mnilvim";
         $result = $this->conn->query($query);
         
+        if ($result === false) {
+            // Query failed
+            echo json_encode([
+                "error" => "Database query failed", 
+                "message" => $this->conn->error
+            ]);
+            return;
+        }
+        
         $mnilvim = [];
         while ($row = $result->fetch_assoc()) {
             $mnilvim[] = $row;
@@ -23,6 +32,7 @@ class MnilvimController {
         
         echo json_encode($mnilvim);
     }
+    
     
     public function readMnilvim($MN_id) {
         $query = "SELECT * FROM mnilvim WHERE MN_id = ?";
@@ -62,27 +72,23 @@ class MnilvimController {
     }
 }
 
-$requestUri = $_SERVER['REQUEST_URI'];
-$requestUri = str_replace('/MnilvimController.php', '', $requestUri);
+// Get the request path info
+$pathInfo = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+$requestMethod = $_SERVER['REQUEST_METHOD'];
 
-$basePath = '/project/hms-md/Back/controller';
-$requestUri = str_replace($basePath, '', $requestUri);
-
-$requestUri = explode("/", trim($requestUri, "/"));
+// Split the path into segments
+$pathSegments = explode('/', trim($pathInfo, '/'));
 
 $controller = new MnilvimController();
 
-if (count($requestUri) >= 1) {
-    if ($requestUri[0] === "mnilvim" && $_SERVER['REQUEST_METHOD'] === "GET" && isset($requestUri[1])) {
-        $controller->readMnilvim($requestUri[1]);
-    } elseif ($requestUri[0] === "mnilvims" && $_SERVER['REQUEST_METHOD'] === "GET") {
-        $controller->getAllMnilvim();
-    } elseif ($requestUri[0] === "mnilvim" && $_SERVER['REQUEST_METHOD'] === "POST") {
-        $controller->addMnilvim();
-    } else {
-        echo json_encode(["error" => "Invalid endpoint: " . implode('/', $requestUri)]);
-    }
+// Simple routing based on path segments
+if ($requestMethod === 'GET' && isset($pathSegments[0]) && $pathSegments[0] === 'mnilvims') {
+    $controller->getAllMnilvim();
+} elseif ($requestMethod === 'GET' && isset($pathSegments[0]) && $pathSegments[0] === 'mnilvim' && isset($pathSegments[1])) {
+    $controller->readMnilvim($pathSegments[1]);
+} elseif ($requestMethod === 'POST' && isset($pathSegments[0]) && $pathSegments[0] === 'mnilvim') {
+    $controller->addMnilvim();
 } else {
-    echo json_encode(["error" => "Invalid request"]);
+    echo json_encode(["error" => "Invalid endpoint or method", "path" => $pathInfo, "method" => $requestMethod]);
 }
 ?>

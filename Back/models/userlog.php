@@ -7,3 +7,4 @@ class UserLog {
     public $Lg_timestmpiout;
 
 }
+?>

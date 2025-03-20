@@ -27,12 +27,12 @@
 
 // window.sendReshumaToServer = sendReshumaToServer;
 
- const apiUrl = 'http://localhost/project/hms-md/Back/controller/mnllvim.php';
+ const apiUrl = 'http://localhost/project/hms-md/Back/controller/mnilvim.php';
 
-// Create a new Mnllvim
+// Create a new Mnilvim
 
 // Create
-export async function createMnllvim(MN_id, MN_pratim, MN_location) {
+export async function createMnilvim(MN_id, MN_pratim, MN_location) {
     debugger;
     const response = await fetch(`${apiUrl}/create`, {
         method: 'POST',
@@ -45,13 +45,13 @@ export async function createMnllvim(MN_id, MN_pratim, MN_location) {
 }
 
 // Read
-export async function readMnllvim(MN_id) {
+export async function readMnilvim(MN_id) {
     const response = await fetch(`${apiUrl}/read/${MN_id}`);
     return response.json();
 }
 
 // Update
-export async function updateMnllvim(MN_id, MN_pratim, MN_location) {
+export async function updateMnilvim(MN_id, MN_pratim, MN_location) {
     const response = await fetch(`${apiUrl}/update/${MN_id}`, {
         method: 'PUT',
         headers: {
@@ -63,7 +63,7 @@ export async function updateMnllvim(MN_id, MN_pratim, MN_location) {
 }
 
 // Delete
-export async function deleteMnllvim(MN_id) {
+export async function deleteMnilvim(MN_id) {
     const response = await fetch(`${apiUrl}/delete/${MN_id}`, {
         method: 'DELETE'
     });
@@ -71,7 +71,7 @@ export async function deleteMnllvim(MN_id) {
 }
 
 // List all
-export async function listAllMnllvim() {
+export async function listAllMnilvim() {
     const response = await fetch(`${apiUrl}/listAll`);
     return response.json();
 }

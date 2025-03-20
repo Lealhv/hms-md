@@ -1,6 +1,6 @@
 <?php
 
-class EndUser {
+ class EndUser {
     public $id;
     public $EU_ID;
     public $EU_Name;
@@ -11,3 +11,4 @@ class EndUser {
     public $EU_Stat;
 
 }
+?>

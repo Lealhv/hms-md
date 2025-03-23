@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,27 +18,27 @@
             --success-color: #2ecc71;
             --warning-color: #f39c12;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Heebo', Arial, sans-serif;
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
         }
-        
+
         .container {
             width: 90%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -46,13 +47,13 @@
             margin-bottom: 30px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         header h1 {
             text-align: center;
             font-weight: 700;
             font-size: 2rem;
         }
-        
+
         .card {
             background: white;
             border-radius: 8px;
@@ -60,7 +61,7 @@
             padding: 20px;
             margin-bottom: 30px;
         }
-        
+
         .filter-area {
             display: flex;
             flex-wrap: wrap;
@@ -68,20 +69,21 @@
             margin-bottom: 20px;
             align-items: center;
         }
-        
-        .filter-area input, .filter-area button {
+
+        .filter-area input,
+        .filter-area button {
             padding: 10px 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
             font-family: 'Heebo', Arial, sans-serif;
         }
-        
+
         .filter-area input {
             flex: 1;
             min-width: 150px;
         }
-        
+
         .btn {
             background-color: var(--primary-color);
             color: white;
@@ -95,27 +97,27 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .btn:hover {
             background-color: #2980b9;
         }
-        
+
         .btn-secondary {
             background-color: #95a5a6;
         }
-        
+
         .btn-secondary:hover {
             background-color: #7f8c8d;
         }
-        
+
         .btn-danger {
             background-color: var(--accent-color);
         }
-        
+
         .btn-danger:hover {
             background-color: #c0392b;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -125,30 +127,31 @@
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
-        th, td {
+
+        th,
+        td {
             padding: 15px;
             text-align: right;
         }
-        
+
         th {
             background-color: var(--secondary-color);
             color: white;
             font-weight: 500;
         }
-        
+
         tr:nth-child(even) {
             background-color: #f8f9fa;
         }
-        
+
         tr:hover {
             background-color: #e9f7fe;
         }
-        
+
         .yellow-bg {
             background-color: #fff9c4;
         }
-        
+
         .status {
             padding: 15px;
             border-radius: 8px;
@@ -159,11 +162,11 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .status i {
             color: var(--primary-color);
         }
-        
+
         #documentPreview {
             min-height: 300px;
             background-color: white;
@@ -172,28 +175,28 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
-        
+
         .footer-actions {
             display: flex;
             justify-content: flex-end;
             gap: 15px;
             margin-top: 30px;
         }
-        
+
         @media (max-width: 768px) {
             .filter-area {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .filter-area input {
                 width: 100%;
             }
-            
+
             .footer-actions {
                 flex-direction: column;
             }
-            
+
             .btn {
                 width: 100%;
                 margin-bottom: 10px;
@@ -202,13 +205,17 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <div class="container">
             <h1>מערכת ניהול מסמכים מאובטחת</h1>
         </div>
+
+        <button class="btn" onclick="goToEmployeePage(2)">לעמוד עובד</button>
+
     </header>
-    
+
     <div class="container">
         <div class="card">
             <h2><i class="fas fa-filter"></i> סינון מסמכים</h2>
@@ -220,7 +227,7 @@
                 <button class="btn" onclick="filterRecords()"><i class="fas fa-search"></i> סנן</button>
             </div>
         </div>
-        
+
         <div class="card">
             <h2><i class="fas fa-file-alt"></i> רשימת רשומות</h2>
             <table id="recordTable">
@@ -238,28 +245,31 @@
                         <td>DOC001</td>
                         <td>הנדסה</td>
                         <td>5</td>
-                        <td><button class="btn" onclick="loadDocument('DOC001')"><i class="fas fa-eye"></i> צפה</button></td>
+                        <td><button class="btn" onclick="loadDocument('DOC001')"><i class="fas fa-eye"></i> צפה</button>
+                        </td>
                     </tr>
                     <tr onclick="loadDocument('DOC002')">
                         <td>DOC002</td>
                         <td>כספים</td>
                         <td>3</td>
-                        <td><button class="btn" onclick="loadDocument('DOC002')"><i class="fas fa-eye"></i> צפה</button></td>
+                        <td><button class="btn" onclick="loadDocument('DOC002')"><i class="fas fa-eye"></i> צפה</button>
+                        </td>
                     </tr>
                     <tr onclick="loadDocument('DOC003')">
                         <td>DOC003</td>
                         <td>משאבי אנוש</td>
                         <td>7</td>
-                        <td><button class="btn" onclick="loadDocument('DOC003')"><i class="fas fa-eye"></i> צפה</button></td>
+                        <td><button class="btn" onclick="loadDocument('DOC003')"><i class="fas fa-eye"></i> צפה</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        
+
         <div class="status" id="statusMessage">
             <i class="fas fa-info-circle"></i> סטטוס: לא נבחר מסמך
         </div>
-        
+
         <div class="card">
             <h2><i class="fas fa-file-pdf"></i> תצוגה מקדימה של המסמך</h2>
             <div id="documentPreview">
@@ -270,39 +280,28 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="footer-actions">
             <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> התנתק</button>
         </div>
     </div>
 
     <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            updateUser(localStorage.getItem('userId'),
-        {
-            Lg_timestmpin:new Date().toLocaleString('sv-SE'),
-            Lg_status: 1
-        });
-        });
-
-        if (window.location.pathname === '/login') {
-    window.addEventListener('beforeunload', function () {
-        updateUser(localStorage.getItem('userId'), {
-            Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
-            Lg_status: 0
-        });
-    });
-}
+        if (document.referrer.includes("login")) {
+            document.addEventListener('DOMContentLoaded', function () {
+                updateUser(localStorage.getItem('userId'),
+                    {
+                        Lg_timestmpin: new Date().toLocaleString('sv-SE'),
+                        Lg_status: 1
+                    });
+            });
+        }
+       
         let inactivityTime = function () {
             let timer;
             window.onload = resetTimer;
             window.onmousemove = resetTimer;
             window.onkeypress = resetTimer;
-
-            function logout() {
-                alert("התנתקת מהמערכת עקב חוסר פעילות.");
-                window.location.href = 'login.html'; // הפניה לדף התחברות
-            }
 
             function resetTimer() {
                 clearTimeout(timer);
@@ -326,7 +325,7 @@
         function loadDocument(documentId) {
             // לוגיקה לטעינה והצגת המסמך
             document.getElementById('statusMessage').innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ' + documentId + ' נטען בהצלחה.';
-            
+
             // דוגמה להצגת תוכן מסמך
             document.getElementById('documentPreview').innerHTML = `
                 <div style="text-align: center; padding: 20px;">
@@ -339,10 +338,21 @@
             `;
         }
 
+        function goToEmployeePage(variable) {
+            localStorage.setItem('PR', variable);
+            window.location.href = "worker.html";
+        }
+
+
         function logout() {
-            alert("מתנתק מהמערכת...");
+                updateUser(localStorage.getItem('userId'), {
+                    Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
+                    Lg_status: 0
+                });
+             alert("מתנתק מהמערכת...");
             window.location.href = 'login.html'; // הפניה לדף התחברות
         }
     </script>
 </body>
+
 </html>

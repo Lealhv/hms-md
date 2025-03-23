@@ -213,12 +213,13 @@
                             attempts++;
                         } else {
                             if (code === verificationCode) {
-                                const PR = validUser.EU_PR;
-                                if (PR == 1) {
+                                if (validUser.EU_PR == 1) {
                                     localStorage.setItem('userId', validUser.EU_ID);
-                                    window.location.href = "employee.html";
+                                    localStorage.setItem('PR', 1);
+                                    window.location.href = "worker.html";
                                 } else {
                                     localStorage.setItem('userId', validUser.EU_ID);
+                                    localStorage.setItem('PR', 2);
                                     window.location.href = "admin.html";
                                 }
                             } else {

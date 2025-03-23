@@ -241,16 +241,10 @@
                 errorElement.innerText = "אירעה שגיאה במהלך הכניסה. אנא נסה שוב.";
                 errorElement.classList.add("active");
             }
-        } else {
-            errorElement.innerText = "Invalid username or password.";
-            errorElement.classList.add("active");
+
+
+
         }
-    } catch (error) {
-        console.error('Error during login:', error);
-        errorElement.innerText = "An error occurred during login. Please try again.";
-        errorElement.classList.add("active");
-    }
-}
 
         function clearFields() {
             document.getElementById("username").value = "";
@@ -271,21 +265,7 @@
 </body>
 
 </html>
-        }
-        function clearFields() {
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-            document.getElementById("code").value = "";
-            document.getElementById("error-message").innerText = "";
-            document.getElementById("error-message").classList.remove("active");
-            verificationCode = "";
-            attempts = 0;
-        }
-
-        function exit() {
-            window.close();
-        }
-    </script>
+</script>
 </body>
 
 </html>

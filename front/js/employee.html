@@ -142,18 +142,20 @@
         window.addEventListener('beforeunload', function () {
             updateUser(localStorage.getItem('userId'),
                 {
-                    Lg_timestmpiout: new Date().toISOString(),
+                    Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
                     Lg_status: 0
                 }
             );
         });
         document.addEventListener('DOMContentLoaded', function () {
-            updateUser(localStorage.getItem('userId'),
-        {
-            Lg_timestmpin:new Date().toISOString(),
+    if (document.referrer.includes("login")) {
+        updateUser(localStorage.getItem('userId'), {
+            Lg_timestmpin: new Date().toLocaleString('sv-SE'),
             Lg_status: 1
         });
-        });
+    }
+});
+
         function clearFields() {
         document.getElementById('record-number').value = '';
         document.getElementById('timestamp').value = '';

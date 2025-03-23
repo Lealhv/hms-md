@@ -142,7 +142,7 @@ if (count($requestUri) >= 1) {
     } elseif ($requestUri[0] === "log" && $_SERVER['REQUEST_METHOD'] === "PUT" && isset($requestUri[1])) {
         $controller->updateLog($requestUri[1]); // PUT /log/{user}
     } elseif ($requestUri[0] === "log" && $_SERVER['REQUEST_METHOD'] === "PATCH" && isset($requestUri[1])) {
-        $controller->partialUpdateLog($requestUri[1]); // PATCH /log/{user}
+        $controller->partialUpdateLog($requestUri[1]); // Post /log/{user}
     } else {
         echo json_encode(["error" => "Invalid endpoint: " . implode('/', $requestUri)]);
     }

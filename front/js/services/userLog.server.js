@@ -4,7 +4,7 @@ function updateUser(id, userData) {
     debugger
   console.log("start")
     fetch(url, {
-        method: 'Patch',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
         },

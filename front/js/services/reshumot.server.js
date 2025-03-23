@@ -1,43 +1,41 @@
 
 // Create
+// In reshumot.server.js, around line 22
 async function createReshumot(data) {
-    console.log('Sending data to the API:', data);
-    const response = await fetch(`${apiUrl}/create`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-
-    // Check if the response is not empty
-    if (response.ok) {
-        const text = await response.text();
-        console.log('Raw response text:', text);
-
-        // If the text is not empty, try to parse it as JSON
-        if (text) {
-            try {
-                const result = JSON.parse(text);
-                console.log('Request succeeded:', result);
-                return result;
-            } catch (error) {
-                console.error('Error parsing JSON:', error);
-                throw new Error('Invalid JSON response');
-            }
-        } else {
-            console.error('Response is empty');
-            throw new Error('Response is empty');
+    debugger
+    try {
+        const response = await fetch('http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        // Check if response is OK
+        if (!response.ok) {
+            const text = await response.text();
+            console.error("Server error response:", text);
+            throw new Error(`Server error: ${response.status}`);
         }
-    } else {
-        console.error('Request failed:', response.status, response.statusText);
-        throw new Error(`Request failed with status ${response.status}`);
+        
+        // Try to parse as JSON
+        let responseText = await response.text();
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            console.error("Error parsing JSON:", e);
+            console.error("Raw response:", responseText);
+            throw new Error("Invalid JSON response");
+        }
+    } catch (error) {
+        console.error("Error in createReshumot:", error);
+        throw error;
     }
 }
 
 
-window.createReshumot = createReshumot;
-window.updateReshumot = updateReshumot;
+
 // // Read
 // export async function readReshumot(Rsh_id) {
 //     const response = await fetch(`${apiUrl}/read/${Rsh_id}`);
@@ -46,7 +44,9 @@ window.updateReshumot = updateReshumot;
 
 // Update
 async function updateReshumot(Rsh_id, data) {
-    const response = await fetch(`${apiUrl}/update/${Rsh_id}`, {
+    const apiUrl = 'http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot';
+
+    const response = await fetch(`${apiUrl}/${Rsh_id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -83,3 +83,6 @@ async function updateReshumot(Rsh_id, data) {
 
 
 window.listAllReshumot = listAllReshumot;
+
+window.createReshumot = createReshumot;
+window.updateReshumot = updateReshumot;

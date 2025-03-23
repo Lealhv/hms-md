@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מערכת ניהול מסמכים</title>
+    <link rel="stylesheet" href="worker.style.css">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,13 +22,61 @@
             padding: 10px;
             border: 1px solid #ccc;
         }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left-color: #28a745;
+        }
+
+        .notification.error {
+            border-left-color: #dc3545;
+        }
+
+        .notification-icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .notification-message {
+            flex-grow: 1;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
     </style>
     <script src="services/reshumot.server.js" defer></script>
+    <script src="services/maam.server.js" defer></script>
     <script src="services/mnilvim.server.js" defer></script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- הוספת קישור לספריית html2pdf -->
 </head>
 
-<body onload="getReshumot()">
+<body onload="getData()">
     <div class="container">
         <div class="section" id="header">
             <h1>מערכת ניהול מסמכים</h1>
@@ -35,63 +85,119 @@
         </div>
 
         <div class="section" id="input-form">
+
             <h2>טופס קלט</h2>
             <form id="documentForm">
-                <label for="autoNumber">מס סודר אוטומטי:</label>
-                <input type="text" id="autoNumber" name="autoNumber" readonly><br>
+                <!-- Row 1 -->
+                <div class="form-group">
+                    <label for="department">מחלקה:</label>
+                    <input type="text" id="department" name="department" placeholder="הזן שם מחלקה">
+                </div>
 
-                <label for="timestamp">חתימת זמן אוטומטית:</label>
-                <input type="text" id="timestamp" name="timestamp" readonly><br>
+                <div class="form-group">
+                    <label for="supplierName">שם הספק:</label>
+                    <select id="supplierName" name="supplierName">
+                        <option value="" disabled selected>בחר ספק</option>
+                        <option value="ספק 1">ספק 1</option>
+                        <option value="ספק 2">ספק 2</option>
+                    </select>
+                </div>
 
-                <label for="department">מחלקה:</label>
-                <input type="text" id="department" name="department"><br>
+                <!-- Row 2 -->
+                <div class="form-group checkbox-container">
+                    <label for="exempt">עוסק פטור:</label>
+                    <input type="checkbox" id="exempt" name="exempt">
+                </div>
 
-                <label for="supplierName">שם הספק:</label>
-                <select id="supplierName" name="supplierName">
-                    <option value="ספק 1">ספק 1</option>
-                    <option value="ספק 2">ספק 2</option>
-                </select><br>
+                <div class="form-group">
+                    <label for="amount">סכום:</label>
+                    <input type="number" id="amount" name="amount" onchange="calculateVAT()" placeholder="הזן סכום">
+                </div>
 
-                <label for="requiredDate">תאריך נדרש:</label>
-                <input type="date" id="requiredDate" name="requiredDate"><br>
+                <!-- Row 3 -->
+                <div class="form-group">
+                    <label for="maam_id">מע"מ:</label>
+                    <input type="number" id="maam_id" name="vat" readonly>
+                </div>
 
-                <label for="amount">סכום:</label>
-                <input type="number" id="amount" name="amount" oninput="calculateVAT()"><br>
+                <div class="form-group">
+                    <label for="scmaan">סכום מע"מ:</label>
+                    <input type="number" id="scmaan" name="scmaan" readonly>
+                </div>
 
-                <label for="vat">מע"מ:</label>
-                <input type="number" id="vat" name="vat" readonly><br>
+                <!-- Row 4 -->
+                <div class="form-group">
+                    <label for="totalAmount">סכום כולל:</label>
+                    <input type="number" id="totalAmount" name="totalAmount" readonly>
+                </div>
 
-                <label for="exempt">עוסק פטור:</label>
-                <input type="checkbox" id="exempt" name="exempt"><br>
+                <div class="form-group">
+                    <label for="deliveryPlace">מקום אספקה:</label>
+                    <input type="text" id="deliveryPlace" name="deliveryPlace" placeholder="הזן מקום אספקה">
+                </div>
 
-                <label for="totalAmount">סכום כולל:</label>
-                <input type="number" id="totalAmount" name="totalAmount" readonly><br>
+                <!-- Row 5 -->
+                <div class="form-group">
+                    <label for="agentNumber">מס סוכן:</label>
+                    <input type="text" id="agentNumber" name="agentNumber" placeholder="הזן מספר סוכן">
+                </div>
 
-                <label for="deliveryPlace">מקום אספקה:</label>
-                <input type="text" id="deliveryPlace" name="deliveryPlace"><br>
+                <div class="form-group">
+                    <label for="contactName">שם סוכן:</label>
+                    <input type="text" id="contactName" name="contactName" placeholder="הזן שם סוכן">
+                </div>
 
-                <label for="contactName">שם איש הקשר:</label>
-                <input type="text" id="contactName" name="contactName"><br>
+                <!-- Row 6 -->
+                <div class="form-group">
+                    <label for="contactPhone">טלפון סוכן:</label>
+                    <input type="text" id="contactPhone" name="contactPhone" placeholder="הזן טלפון סוכן">
+                </div>
 
-                <label for="contactPhone">טלפון איש קשר:</label>
-                <input type="text" id="contactPhone" name="contactPhone"><br>
+                <div class="form-group">
+                    <label for="contactEmail">מייל סוכן:</label>
+                    <input type="email" id="contactEmail" name="contactEmail" placeholder="הזן מייל סוכן">
+                </div>
 
-                <label for="contactEmail">מייל איש קשר:</label>
-                <input type="email" id="contactEmail" name="contactEmail"><br>
+                <!-- Row 7 -->
+                <div class="form-group">
+                    <label for="projectName">שם פרויקט:</label>
+                    <input type="text" id="projectName" name="projectName" placeholder="הזן שם פרויקט">
+                </div>
 
-                <label for="projectName">שם פרויקט:</label>
-                <input type="text" id="projectName" name="projectName"><br>
+                <div class="form-group">
+                    <label for="budgetItem">תקציב:</label>
+                    <input type="text" id="budgetItem" name="budgetItem" placeholder="הזן תקציב">
+                </div>
 
-                <label for="agentNumber">מס סוכן:</label>
-                <input type="text" id="agentNumber" name="agentNumber"><br>
+                <!-- Hidden fields -->
+                <input type="hidden" id="autoNumber" name="autoNumber">
+                <input type="hidden" id="timestamp" name="timestamp">
 
-                <label for="budgetItem">סעיף תקציבי:</label>
-                <input type="text" id="budgetItem" name="budgetItem"><br>
-
-                <button type="button" onclick="clearFields()">ניקוי שדות הכל</button>
-                <button type="button" onclick="saveData()">שמירת נתונים</button>
-                <button type="button" onclick="printData()">הדפסה</button>
-                <button type="button" onclick="exit()">יציאה</button>
+                <!-- Buttons -->
+                <div class="btn-container">
+                    <button type="button" class="btn-primary" onclick="saveData()">
+                        <i class="fas fa-save"></i> שמירת נתונים
+                    </button>
+                    <button type="button" class="btn-secondary"
+                        onclick="document.getElementById('file-input').click();">
+                        <i class="fas fa-upload"></i> העלאת מסמכים
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="printData()">
+                        <i class="fas fa-print"></i> הדפסה
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="exportToPDF()">
+                        <i class="fas fa-file-pdf"></i> ייצוא PDF
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i> ייצוא EXCEL
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="clearFields()">
+                        <i class="fas fa-eraser"></i> ניקוי
+                    </button>
+                    <button type="button" class="btn-danger" onclick="exit()">
+                        <i class="fas fa-sign-out-alt"></i> יציאה
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -242,32 +348,56 @@
                 </div>
             </form>
         </div>
-        
-        <div id="formContainer"></div> <!-- אלמנט מיכל עבור הטפסים -->
-        
+
+        <div id="formContainer"></div> <!-- הוספת אלמנט זה -->
+
+        <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)">
+    </div>
+
     <script>
+        function getData() {
+            console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            getReshumot();
+            getMaam();
+
+        }
         function calculateVAT() {
             const amount = document.getElementById('amount').value;
-            const vat = amount * 0.17; // לדוגמה, מע"מ 17%
-            document.getElementById('vat').value = vat;
+            let maam = document.getElementById('maam_id').value;
+            maam = maam / 100;
+            const vat = amount * maam; // לדוגמה, מע"מ 17%
+            // document.getElementById('vat').value = vat;
+            document.getElementById('scmaan').value = vat;
             document.getElementById('totalAmount').value = parseFloat(amount) + vat;
         }
-
         function clearFields() {
-            document.getElementById('documentForm').reset();
+            // Check if elements exist before trying to set their value
+            if (document.getElementById('autoNumber')) document.getElementById('autoNumber').value = '';
+            if (document.getElementById('timestamp')) document.getElementById('timestamp').value = '';
+            if (document.getElementById('department')) document.getElementById('department').value = '';
+            if (document.getElementById('supplierName')) document.getElementById('supplierName').value = 'ספק 1';
+            // Remove or replace this line since requiredDate doesn't exist
+            // if (document.getElementById('requiredDate')) document.getElementById('requiredDate').value = '';
+            if (document.getElementById('amount')) document.getElementById('amount').value = '';
+            // Change 'vat' to 'maam_id' since that's what's in your HTML
+            // if (document.getElementById('maam_id')) document.getElementById('maam_id').value = '';
+            if (document.getElementById('scmaan')) document.getElementById('scmaan').value = '';
+            if (document.getElementById('totalAmount')) document.getElementById('totalAmount').value = '';
+            if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = '';
+            if (document.getElementById('contactName')) document.getElementById('contactName').value = '';
+            if (document.getElementById('contactPhone')) document.getElementById('contactPhone').value = '';
+            if (document.getElementById('contactEmail')) document.getElementById('contactEmail').value = '';
+            if (document.getElementById('projectName')) document.getElementById('projectName').value = '';
+            if (document.getElementById('agentNumber')) document.getElementById('agentNumber').value = '';
+            if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = '';
+
+            // If you have a checkbox for exempt, you might want to uncheck it
+            if (document.getElementById('exempt')) document.getElementById('exempt').checked = false;
         }
+
 
         function clearField(fieldId) {
             document.getElementById(fieldId).value = '';
-        }
-/*************  ✨ Codeium Command ⭐  *************/
-        /**
-         * Saves the data from the form to the server.
-         * @returns {void}
-         */
-/******  5dd1f630-969f-4cc7-9fdb-f97b0cdce5dc  *******/
-        function saveData() {
-            alert("נתונים נשמרו בהצלחה!");
         }
 
         function printData() {
@@ -278,15 +408,216 @@
             window.location.href = 'login.html'; // דף הלוגאין
         }
 
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const content = e.target.result;
+                    const rows = content.split('\n').map(row => row.split(','));
+                    const headers = rows[0].map(header => header.trim());
+                    const data = rows[1].map(value => value.trim());
+                    const expectedFields = [
+                        "Record Number", "Timestamp", "Department", "Supplier Name", "Amount",
+                        "VAT", "Total Amount", "Delivery Location", "Contact Name",
+                        "Contact Phone", "Contact Email", "Project Name", "Agent Number", "Budget Item"
+                    ];
+                    if (headers.length !== expectedFields.length) {
+                        showNotification("הקובץ שהועלה אינו תואם לשדות הדרושים");
+                        return;
+                    }
+
+                    for (let i = 0; i < headers.length; i++) {
+                        const fieldId = headers[i].toLowerCase().replace(/ /g, '-');
+                        if (document.getElementById(fieldId)) {
+                            document.getElementById(fieldId).value = data[i];
+                        }
+                    }
+                    showNotification("הקובץ הועלה ויובאו נתונים בהצלחה!");
+                };
+                reader.readAsText(file);
+            }
+            event.target.value = '';
+        }
+
+        function showNotification(message, type = 'info') {
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.remove();
+            });
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            let icon = 'info-circle';
+            if (type === 'success') {
+                icon = 'check-circle';
+            } else if (type === 'error') {
+                icon = 'exclamation-circle';
+            }
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="notification-message">${message}</div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+
         function deleteDocument() {
             alert("המסמך נמחק.");
         }
 
+        async function getMaam() {
+            try {
+                const maam = await listAllMaam();
+
+                // Log the object properly without string concatenation
+                console.log("Maam data:", maam);
+
+                // Check if maam data exists and has at least one entry
+                if (maam && maam.length > 0 && maam[0].maam_value) {
+                    // Update the VAT percentage field with the value from maam[0].maam_v
+                    const vatPercentage = maam[0].maam_value;
+                    document.getElementById('maam_id').value = vatPercentage;
+
+                    // If amount is already entered, recalculate the VAT amount
+                    const amount = document.getElementById('amount').value;
+                    // if (amount) {
+                    //     calculateVAT(amount, vatPercentage);
+                    // }
+                }
+
+                return maam;
+            } catch (error) {
+                console.error("Error fetching maam data:", error);
+                return null;
+            }
+        }
+
+
+
+        // function exportToPDF() {
+        //     const element = document.querySelector('.container');
+        //     html2pdf()
+        //         .from(element)
+        //         .save('purchase_request.pdf')
+        //         .then(() => {
+        //             showNotification('PDF exported successfully!', 'success');
+        //         });
+        // }
+
+        function exportToPDF() {
+            const element = document.querySelector('.container');
+            html2pdf()
+                .from(element)
+                .save('purchase_request.pdf')
+                .then(() => {
+                    showNotification('הקובץ PDF יוצא בהצלחה!');
+                });
+        }
+
+        function exportToExcel() {
+            const data = [
+                ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Amount', 'VAT', 'Total Amount', 'Delivery Location', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Agent Number', 'Budget Item'],
+                [
+                    document.getElementById('autoNumber').value,
+                    document.getElementById('timestamp').value,
+                    document.getElementById('department').value,
+                    document.getElementById('supplierName').value,
+                    document.getElementById('amount').value,
+                    document.getElementById('vat').value,
+                    document.getElementById('totalAmount').value,
+                    document.getElementById('deliveryPlace').value,
+                    document.getElementById('contactName').value,
+                    document.getElementById('contactPhone').value,
+                    document.getElementById('contactEmail').value,
+                    document.getElementById('projectName').value,
+                    document.getElementById('agentNumber').value,
+                    document.getElementById('budgetItem').value
+                ]
+            ];
+
+            let csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "purchase_request.csv");
+            document.body.appendChild(link);
+            link.click(); // יוצר את ההורדה אוטומטית
+            document.body.removeChild(link); // מסיר את הלינק לאחר ההורדה
+        }
+
+
+
+        async function saveData() {
+            const recordId = document.getElementById('autoNumber').value;
+
+            // Fetch all records to check if the record already exists
+            const records = await listAllReshumot();
+            const existingRecord = records.find(record => record.Rsh_id === recordId);
+
+            const data = {
+                Rsh_id: recordId,
+                Rsh_date: document.getElementById('timestamp').value,
+                Rsh_mchlaka: document.getElementById('department').value,
+                Rsh_sapak: document.getElementById('supplierName').value,
+                Rsh_patoor: document.getElementById('exempt').checked ? '1' : '0', // Use the checkbox value
+                Rsh_schoom: document.getElementById('amount').value,
+                Rsh_maam: document.getElementById('maam_id').value, // Changed from 'vat' to 'maam_id'
+                Rsh_schmaam: document.getElementById('scmaan').value, // Changed from 'totalAmount' to 'scmaan'
+                Rsh_schtotal: document.getElementById('totalAmount').value,
+                Rsh_aspaka: document.getElementById('deliveryPlace').value, // Changed from 'contactName' to 'deliveryPlace'
+                Rsh_proyktnam: document.getElementById('projectName').value,
+                Rsh_status: document.getElementById('contactEmail').value,
+                Rsh_sochen: document.getElementById('contactName').value, // Changed from 'contactPhone' to 'contactName'
+                Rsh_takziv: document.getElementById('budgetItem').value, // Changed from 'agentNumber' to 'budgetItem'
+                Rsh_cname: document.getElementById('contactName').value, // Changed from 'budgetItem' to 'contactName'
+                Rsh_cnametl: document.getElementById('contactPhone').value, // Added this field
+                Rsh_cemail: document.getElementById('contactEmail').value
+            };
+
+            console.log('Data to save:', data);
+
+            try {
+                if (existingRecord) {
+                    // If record exists, update it
+                    await updateReshumot(data);
+                    showNotification('רשומה עודכנה בהצלחה!');
+                } else {
+                    // If record does not exist, create it
+                    await createReshumot(data);
+                    showNotification('רשומה נשמרה בהצלחה!');
+                }
+                clearFields(); // Clear fields after saving
+            } catch (error) {
+                console.error('Error saving Reshuma:', error);
+                showNotification('שגיאה בשמירת רשומה!');
+            }
+        }
+
         // פונקציה לניהול הרשאות
-        setTimeout(() => {
-            alert("אין פעילות בדף, תתבצע יציאה אוטומטית.");
-            exit();
-        }, 600000); // 10 דקות
+        // setTimeout(() => {
+        //     alert("אין פעילות בדף, תתבצע יציאה אוטומטית.");
+        //     exit();
+        // }, 600000); // 10 דקות
 
         // פונקציה לטעינת רשומות
         async function getReshumot() {
@@ -347,13 +678,15 @@
  
         window.onload = function () {
             initializeForm();
-            getReshumot().catch(error => {
-                console.error('Error in getReshumot:', error);
+            try {
+                getData();
+            } catch (error) {
+                console.error('Error in getData:', error);
                 const reshumotListDiv = document.getElementById('reshumotList');
                 if (reshumotListDiv) {
                     reshumotListDiv.innerHTML = '<p>Failed to load data</p>';
                 }
-            });
+            }
         };
 
         function initializeForm() {
@@ -373,7 +706,7 @@
                 }
             });
 
-            calculateVAT();
+            // calculateVAT();
         }
 
 

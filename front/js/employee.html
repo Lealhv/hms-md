@@ -362,19 +362,11 @@
         window.addEventListener('beforeunload', function () {
             updateUser(localStorage.getItem('userId'),
                 {
-                    Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
+                    Lg_timestmpiout: new Date().toISOString(),
                     Lg_status: 0
                 }
             );
         });
-        document.addEventListener('DOMContentLoaded', function () {
-    if (document.referrer.includes("login")) {
-        updateUser(localStorage.getItem('userId'), {
-            Lg_timestmpin: new Date().toLocaleString('sv-SE'),
-            Lg_status: 1
-        });
-    }
-});
 
         function clearFields() {
             document.getElementById('record-number').value = '';
@@ -409,7 +401,7 @@
                 Rsh_maam: document.getElementById('vat').value,
                 Rsh_schmaam: document.getElementById('total-amount').value,
                 Rsh_schtotal: document.getElementById('total-amount').value,
-                Rsh_pratim: document.getElementById('contact-name').value,
+                Rsh_aspaka: document.getElementById('contact-name').value,
                 Rsh_proyktnam: document.getElementById('project-name').value,
                 Rsh_status: document.getElementById('contact-email').value,
                 Rsh_sochen: document.getElementById('contact-phone').value,
@@ -676,7 +668,7 @@
             document.getElementById('vat').value = record.Rsh_maam;
             document.getElementById('total-amount').value = record.Rsh_schmaam;
             document.getElementById('delivery-location').value = record.Rsh_schtotal;
-            document.getElementById('contact-name').value = record.Rsh_pratim;
+            document.getElementById('contact-name').value = record.Rsh_aspaka;
             document.getElementById('contact-phone').value = record.Rsh_sochen;
             document.getElementById('contact-email').value = record.Rsh_cemail;
             document.getElementById('project-name').value = record.Rsh_proyktnam;

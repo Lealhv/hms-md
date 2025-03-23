@@ -201,37 +201,37 @@
             </form>
         </div>
 
-<!-- ---------------------------------------------------- -->
-<div class="card" id="documents-area">
-    <h2><i class="fas fa-folder-open"></i>מסמכים נלווים</h2>
-    <table id="documentsTable">
-        <thead>
-            <tr>
-                <th>שם מסמך</th>
-                <th>תאריך הוספה</th>
-                <th>פעולה</th>
-            </tr>
-        </thead>
-        <tbody id="documents-body">
-            <td><button onclick="deleteDocument()">מחק</button></td>
+        <!-- ---------------------------------------------------- -->
+        <div class="card" id="documents-area">
+            <h2><i class="fas fa-folder-open"></i>מסמכים נלווים</h2>
+            <table id="documentsTable">
+                <thead>
+                    <tr>
+                        <th>שם מסמך</th>
+                        <th>תאריך הוספה</th>
+                        <th>פעולה</th>
+                    </tr>
+                </thead>
+                <tbody id="documents-body">
+                    <td><button onclick="deleteDocument()">מחק</button></td>
 
-        </tbody>
-    </table>
-</div>
+                </tbody>
+            </table>
+        </div>
 
-<div class="card hidden" id="document-display-area">
-    <h2>
-        <i class="fas fa-file-alt"></i> 
-        <span id="preview-document-name">תצוגה מקדימה של מסמך</span>
-        <button class="action-btn" onclick="closePreview()" style="margin-right: auto;">
-            <i class="fas fa-times"></i>
-        </button>
-    </h2>
-    <iframe id="document-viewer" width="100%" height="500px"></iframe>
-</div>
+        <div class="card hidden" id="document-display-area">
+            <h2>
+                <i class="fas fa-file-alt"></i>
+                <span id="preview-document-name">תצוגה מקדימה של מסמך</span>
+                <!-- <button class="action-btn" onclick="closePreview()" style="margin-right: auto;"> -->
+                    <i class="fas fa-times"></i>
+                </button>
+            </h2>
+            <iframe id="document-viewer" width="100%" height="500px"></iframe>
+        </div>
 
         <!---------------------------------------------  -->
-                
+
 
 
         <!-- <div class="card" id="documents-area">
@@ -287,22 +287,22 @@
                     <label for="Rsh_Date">חתימת זמן אוטומטית:</label>
                     <input type="text" id="Rsh_Date" name="Rsh_Date">
                     <button type="button" onclick="clearField('Rsh_Date')">נקה</button>
-                </div>  
-                 <div class="field-container">
+                </div>
+                <div class="field-container">
                     <label for="Rsh_mchlaka">מחלקה:</label>
                     <input type="text" id="Rsh_mchlaka" name="Rsh_mchlaka">
                     <button type="button" onclick="clearField('Rsh_mchlaka')">נקה</button>
-                </div>  
-                 <div class="field-container">
+                </div>
+                <div class="field-container">
                     <label for="Rsh_sapak">שם הספק:</label>
                     <input type="text" id="Rsh_sapak" name="Rsh_sapak">
                     <button type="button" onclick="clearField('Rsh_sapak')">נקה</button>
-                </div> 
-                  <div class="field-container">
+                </div>
+                <div class="field-container">
                     <label for="Rsh_proyktnam">תאריך נדרש:</label>
                     <input type="text" id="Rsh_proyktnam" name="Rsh_proyktnam">
                     <button type="button" onclick="clearField('Rsh_proyktnam')">נקה</button>
-                </div> 
+                </div>
                 <div class="field-container">
                     <label for="Rsh_sapak">ספק:</label>
                     <input type="text" id="Rsh_sapak" name="Rsh_sapak">
@@ -621,61 +621,61 @@
 
         // פונקציה לטעינת רשומות
         async function getReshumot() {
-        try {
-            if (typeof listAllReshumot !== 'function') {
-                console.error('Error: listAllReshumot function is not defined');
+            try {
+                if (typeof listAllReshumot !== 'function') {
+                    console.error('Error: listAllReshumot function is not defined');
+                    const reshumotListDiv = document.getElementById('reshumotList');
+                    if (reshumotListDiv) {
+                        reshumotListDiv.innerHTML = '<p>Error loading data: Function not available</p>';
+                    }
+                    return;
+                }
+
+                const reshumotListDiv = document.getElementById('reshumotList');
+                if (!reshumotListDiv) {
+                    console.error('reshumotList element not found');
+                    return;
+                }
+
+                reshumotListDiv.innerHTML = '<p>Loading data...</p>';
+
+                let reshumot;
+                try {
+                    reshumot = await listAllReshumot();
+                    console.log('Received reshumot data:', reshumot);
+                    fillForm(reshumot);
+                } catch (e) {
+                    console.error('Error calling listAllReshumot:', e);
+                    reshumotListDiv.innerHTML = '<p>Error fetching data: ' + e.message + '</p>';
+                    return;
+                }
+
+                if (!reshumot) {
+                    console.warn('Reshumot data is null or undefined');
+                    reshumotListDiv.innerHTML = '<p>No data available</p>';
+                    return;
+                }
+
+                if (Array.isArray(reshumot)) {
+                    if (reshumot.length === 0) {
+                        reshumotListDiv.innerHTML = '<p>No records found</p>';
+                    } else {
+                        reshumotListDiv.innerHTML = reshumot.map(item => `<p>${item || 'Unnamed record'}</p>`).join('');
+                    }
+                } else {
+                    console.warn('Reshumot is not an array:', reshumot);
+                    reshumotListDiv.innerHTML = `<p>Data received in unexpected format</p>`;
+                    console.log('Data type:', typeof reshumot);
+                }
+            } catch (error) {
+                console.error('Error in getReshumot function:', error);
                 const reshumotListDiv = document.getElementById('reshumotList');
                 if (reshumotListDiv) {
-                    reshumotListDiv.innerHTML = '<p>Error loading data: Function not available</p>';
+                    reshumotListDiv.innerHTML = '<p>Error loading data: ' + error.message + '</p>';
                 }
-                return;
-            }
-
-            const reshumotListDiv = document.getElementById('reshumotList');
-            if (!reshumotListDiv) {
-                console.error('reshumotList element not found');
-                return;
-            }
-
-            reshumotListDiv.innerHTML = '<p>Loading data...</p>';
-
-            let reshumot;
-            try {
-                reshumot = await listAllReshumot();
-                console.log('Received reshumot data:', reshumot);
-                fillForm(reshumot);
-            } catch (e) {
-                console.error('Error calling listAllReshumot:', e);
-                reshumotListDiv.innerHTML = '<p>Error fetching data: ' + e.message + '</p>';
-                return;
-            }
-
-            if (!reshumot) {
-                console.warn('Reshumot data is null or undefined');
-                reshumotListDiv.innerHTML = '<p>No data available</p>';
-                return;
-            }
-
-            if (Array.isArray(reshumot)) {
-                if (reshumot.length === 0) {
-                    reshumotListDiv.innerHTML = '<p>No records found</p>';
-                } else {
-                    reshumotListDiv.innerHTML = reshumot.map(item => `<p>${item || 'Unnamed record'}</p>`).join('');
-                }
-            } else {
-                console.warn('Reshumot is not an array:', reshumot);
-                reshumotListDiv.innerHTML = `<p>Data received in unexpected format</p>`;
-                console.log('Data type:', typeof reshumot);
-            }
-        } catch (error) {
-            console.error('Error in getReshumot function:', error);
-            const reshumotListDiv = document.getElementById('reshumotList');
-            if (reshumotListDiv) {
-                reshumotListDiv.innerHTML = '<p>Error loading data: ' + error.message + '</p>';
             }
         }
-    }
- 
+
         window.onload = function () {
             initializeForm();
             try {
@@ -711,88 +711,88 @@
 
 
         function fillForm(data) {
-        document.getElementById('Rsh_proyktnam').value = data.proyktnam || '';
-        document.getElementById('Rsh_sapak').value = data.sapak || '';
-        document.getElementById('Rsh_schmaam').value = data.schmaam || '';
-        document.getElementById('Rsh_schoom').value = data.schoom || '';
-        document.getElementById('Rsh_schtotal').value = data.schtotal || '';
-        document.getElementById('Rsh_sochen').value = data.sochen || '';
-        document.getElementById('Rsh_status').value = data.status || '';
-        document.getElementById('Rsh_takziv').value = data.takziv || '';
-    }
-// -----------------------------------
+            document.getElementById('Rsh_proyktnam').value = data.proyktnam || '';
+            document.getElementById('Rsh_sapak').value = data.sapak || '';
+            document.getElementById('Rsh_schmaam').value = data.schmaam || '';
+            document.getElementById('Rsh_schoom').value = data.schoom || '';
+            document.getElementById('Rsh_schtotal').value = data.schtotal || '';
+            document.getElementById('Rsh_sochen').value = data.sochen || '';
+            document.getElementById('Rsh_status').value = data.status || '';
+            document.getElementById('Rsh_takziv').value = data.takziv || '';
+        }
+        // -----------------------------------
 
 
 
-            async function loadDocuments() {
-                document.getElementById('documents-loading').classList.remove('hidden');
-    document.getElementById('documentsTable').classList.add('hidden');
-    document.getElementById('empty-documents').classList.add('hidden');
-    
-       
-        const documents = await listAllMnilvim(); // קריאה לשרת
-        document.getElementById('documents-loading').classList.add('hidden');
-        
-        const tbody = document.getElementById('documents-body');
-        tbody.innerHTML = ''; // ניקוי התוכן הקודם
+        async function loadDocuments() {
+            // document.getElementById('documents-loading').classList.remove('hidden');
+            document.getElementById('documentsTable').classList.add('hidden');
+            // document.getElementById('empty-documents').classList.add('hidden');
 
-        documents.forEach(doc => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
+
+            const documents = await listAllMnilvim(); // קריאה לשרת
+            // document.getElementById('documents-loading').classList.add('hidden');
+
+            const tbody = document.getElementById('documents-body');
+            tbody.innerHTML = ''; // ניקוי התוכן הקודם
+
+            documents.forEach(doc => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                 <td>${doc.MN_pratim}</td>
                 <td>${doc.MN_dateAdd}</td>
                 <td><button onclick="deleteDocument('${doc.MN_id}')">מחק</button></td>
             `;
-            row.onclick = () => showDocumentPreview(doc.MN_location, doc.MN_type); // תצוגה מקדימה
-            tbody.appendChild(row);
-        });
-    }
+                row.onclick = () => showDocumentPreview(doc.MN_location, doc.MN_type); // תצוגה מקדימה
+                tbody.appendChild(row);
+            });
+        }
 
-  function showDocumentPreview(url, type) {
-    const viewer = document.getElementById('document-viewer');
-    const displayArea = document.getElementById('document-display-area');
-    
-    // נקה את התוכן הקודם
-    viewer.src = "about:blank";
-    displayArea.classList.remove('hidden');
-    
-    // בדוק את סוג הקובץ
-    
-    
-    switch(type) {
-        case 'pdf':
-            // PDF יכול להיות מוצג ישירות
-            viewer.src = url;
-            
-       
-        case 'doc':
-        case 'docx':
-        case 'xls':
-        case 'xlsx':
-            // נסה להשתמש ב-Office Online Viewer (Microsoft)
-            const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
-            viewer.src = officeViewerUrl;
-            break;
-            
-}
-}
+        function showDocumentPreview(url, type) {
+            const viewer = document.getElementById('document-viewer');
+            const displayArea = document.getElementById('document-display-area');
 
-    // function showDocumentPreview(url) {
-    //     const viewer = document.getElementById('document-viewer');
-    //     viewer.src = url;
-    //     document.getElementById('document-display-area').classList.remove('hidden');
-    // }
+            // נקה את התוכן הקודם
+            viewer.src = "about:blank";
+            displayArea.classList.remove('hidden');
 
-    async function deleteDocument(id) {
-        // כאן תוסיף את הקוד למחיקת המסמך מהשרת
-        alert(`מסמך עם ID ${id} נמחק!`);
-        loadDocuments(); // טען מחדש את המסמכים
-    }
+            // בדוק את סוג הקובץ
 
-    // טען את המסמכים כאשר הדף נטען
-    window.onload = loadDocuments;
-            // ------------------------
-            
+
+            switch (type) {
+                case 'pdf':
+                    // PDF יכול להיות מוצג ישירות
+                    viewer.src = url;
+
+
+                case 'doc':
+                case 'docx':
+                case 'xls':
+                case 'xlsx':
+                    // נסה להשתמש ב-Office Online Viewer (Microsoft)
+                    const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+                    viewer.src = officeViewerUrl;
+                    break;
+
+            }
+        }
+
+        // function showDocumentPreview(url) {
+        //     const viewer = document.getElementById('document-viewer');
+        //     viewer.src = url;
+        //     document.getElementById('document-display-area').classList.remove('hidden');
+        // }
+
+        async function deleteDocument(id) {
+            // כאן תוסיף את הקוד למחיקת המסמך מהשרת
+            alert(`מסמך עם ID ${id} נמחק!`);
+            loadDocuments(); // טען מחדש את המסמכים
+        }
+
+        // טען את המסמכים כאשר הדף נטען
+        window.onload = loadDocuments;
+        // ------------------------
+
         // function fillForm(data) {
         //     const container = document.getElementById('formContainer');
         //     container.innerHTML = ''; // נקה את התוכן הקודם
@@ -830,8 +830,8 @@
             );
         });
         document.addEventListener('DOMContentLoaded', function () {
-              // Try to load mnilvim
-              if (typeof listAllMnilvim === 'function') {
+            // Try to load mnilvim
+            if (typeof listAllMnilvim === 'function') {
                 listAllMnilvim()
                     .then(documents => {
                         console.log('Documents loaded:', documents); // לוג של המסמכים שהוטענו
@@ -867,7 +867,7 @@
 
                             const MN_dateAddCell = row.insertCell(5);
                             locationCell.textContent = doc.MN_dateAdd || 'N/A'; // הנחה שיש שדה בשם 'MN_location'
-                           
+
                             const MN_typeCell = row.insertCell(6);
                             locationCell.textContent = doc.MN_type || 'N/A'; // הנחה שיש שדה בשם 'MN_location'
 

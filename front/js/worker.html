@@ -30,6 +30,7 @@
         <div class="section" id="header">
             <h1>מערכת ניהול מסמכים</h1>
             <p>ברוכים הבאים למערכת לניהול מסמכים.</p>
+            <button id="conditionalButton" class="btn" onclick="goToAdmin()">לעמוד מנהל</button>
         </div>
 
         <div class="section" id="input-form">
@@ -325,6 +326,41 @@
                 console.warn('Data is not an array or is empty:', data);
             }
         }
+
+
+        window.addEventListener('beforeunload', function () {
+            updateUser(localStorage.getItem('userId'),
+                {
+                    Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
+                    Lg_status: 0
+                }
+            );
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            checkPR();
+            if (document.referrer.includes("login")) {
+                updateUser(localStorage.getItem('userId'), {
+                    Lg_timestmpin: new Date().toLocaleString('sv-SE'),
+                    Lg_status: 1
+                });
+            }
+        });
+
+        function checkPR() {
+
+            if (localStorage.getItem('PR') === '2') {
+                document.getElementById('conditionalButton').style.display = 'block';
+            } else {
+                document.getElementById('conditionalButton').style.display = 'none';
+            }
+        }
+
+        function goToAdmin() {
+            window.location.href = 'admin.html';
+        }
+
+
+
     </script>
 </body>
 

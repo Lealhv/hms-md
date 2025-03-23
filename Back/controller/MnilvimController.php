@@ -22,21 +22,29 @@ class MnilvimController
         if (!isset(
             $data['MN_id'],
             $data['MN_pratim'],
-            $data['MN_location']
+            $data['MN_location'],
+            $data['MN_shyooch'],
+            $data['MN_status'],
+            $data['MN_dateAdd'],
+            $data['MN_type']
         )) {
             echo json_encode(['error' => 'Missing required parameters']);
             return;
         }
 
         // Create the Mnilvim object and save to database
-        $query = "INSERT INTO mnilvim (MN_id, MN_pratim, MN_location) VALUES (?, ?, ?)";
+        $query = "INSERT INTO mnilvim (MN_id, MN_pratim, MN_location, MN_shyooch, MN_status, MN_dateAdd,MN_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "sss",
+            "sssssss",
             $data['MN_id'],
             $data['MN_pratim'],
-            $data['MN_location']
+            $data['MN_location'],
+            $data['MN_shyooch'],
+            $data['MN_status'],
+            $data['MN_dateAdd'],
+            $data['MN_type']
         );
 
         if ($stmt->execute()) {
@@ -69,7 +77,11 @@ class MnilvimController
         // Check if all required keys exist
         if (!isset(
             $data['MN_pratim'],
-            $data['MN_location']
+            $data['MN_location'],
+            $data['MN_shyooch'],
+            $data['MN_status'],
+            $data['MN_dateAdd'],
+            $data['MN_type']
         )) {
             echo json_encode(['error' => 'Missing required parameters']);
             return;
@@ -79,9 +91,13 @@ class MnilvimController
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "sss",
+            "sssssss",
             $data['MN_pratim'],
             $data['MN_location'],
+            $data['MN_shyooch'],
+            $data['MN_status'],
+            $data['MN_dateAdd'],
+            $data['MN_type'],
             $MN_id
         );
 

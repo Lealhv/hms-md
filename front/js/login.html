@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login</title>
+    <title>כניסת משתמש</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="services/login.server.js" defer></script>
     <style>
@@ -164,36 +164,31 @@
 </head>
 
 <body>
-
     <div class="container">
-        <h2>Welcome Back</h2>
+        <h2>ברוך הבא</h2>
         <div id="error-message" class="error"></div>
-
         <div class="input-group">
             <i class="fas fa-user"></i>
-            <input type="text" id="username" placeholder="Username" required>
+            <input type="text" id="username" placeholder="שם" required>
         </div>
-
         <div class="input-group">
             <i class="fas fa-lock"></i>
-            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="password" placeholder="סיסמה" required>
         </div>
-
         <div class="input-group">
             <i class="fas fa-key"></i>
-            <input type="text" id="code" placeholder="Verification Code" required>
+            <input type="text" id="code" placeholder="קוד אימות" required>
         </div>
-
         <button class="btn btn-primary" onclick="login()">
-            <i class="fas fa-sign-in-alt"></i> Login
+            <i class="fas fa-sign-in-alt"></i> כניסה
         </button>
 
         <div class="button-group">
             <button class="btn btn-secondary" onclick="clearFields()">
-                <i class="fas fa-redo"></i> Clear
+                <i class="fas fa-redo"></i> ניקוי
             </button>
             <button class="btn btn-danger" onclick="exit()">
-                <i class="fas fa-times"></i> Exit
+                <i class="fas fa-times"></i> יציאה
             </button>
         </div>
     </div>
@@ -202,43 +197,48 @@
         let attempts = 0;
         let verificationCode = "";
         async function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-    const code = document.getElementById("code").value;
-    const errorElement = document.getElementById("error-message");
-    debugger;
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const code = document.getElementById("code").value;
+            const errorElement = document.getElementById("error-message");
 
-    try {
-        const validUser = await fetchData(password); 
-        debugger;
+            try {
+                const validUser = await fetchData(password);
 
-        if (username === validUser.EU_Name && parseInt(password) === validUser.EU_PW) {
-            debugger;
-            if (attempts < 6) {
-                if (verificationCode === "") {
-                    verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a random 6-digit code
-                    alert(`Verification code sent: ${verificationCode}`); // Simulate sending SMS
-                    attempts++;
-                } else {
-                    if (code === verificationCode) {
-                        const PR = validUser.EU_PR;
-                        console.log(PR);
-                        if (PR == 1) {
-                            localStorage.setItem('userId', validUser.EU_ID);
-                            window.location.href = "employee.html";
+                if (username === validUser.EU_Name && parseInt(password) === validUser.EU_PW) {
+                    if (attempts < 6) {
+                        if (verificationCode === "") {
+                            verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+                            alert(`קוד האימות נשלח: ${verificationCode}`);
+                            attempts++;
                         } else {
-                            localStorage.setItem('userId', validUser.EU_ID);
-                            window.location.href = "admin.html";
+                            if (code === verificationCode) {
+                                const PR = validUser.EU_PR;
+                                if (PR == 1) {
+                                    localStorage.setItem('userId', validUser.EU_ID);
+                                    window.location.href = "employee.html";
+                                } else {
+                                    localStorage.setItem('userId', validUser.EU_ID);
+                                    window.location.href = "admin.html";
+                                }
+                            } else {
+                                errorElement.innerText = "קוד אימות לא תקין. קוד חדש נשלח.";
+                                errorElement.classList.add("active");
+                                verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+                                alert(`קוד אימות חדש נשלח: ${verificationCode}`);
+                            }
                         }
                     } else {
-                        errorElement.innerText = "Invalid verification code. A new code has been sent.";
+                        errorElement.innerText = "יותר מדי ניסיונות. אנא המתן 10 דקות.";
                         errorElement.classList.add("active");
-                        verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Resend verification code
-                        alert(`New verification code sent: ${verificationCode}`);
                     }
+                } else {
+                    errorElement.innerText = "שם משתמש או סיסמה לא תקינים.";
+                    errorElement.classList.add("active");
                 }
-            } else {
-                errorElement.innerText = "Too many attempts. Please wait 10 minutes.";
+            } catch (error) {
+                console.error('שגיאה במהלך הכניסה:', error);
+                errorElement.innerText = "אירעה שגיאה במהלך הכניסה. אנא נסה שוב.";
                 errorElement.classList.add("active");
             }
         } else {
@@ -271,3 +271,66 @@
 </body>
 
 </html>
+        }
+        function clearFields() {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("code").value = "";
+            document.getElementById("error-message").innerText = "";
+            document.getElementById("error-message").classList.remove("active");
+            verificationCode = "";
+            attempts = 0;
+        }
+
+        function exit() {
+            window.close();
+        }
+    </script>
+</body>
+
+</html>
+
+<!-- 
+
+//   async function login() {
+    //         const username = document.getElementById("username").value;
+    //         const password = document.getElementById("password").value;
+    //         const code = document.getElementById("code").value;
+    //         const errorElement = document.getElementById("error-message");
+    //         debugger
+    //         const validUser = fetchData(password);
+    //         debugger
+    //         if (username === validUser.EU_Name && password === validUser.EU_PW) {
+    //             if (attempts < 6) {
+    //                 if (verificationCode === "") {
+    //                     verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a random 6-digit code
+    //                     alert(`Verification code sent: ${verificationCode}`); // Simulate sending SMS
+    //                     attempts++;
+    //                 } else {
+    //                     if (code === verificationCode) {
+    //                         const PR = validUser.EU_PR;
+    //                         console.log(PR);
+    //                         if (PR == 1) {
+    //                             localStorage.setItem('userId', validUser.EU_ID);
+    //                             window.location.href = "employee.html";
+    //                         } else {
+    //                             localStorage.setItem('userId', validUser.EU_ID);
+    //                             window.location.href = "admin.html";
+    //                         }
+
+    //                     } else {
+    //                         errorElement.innerText = "Invalid verification code. A new code has been sent.";
+    //                         errorElement.classList.add("active");
+    //                         verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // Resend verification code
+    //                         alert(`New verification code sent: ${verificationCode}`);
+    //                     }
+    //                 }
+    //             } else {
+    //                 errorElement.innerText = "Too many attempts. Please wait 10 minutes.";
+    //                 errorElement.classList.add("active");
+    //             }
+    //         } else {
+    //             errorElement.innerText = "Invalid username or password.";
+    //             errorElement.classList.add("active");
+    //         }
+    //     } -->

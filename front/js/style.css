@@ -403,3 +403,165 @@ tr:hover {
 }
 
 
+.enhanced-record-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 20px;
+    padding: 15px;
+}
+
+.record-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.record-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.record-header {
+    background: linear-gradient(135deg, #4a90e2, #5637d9);
+    color: white;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.record-body {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.record-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.record-body p {
+    margin: 10px 0;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.record-body p span {
+    font-weight: bold;
+    color: #4a5568;
+    display: inline-block;
+    width: 120px;
+    margin-right: 10px;
+}
+
+.record-actions {
+    display: flex;
+    border-top: 1px solid #e0e0e0;
+}
+
+.record-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.edit-btn {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #3a7bc8;
+}
+
+.view-btn {
+    background-color: #5f6368;
+    color: white;
+}
+
+.view-btn:hover {
+    background-color: #4a4e52;
+}
+
+.no-records {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-style: italic;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px dashed #ccc;
+}
+
+/* Modal Styles for Record Details */
+.record-details {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.detail-row {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    padding: 12px 0;
+    flex-wrap: wrap;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    flex: 0 0 200px;
+    font-weight: bold;
+    color: #4a5568;
+}
+
+.detail-value {
+    flex: 1;
+    min-width: 200px;
+    word-break: break-word;
+}
+
+/* Custom SweetAlert styles */
+.record-details-modal .swal2-html-container {
+    margin: 0;
+    padding: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .enhanced-record-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .record-body {
+        flex-direction: column;
+    }
+    
+    .record-column {
+        width: 100%;
+    }
+    
+    .detail-label {
+        flex: 0 0 100%;
+    }
+    
+    .detail-value {
+        flex: 0 0 100%;
+        padding-left: 10px;
+    }
+}

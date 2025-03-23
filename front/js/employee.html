@@ -12,6 +12,8 @@
     <script type="module" src="services/userLog.server.js"></script>
 
     <script src="services/reshumot.server.js" defer></script>
+    <script src="services/mnilvim.server.js" defer></script>
+
 </head>
 
 <body>
@@ -153,54 +155,156 @@
         });
         });
         function clearFields() {
-            document.getElementById('record-number').value = '';
-            document.getElementById('timestamp').value = '';
-            document.getElementById('department').value = '';
-            document.getElementById('supplier-name').value = '';
-            document.getElementById('amount').value = '';
-            document.getElementById('vat').value = '';
-            document.getElementById('total-amount').value = '';
-            document.getElementById('delivery-location').value = '';
-            document.getElementById('contact-name').value = '';
-            document.getElementById('contact-phone').value = '';
-            document.getElementById('contact-email').value = '';
-            document.getElementById('project-name').value = '';
-            document.getElementById('agent-number').value = '';
-            document.getElementById('budget-item').value = '';
-        }
+        document.getElementById('record-number').value = '';
+        document.getElementById('timestamp').value = '';
+        document.getElementById('department').value = '';
+        document.getElementById('supplier-name').value = '';
+        document.getElementById('amount').value = '';
+        document.getElementById('vat').value = '';
+        document.getElementById('total-amount').value = '';
+        document.getElementById('delivery-location').value = '';
+        document.getElementById('contact-name').value = '';
+        document.getElementById('contact-phone').value = '';
+        document.getElementById('contact-email').value = '';
+        document.getElementById('project-name').value = '';
+        document.getElementById('agent-number').value = '';
+        document.getElementById('budget-item').value = '';
+    }
 
-        async function saveData() {
-            const data = {
-                Rsh_id: document.getElementById('record-number').value,
-                Rsh_date: document.getElementById('timestamp').value,
-                Rsh_mchlaka: document.getElementById('department').value,
-                Rsh_sapak: document.getElementById('supplier-name').value,
-                Rsh_schoom: document.getElementById('amount').value,
-                Rsh_maam: document.getElementById('vat').value,
-                Rsh_schmaam: document.getElementById('total-amount').value,
-                Rsh_schtotal: document.getElementById('total-amount').value,
-                Rsh_pratim: document.getElementById('contact-name').value,
-                Rsh_proyktnam: document.getElementById('project-name').value,
-                Rsh_status: document.getElementById('contact-email').value,
-                Rsh_sochen: document.getElementById('contact-phone').value,
-                Rsh_takziv: document.getElementById('agent-number').value,
-                Rsh_cname: document.getElementById('budget-item').value,
-                Rsh_cnametl: '',
-                Rsh_cemail: document.getElementById('contact-email').value
-            };
+    async function saveData() {
+        const recordId = document.getElementById('record-number').value;
 
-            console.log('Data to save:', data);
+        // Fetch all records to check if the record already exists
+        const records = await listAllReshumot();
+        const existingRecord = records.find(record => record.Rsh_id === recordId);
 
-            try {
-                const response = await createReshumot(data);
+        const data = {
+            Rsh_id: recordId,
+            Rsh_date: document.getElementById('timestamp').value,
+            Rsh_mchlaka: document.getElementById('department').value,
+            Rsh_sapak: document.getElementById('supplier-name').value,
+            Rsh_schoom: document.getElementById('amount').value,
+            Rsh_maam: document.getElementById('vat').value,
+            Rsh_schmaam: document.getElementById('total-amount').value,
+            Rsh_schtotal: document.getElementById('total-amount').value,
+            Rsh_pratim: document.getElementById('contact-name').value,
+            Rsh_proyktnam: document.getElementById('project-name').value,
+            Rsh_status: document.getElementById('contact-email').value,
+            Rsh_sochen: document.getElementById('contact-phone').value,
+            Rsh_takziv: document.getElementById('agent-number').value,
+            Rsh_cname: document.getElementById('budget-item').value,
+            Rsh_cnametl: '',
+            Rsh_cemail: document.getElementById('contact-email').value
+        };
+
+        console.log('Data to save:', data);
+
+        try {
+            if (existingRecord) {
+                // If record exists, update it
+                await updateReshumot(data);
+                showNotification('Reshuma updated successfully!', 'success');
+            } else {
+                // If record does not exist, create it
+                await createReshumot(data);
                 showNotification('Reshuma saved successfully!', 'success');
-                clearFields(); // Clear fields after saving
-                listAllReshumot(); // Refresh the record list
-            } catch (error) {
-                console.error('Error saving Reshuma:', error);
-                showNotification('Error saving Reshuma!', 'error');
             }
+            clearFields(); // Clear fields after saving
+            
+            // Refresh the record list
+            const records = await listAllReshumot();
+            updateRecordList(records);
+        } catch (error) {
+            console.error('Error saving Reshuma:', error);
+            showNotification('Error saving Reshuma!', 'error');
         }
+    }
+function updateRecordList(records) {
+        const recordList = document.getElementById('record-list');
+        recordList.innerHTML = ''; // Clear existing list
+
+        if (Array.isArray(records)) {
+            // Create a styled container for records
+            recordList.classList.add('enhanced-record-list');
+
+            records.forEach(record => {
+                // Create a card-like item for each record
+                const listItem = document.createElement('div');
+                listItem.classList.add('record-card');
+
+                // Create header
+                const header = document.createElement('div');
+                header.classList.add('record-header');
+
+                // Find an ID field or use the first field as header
+                const idField = record.Rsh_id || record.id || Object.values(record)[0] || 'Record';
+                header.innerHTML = `<strong>${idField}</strong>`;
+
+                // Create body with all fields dynamically
+                const body = document.createElement('div');
+                body.classList.add('record-body');
+
+                // Create two columns for fields
+                const leftColumn = document.createElement('div');
+                leftColumn.classList.add('record-column');
+
+                const rightColumn = document.createElement('div');
+                rightColumn.classList.add('record-column');
+
+                // Add all fields to the columns
+                let count = 0;
+                for (const key in record) {
+                    if (record.hasOwnProperty(key)) {
+                        const fieldValue = record[key] !== null && record[key] !== undefined ? record[key] : 'N/A';
+
+                        const fieldElement = document.createElement('p');
+                        fieldElement.innerHTML = `<span>${key}:</span> ${fieldValue}`;
+
+                        // Alternate between columns
+                        if (count % 2 === 0) {
+                            leftColumn.appendChild(fieldElement);
+                        } else {
+                            rightColumn.appendChild(fieldElement);
+                        }
+                        count++;
+                    }
+                }
+
+                // Add columns to body
+                body.appendChild(leftColumn);
+                body.appendChild(rightColumn);
+
+                // Add action buttons
+                const actions = document.createElement('div');
+                actions.classList.add('record-actions');
+
+                const editBtn = document.createElement('button');
+                editBtn.classList.add('record-btn', 'edit-btn');
+                editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+                editBtn.onclick = () => editRecord(record);
+
+                const viewBtn = document.createElement('button');
+                viewBtn.classList.add('record-btn', 'view-btn');
+                viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Details';
+                viewBtn.onclick = () => {
+                    showRecordDetails(record);
+                };
+
+                actions.appendChild(editBtn);
+                actions.appendChild(viewBtn);
+
+                // Assemble the card
+                listItem.appendChild(header);
+                listItem.appendChild(body);
+                listItem.appendChild(actions);
+
+                recordList.appendChild(listItem);
+            });
+        } else {
+            recordList.innerHTML = '<div class="no-records">No records available</div>';
+            console.error('Data is not an array:', records);
+        }
+    }
 
         function printData() {
             window.print();
@@ -334,14 +438,14 @@
                     recordList.innerHTML = '';
                     records.forEach(record => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `Record ID: ${record.Rsh_id}, Date: ${record.Rsh_date}, Department: ${record.Rsh_mchlaka}, Supplier: ${record.Rsh_sapak}, Amount: ${record.Rsh_schoom}, VAT: ${record.Rsh_maam}, Total: ${record.Rsh_schmaam}, Delivery: ${record.Rsh_schtotal}, Contact: ${record.Rsh_pratim}, Project: ${record.Rsh_proyktnam}, Status: ${record.Rsh_status}, Phone: ${record.Rsh_sochen}, Agent: ${record.Rsh_takziv}, Budget: ${record.Rsh_cname}`;
+                        listItem.textContent = record.Rsh_id; // Display record ID or any relevant info
                         listItem.onclick = () => editRecord(record);
                         recordList.appendChild(listItem);
                     });
                 });
         }
-
         function editRecord(record) {
+            // מילוי השדות בטופס
             document.getElementById('record-number').value = record.Rsh_id;
             document.getElementById('timestamp').value = record.Rsh_date;
             document.getElementById('department').value = record.Rsh_mchlaka;
@@ -356,7 +460,98 @@
             document.getElementById('project-name').value = record.Rsh_proyktnam;
             document.getElementById('agent-number').value = record.Rsh_takziv;
             document.getElementById('budget-item').value = record.Rsh_cname;
+
+            // עדכון הרשומה בתצוגת הרשומות
+            const recordList = document.getElementById('record-list');
+
+            // מחפש את הכרטיסייה המתאימה לפי מזהה הרשומה
+            const existingCard = Array.from(recordList.children).find(item => {
+                const header = item.querySelector('.record-header strong');
+                return header && header.textContent === record.Rsh_id;
+            });
+
+            if (existingCard) {
+                // מוחק את הכרטיסייה הקיימת
+                existingCard.remove();
+            }
+
+            // יוצר כרטיסייה חדשה עם הנתונים המעודכנים
+            const newCard = document.createElement('div');
+            newCard.classList.add('record-card');
+
+            // יוצר כותרת
+            const header = document.createElement('div');
+            header.classList.add('record-header');
+            header.innerHTML = `<strong>${record.Rsh_id}</strong>`;
+
+            // יוצר גוף עם שדות
+            const body = document.createElement('div');
+            body.classList.add('record-body');
+
+            // יוצר שתי עמודות לשדות
+            const leftColumn = document.createElement('div');
+            leftColumn.classList.add('record-column');
+
+            const rightColumn = document.createElement('div');
+            rightColumn.classList.add('record-column');
+
+            // מוסיף את כל השדות לעמודות
+            let count = 0;
+            for (const key in record) {
+                if (record.hasOwnProperty(key)) {
+                    const fieldValue = record[key] !== null && record[key] !== undefined ? record[key] : 'N/A';
+
+                    const fieldElement = document.createElement('p');
+                    fieldElement.innerHTML = `<span>${key}:</span> ${fieldValue}`;
+
+                    // מחלק בין העמודות
+                    if (count % 2 === 0) {
+                        leftColumn.appendChild(fieldElement);
+                    } else {
+                        rightColumn.appendChild(fieldElement);
+                    }
+                    count++;
+                }
+            }
+
+            // מוסיף עמודות לגוף
+            body.appendChild(leftColumn);
+            body.appendChild(rightColumn);
+
+            // מוסיף כפתורי פעולה
+            const actions = document.createElement('div');
+            actions.classList.add('record-actions');
+
+            const editBtn = document.createElement('button');
+            editBtn.classList.add('record-btn', 'edit-btn');
+            editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+            editBtn.onclick = () => editRecord(record);
+
+            const viewBtn = document.createElement('button');
+            viewBtn.classList.add('record-btn', 'view-btn');
+            viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Details';
+            viewBtn.onclick = () => {
+                showRecordDetails(record);
+            };
+
+            actions.appendChild(editBtn);
+            actions.appendChild(viewBtn);
+
+            // מרכיב את הכרטיסייה
+            newCard.appendChild(header);
+            newCard.appendChild(body);
+            newCard.appendChild(actions);
+
+            // מוסיף את הכרטיסייה החדשה לרשימה (בתחילת הרשימה)
+            if (recordList.firstChild) {
+                recordList.insertBefore(newCard, recordList.firstChild);
+            } else {
+                recordList.appendChild(newCard);
+            }
         }
+
+
+
 
         let timeout;
         function resetTimer() {
@@ -367,16 +562,157 @@
         document.addEventListener("DOMContentLoaded", function () {
             listAllReshumot().then(records => {
                 const recordList = document.getElementById('record-list');
-                recordList.innerHTML = ''; // Clear existing list
+                recordList.innerHTML = ''; // ניקוי הרשימה הקיימת
                 records.forEach(record => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = `Record ID: ${record.Rsh_id}, Date: ${record.Rsh_date}, Department: ${record.Rsh_mchlaka}, Supplier: ${record.Rsh_sapak}, Amount: ${record.Rsh_schoom}, VAT: ${record.Rsh_maam}, Total: ${record.Rsh_schmaam}, Delivery: ${record.Rsh_schtotal}, Contact: ${record.Rsh_pratim}, Project: ${record.Rsh_proyktnam}, Status: ${record.Rsh_status}, Phone: ${record.Rsh_sochen}, Agent: ${record.Rsh_takziv}, Budget: ${record.Rsh_cname}`;
+                    listItem.textContent = record.Rsh_id; // או כל מידע רלוונטי אחר
                     listItem.onclick = () => editRecord(record);
                     recordList.appendChild(listItem);
                 });
             });
         });
 
+        document.addEventListener("DOMContentLoaded", function () {
+            listAllReshumot().then(records => {
+                const recordList = document.getElementById('record-list');
+                recordList.innerHTML = ''; // Clear existing list
+
+                if (Array.isArray(records)) {
+                    // Create a styled container for records
+                    recordList.classList.add('enhanced-record-list');
+
+                    records.forEach(record => {
+                        // Create a card-like item for each record
+                        const listItem = document.createElement('div');
+                        listItem.classList.add('record-card');
+
+                        // Create header - try to use ID field if available
+                        const header = document.createElement('div');
+                        header.classList.add('record-header');
+
+                        // Try to find an ID field, or use the first field as header
+                        const idField = record.Rsh_id || record.id || Object.values(record)[0] || 'Record';
+                        header.innerHTML = `<strong>${idField}</strong>`;
+
+                        // Create body with all fields dynamically
+                        const body = document.createElement('div');
+                        body.classList.add('record-body');
+
+                        // Create two columns for fields
+                        const leftColumn = document.createElement('div');
+                        leftColumn.classList.add('record-column');
+
+                        const rightColumn = document.createElement('div');
+                        rightColumn.classList.add('record-column');
+
+                        // Add all fields to the columns without knowing field names
+                        let count = 0;
+                        for (const key in record) {
+                            if (record.hasOwnProperty(key)) {
+                                const fieldValue = record[key] !== null && record[key] !== undefined ? record[key] : 'N/A';
+
+                                const fieldElement = document.createElement('p');
+                                fieldElement.innerHTML = `<span>${key}:</span> ${fieldValue}`;
+
+                                // Alternate between columns
+                                if (count % 2 === 0) {
+                                    leftColumn.appendChild(fieldElement);
+                                } else {
+                                    rightColumn.appendChild(fieldElement);
+                                }
+                                count++;
+                            }
+                        }
+
+                        // Add columns to body
+                        body.appendChild(leftColumn);
+                        body.appendChild(rightColumn);
+
+                        // Add action buttons
+                        const actions = document.createElement('div');
+                        actions.classList.add('record-actions');
+
+                        const editBtn = document.createElement('button');
+                        editBtn.classList.add('record-btn', 'edit-btn');
+                        editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+                        editBtn.onclick = () => editRecord(record);
+
+                        const viewBtn = document.createElement('button');
+                        viewBtn.classList.add('record-btn', 'view-btn');
+                        viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Details';
+                        viewBtn.onclick = () => {
+                            // Show detailed view in a modal
+                            showRecordDetails(record);
+                        };
+
+                        actions.appendChild(editBtn);
+                        actions.appendChild(viewBtn);
+
+                        // Assemble the card
+                        listItem.appendChild(header);
+                        listItem.appendChild(body);
+                        listItem.appendChild(actions);
+
+                        recordList.appendChild(listItem);
+                    });
+                } else {
+                    recordList.innerHTML = '<div class="no-records">No records available</div>';
+                    console.error('Data is not an array:', records);
+                }
+            });
+        });
+
+        // Function to show record details in a modal
+        function showRecordDetails(record) {
+            // Create modal content with all record details
+            let modalContent = '<div class="record-details">';
+
+            // Display all fields dynamically
+            for (const key in record) {
+                if (record.hasOwnProperty(key)) {
+                    const fieldValue = record[key] !== null && record[key] !== undefined ? record[key] : 'N/A';
+
+                    modalContent += `<div class="detail-row">
+                <div class="detail-label">${key}:</div>
+                <div class="detail-value">${fieldValue}</div>
+            </div>`;
+                }
+            }
+
+            modalContent += '</div>';
+
+            // Use SweetAlert2 to display the modal
+            Swal.fire({
+                title: 'Record Details',
+                html: modalContent,
+                width: '800px',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    container: 'record-details-modal'
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // Check if the function exists before calling it
+    if (typeof listAllMnilvim === 'function') {
+        listAllMnilvim()
+            .then(documents => {
+                console.log('Documents loaded:', documents);
+                // Process the documents here
+                updateDocumentsTable(documents);
+            })
+            .catch(error => {
+                console.error('Error loading documents:', error);
+                showNotification('Failed to load documents', 'error');
+            });
+    } else {
+        console.error('listAllMnilvim function is not available');
+    }
+});
+
+        // document.onload = listAllMnilvim;
         document.onload = resetTimer();
         document.onmousemove = resetTimer;
         document.onkeypress = resetTimer;

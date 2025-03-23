@@ -280,19 +280,19 @@
           document.addEventListener('DOMContentLoaded', function () {
             updateUser(localStorage.getItem('userId'),
         {
-            Lg_timestmpin:new Date().toISOString(),
+            Lg_timestmpin:new Date().toLocaleString('sv-SE'),
             Lg_status: 1
         });
         });
 
-        window.addEventListener('beforeunload', function () {
-            updateUser(localStorage.getItem('userId'),
-            {
-                Lg_timestmpiout:new Date().toISOString(),
-                Lg_status: 0
-            }
-        );
+        if (window.location.pathname === '/login') {
+    window.addEventListener('beforeunload', function () {
+        updateUser(localStorage.getItem('userId'), {
+            Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
+            Lg_status: 0
         });
+    });
+}
         let inactivityTime = function () {
             let timer;
             window.onload = resetTimer;

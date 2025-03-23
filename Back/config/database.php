@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "";
+$password = "new_password";
 $dbname = "isgulaorg_101";
 
 // Create connection

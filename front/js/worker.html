@@ -122,46 +122,6 @@
             <p id="reshumotList">אפשרות לדפדוף ברשומות.</p>
             <form id="fieldsForm">
                 <div class="field-container">
-                    <label for="Rsh_cemail">דוא"ל:</label>
-                    <input type="text" id="Rsh_cemail" name="Rsh_cemail">
-                    <button type="button" onclick="clearField('Rsh_cemail')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_cname">שם:</label>
-                    <input type="text" id="Rsh_cname" name="Rsh_cname">
-                    <button type="button" onclick="clearField('Rsh_cname')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_cnametl">טלפון:</label>
-                    <input type="text" id="Rsh_cnametl" name="Rsh_cnametl">
-                    <button type="button" onclick="clearField('Rsh_cnametl')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_date">תאריך:</label>
-                    <input type="text" id="Rsh_date" name="Rsh_date">
-                    <button type="button" onclick="clearField('Rsh_date')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_id">מזהה:</label>
-                    <input type="text" id="Rsh_id" name="Rsh_id">
-                    <button type="button" onclick="clearField('Rsh_id')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_maam">מע"מ:</label>
-                    <input type="text" id="Rsh_maam" name="Rsh_maam">
-                    <button type="button" onclick="clearField('Rsh_maam')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_mchlaka">מחלקה:</label>
-                    <input type="text" id="Rsh_mchlaka" name="Rsh_mchlaka">
-                    <button type="button" onclick="clearField('Rsh_mchlaka')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_pratim">פרטים:</label>
-                    <input type="text" id="Rsh_pratim" name="Rsh_pratim">
-                    <button type="button" onclick="clearField('Rsh_pratim')">נקה</button>
-                </div>
-                <div class="field-container">
                     <label for="Rsh_proyktnam">פרויקט:</label>
                     <input type="text" id="Rsh_proyktnam" name="Rsh_proyktnam">
                     <button type="button" onclick="clearField('Rsh_proyktnam')">נקה</button>
@@ -202,7 +162,10 @@
                     <button type="button" onclick="clearField('Rsh_takziv')">נקה</button>
                 </div>
             </form>
+        </div>            </form>
         </div>
+
+        <div id="formContainer"></div> <!-- אלמנט מיכל עבור הטפסים -->
     </div>
 
     <script>
@@ -220,6 +183,12 @@
         function clearField(fieldId) {
             document.getElementById(fieldId).value = '';
         }
+/*************  ✨ Codeium Command ⭐  *************/
+        /**
+         * Saves the data from the form to the server.
+         * @returns {void}
+         */
+/******  5dd1f630-969f-4cc7-9fdb-f97b0cdce5dc  *******/
         function saveData() {
             alert("נתונים נשמרו בהצלחה!");
         }
@@ -242,10 +211,9 @@
             exit();
         }, 600000); // 10 דקות
 
-        // פונקציה לטעינת רשומות// Update the getReshumot function to handle the Promise
+        // פונקציה לטעינת רשומות
         async function getReshumot() {
             try {
-                // Check if the function exists
                 if (typeof listAllReshumot !== 'function') {
                     console.error('Error: listAllReshumot function is not defined');
                     const reshumotListDiv = document.getElementById('reshumotList');
@@ -261,43 +229,32 @@
                     return;
                 }
 
-                // Show loading indicator
                 reshumotListDiv.innerHTML = '<p>Loading data...</p>';
 
-                // Get the reshumot data and await the Promise
                 let reshumot;
                 try {
-                    // Call the function and await the Promise
                     reshumot = await listAllReshumot();
                     console.log('Received reshumot data:', reshumot);
-                    fillForm(reshumot)
-
+                    fillForm(reshumot); // שיניתי ל-fillForm
                 } catch (e) {
                     console.error('Error calling listAllReshumot:', e);
                     reshumotListDiv.innerHTML = '<p>Error fetching data: ' + e.message + '</p>';
                     return;
                 }
-                fillForm(reshumotListDiv)
 
-                // Handle null or undefined reshumot
                 if (!reshumot) {
                     console.warn('Reshumot data is null or undefined');
                     reshumotListDiv.innerHTML = '<p>No data available</p>';
                     return;
                 }
 
-
-                // Check if reshumot is an array before using map
                 if (Array.isArray(reshumot)) {
-
                     if (reshumot.length === 0) {
                         reshumotListDiv.innerHTML = '<p>No records found</p>';
                     } else {
-
                         reshumotListDiv.innerHTML = reshumot.map(item => `<p>${item || 'Unnamed record'}</p>`).join('');
                     }
                 } else {
-                    // If it's not an array, try to convert it to a string
                     console.warn('Reshumot is not an array:', reshumot);
                     reshumotListDiv.innerHTML = `<p>Data received in unexpected format</p>`;
                     console.log('Data type:', typeof reshumot);
@@ -311,13 +268,8 @@
             }
         }
 
-        // Update the window.onload function to properly handle the async function
         window.onload = function () {
-            // Initialize form fields
             initializeForm();
-
-
-            // Call the async function
             getReshumot().catch(error => {
                 console.error('Error in getReshumot:', error);
                 const reshumotListDiv = document.getElementById('reshumotList');
@@ -327,20 +279,16 @@
             });
         };
 
-        // Add the initializeForm function if it doesn't exist
         function initializeForm() {
-            // Set current date for timestamp
             const now = new Date();
             if (document.getElementById('timestamp')) {
                 document.getElementById('timestamp').value = now.toLocaleString();
             }
 
-            // Generate auto number (example implementation)
             if (document.getElementById('autoNumber')) {
                 document.getElementById('autoNumber').value = 'AUTO-' + Math.floor(Math.random() * 10000);
             }
 
-            // Initialize other fields with default values if needed
             const formFields = document.querySelectorAll('#documentForm input, #documentForm select');
             formFields.forEach(field => {
                 if (field.type === 'number' && !field.value) {
@@ -348,11 +296,11 @@
                 }
             });
 
-            // Call calculateVAT to initialize related fields
             calculateVAT();
         }
-        function fillForms(data) {
-            const container = document.getElementById('formContainer'); // הנח שיש אלמנט עם id 'formContainer'
+
+        function fillForm(data) {
+            const container = document.getElementById('formContainer');
             container.innerHTML = ''; // נקה את התוכן הקודם
 
             if (Array.isArray(data) && data.length > 0) {
@@ -365,7 +313,7 @@
                         if (item.hasOwnProperty(key)) {
                             const input = document.createElement('input');
                             input.type = 'text';
-                            input.id = key;
+                            input.id = key + '-' + index; // הוסף מזהה ייחודי לכל שדה
                             input.value = item[key];
                             input.placeholder = key; // הוסף פלייסהולדר
                             form.appendChild(input);
@@ -377,11 +325,6 @@
                 console.warn('Data is not an array or is empty:', data);
             }
         }
-
-
-
-
-
     </script>
 </body>
 

@@ -145,7 +145,13 @@
                 }
             );
         });
-
+        document.addEventListener('DOMContentLoaded', function () {
+            updateUser(localStorage.getItem('userId'),
+        {
+            Lg_timestmpin:new Date().toISOString(),
+            Lg_status: 1
+        });
+        });
         function clearFields() {
             document.getElementById('record-number').value = '';
             document.getElementById('timestamp').value = '';

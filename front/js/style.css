@@ -22,6 +22,8 @@ body {
     line-height: 1.6;
 }
 
+
+
 .container {
     max-width: 1000px;
     margin: 0 auto;
@@ -565,3 +567,5 @@ tr:hover {
         padding-left: 10px;
     }
 }
+
+        

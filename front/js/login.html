@@ -241,21 +241,31 @@
                 errorElement.innerText = "אירעה שגיאה במהלך הכניסה. אנא נסה שוב.";
                 errorElement.classList.add("active");
             }
+
+
+
         }
+
         function clearFields() {
             document.getElementById("username").value = "";
             document.getElementById("password").value = "";
             document.getElementById("code").value = "";
             document.getElementById("error-message").innerText = "";
             document.getElementById("error-message").classList.remove("active");
-            verificationCode = "";
-            attempts = 0;
+            verificationCode = ""; // Reset verification code
+            attempts = 0; // Reset attempts
         }
 
         function exit() {
-            window.close();
+            window.close(); // Close the window
         }
+
     </script>
+
+</body>
+
+</html>
+</script>
 </body>
 
 </html>

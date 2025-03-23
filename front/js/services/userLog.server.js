@@ -1,9 +1,10 @@
 
 function updateUser(id, userData) {
-    const url = `http://localhost/project/hms-md/Back/config/database.php/controller/UserLogController.php/updatePartialLog?id=${id},${userData}`;
-
+    const url =`http://localhost/project/hms-md/Back/controller/UserLogController.php/log/${id} `;
+    debugger
+  console.log("start")
     fetch(url, {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
         },

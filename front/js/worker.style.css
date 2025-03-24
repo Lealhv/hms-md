@@ -9,6 +9,7 @@
     --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
+  
   body {
     font-family: 'Rubik', 'Segoe UI', Tahoma, sans-serif;
     background-color: #f9fafc;
@@ -200,3 +201,5 @@
       width: 100%;
     }
   }
+
+  

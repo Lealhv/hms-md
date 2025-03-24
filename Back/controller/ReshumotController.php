@@ -15,85 +15,87 @@ class ReshumotController
     }
 
     public function create()
-{
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    // Log the received data for debugging
-    error_log("Received data: " . print_r($data, true));
-
-    // Check if all required keys exist except Rsh_id
-    if (!isset(
-        $data['Rsh_date'],
-        $data['Rsh_mchlaka'],
-        $data['Rsh_sapak'],
-        $data['Rsh_patoor'],
-        $data['Rsh_schoom'],
-        $data['Rsh_maam'],
-        $data['Rsh_schmaam'],
-        $data['Rsh_schtotal'],
-        $data['Rsh_aspaka'],
-        $data['Rsh_proyktnam'],
-        $data['Rsh_status'],
-        $data['Rsh_sochen'],
-        $data['Rsh_takziv'],
-        $data['Rsh_cname'],
-        $data['Rsh_cnametl'],
-        $data['Rsh_cemail']
-    )) {
-        echo json_encode(['error' => 'Missing required parameters']);
-        return;
-    }
-
-    // Create the Reshumot object and save to database
-    $query = "INSERT INTO reshumot (Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_patoor, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_aspaka, Rsh_proyktnam, Rsh_status, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = $this->conn->prepare($query);
-    
-    if ($stmt === false) {
-        error_log("Prepare failed: " . $this->conn->error);
-        echo json_encode(["error" => "Failed to prepare statement: " . $this->conn->error]);
-        return;
-    }
-    
-    $stmt->bind_param(
-        "ssssssssssssssss",
-        $data['Rsh_date'],
-        $data['Rsh_mchlaka'],
-        $data['Rsh_sapak'],
-        $data['Rsh_patoor'],
-        $data['Rsh_schoom'],
-        $data['Rsh_maam'],
-        $data['Rsh_schmaam'],
-        $data['Rsh_schtotal'],
-        $data['Rsh_aspaka'],
-        $data['Rsh_proyktnam'],
-        $data['Rsh_status'],
-        $data['Rsh_sochen'],
-        $data['Rsh_takziv'],
-        $data['Rsh_cname'],
-        $data['Rsh_cnametl'],
-        $data['Rsh_cemail']
-    );
-
-    $result = $stmt->execute();
-    
-    if ($result) {
-        // Check if any rows were affected
-        $affectedRows = $stmt->affected_rows;
-        error_log("Insert executed. Affected rows: " . $affectedRows);
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
         
-        if ($affectedRows > 0) {
-            echo json_encode(["message" => "Reshumot created successfully", "id" => $this->conn->insert_id]);
-        } else {
-            echo json_encode(["warning" => "Query executed but no rows were affected"]);
+        // Log the received data for debugging
+        error_log("Received data: " . print_r($data, true));
+    
+        // Check if all required keys exist except Rsh_id
+        if (!isset(
+            $data['Rsh_date'],
+            $data['Rsh_mchlaka'],
+            $data['Rsh_sapak'],
+            $data['Rsh_patoor'],
+            $data['Rsh_schoom'],
+            $data['Rsh_maam'],
+            $data['Rsh_schmaam'],
+            $data['Rsh_schtotal'],
+            $data['Rsh_aspaka'],
+            $data['Rsh_proyktnam'],
+            $data['Rsh_status'],
+            $data['Rsh_sochen'],
+            $data['Rsh_takziv'],
+            $data['Rsh_cname'],
+            $data['Rsh_cnametl'],
+            $data['Rsh_cemail']
+        )) {
+            echo json_encode(['error' => 'Missing required parameters']);
+            return;
         }
-    } else {
-        error_log("Execute failed: " . $stmt->error);
-        echo json_encode(["error" => "Failed to create Reshumot: " . $stmt->error]);
+    
+        // Create the Reshumot object and save to database
+        $query = "INSERT INTO reshumot (Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_patoor, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_aspaka, Rsh_proyktnam, Rsh_status, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+        $stmt = $this->conn->prepare($query);
+        
+        if ($stmt === false) {
+            error_log("Prepare failed: " . $this->conn->error);
+            echo json_encode(["error" => "Failed to prepare statement: " . $this->conn->error]);
+            return;
+        }
+        
+        $stmt->bind_param(
+            "sssssssssssssss", // הסר את אחד ה-s עבור Rsh_patoor
+            $data['Rsh_date'],
+            $data['Rsh_mchlaka'],
+            $data['Rsh_sapak'],
+            (int)$data['Rsh_patoor'], // ודא שזה מספר
+            (int)$data['Rsh_schoom'], // ודא שזה מספר
+            (int)$data['Rsh_maam'], // ודא שזה מספר
+            (int)$data['Rsh_schmaam'], // ודא שזה מספר
+            (int)$data['Rsh_schtotal'], // ודא שזה מספר
+            $data['Rsh_aspaka'],
+            $data['Rsh_proyktnam'],
+            (int)$data['Rsh_status'], // ודא שזה מספר
+            $data['Rsh_sochen'],
+            (int)$data['Rsh_takziv'], // ודא שזה מספר
+            $data['Rsh_cname'],
+            $data['Rsh_cnametl'],
+            $data['Rsh_cemail']
+        );
+        
+    
+        $result = $stmt->execute();
+        
+        if ($result) {
+            // Check if any rows were affected
+            $affectedRows = $stmt->affected_rows;
+            error_log("Insert executed. Affected rows: " . $affectedRows);
+            
+            if ($affectedRows > 0) {
+                echo json_encode(["message" => "Reshumot created successfully", "id" => $this->conn->insert_id]);
+            } else {
+                echo json_encode(["warning" => "Query executed but no rows were affected"]);
+            }
+        } else {
+            error_log("Execute failed: " . $stmt->error);
+            echo json_encode(["error" => "Failed to create Reshumot: " . $stmt->error]);
+        }
+        
+        $stmt->close();
     }
     
-    $stmt->close();
-}
 
 
 

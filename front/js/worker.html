@@ -69,7 +69,8 @@
     </style>
     <script src="services/reshumot.server.js" defer></script>
     <script src="services/maam.server.js" defer></script>
-    <script src="services/mnilvim.server.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -80,7 +81,6 @@
     <div class="container">
         <div class="section" id="header">
             <h1>מערכת ניהול מסמכים</h1>
-            <p>ברוכים הבאים למערכת לניהול מסמכים.</p>
             <button id="conditionalButton" class="btn" onclick="goToAdmin()">לעמוד מנהל</button>
         </div>
 
@@ -274,79 +274,14 @@
             <p>תצוגה של מסמך נלווה בפורמטים שונים.</p>
         </div> -->
 
-        <div class="section" id="permissionsManagement">
+        <!-- <div class="section" id="permissionsManagement">
             <h2>ניהול הרשאות</h2>
             <p>בדיקת הרשאות בכניסה לדף.</p>
-        </div>
+        </div> -->
 
-        <div class="section" id="reshumotNavigation">
-            <h2>דפדוף ברשומות</h2>
-            <p id="reshumotList">אפשרות לדפדוף ברשומות.</p>
-            <form id="fieldsForm">
-                <div class="field-container">
-                    <label for="Rsh_Date">חתימת זמן אוטומטית:</label>
-                    <input type="text" id="Rsh_Date" name="Rsh_Date">
-                    <button type="button" onclick="clearField('Rsh_Date')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_mchlaka">מחלקה:</label>
-                    <input type="text" id="Rsh_mchlaka" name="Rsh_mchlaka">
-                    <button type="button" onclick="clearField('Rsh_mchlaka')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_sapak">שם הספק:</label>
-                    <input type="text" id="Rsh_sapak" name="Rsh_sapak">
-                    <button type="button" onclick="clearField('Rsh_sapak')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_proyktnam">תאריך נדרש:</label>
-                    <input type="text" id="Rsh_proyktnam" name="Rsh_proyktnam">
-                    <button type="button" onclick="clearField('Rsh_proyktnam')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_sapak">ספק:</label>
-                    <input type="text" id="Rsh_sapak" name="Rsh_sapak">
-                    <button type="button" onclick="clearField('Rsh_sapak')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_schoom">סכום :</label>
-                    <input type="text" id="Rsh_schoom" name="Rsh_schoom">
-                    <button type="button" onclick="clearField('Rsh_schoom')">נקה</button>
-                </div>
-
-                <div class="field-container">
-                    <label for="Rsh_maam"> מע"מ:</label>
-                    <input type="text" id="Rsh_maam" name="Rsh_maam">
-                    <button type="button" onclick="clearField('Rsh_maam')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_schmaam">סכום מע"מ:</label>
-                    <input type="text" id="Rsh_schmaam" name="Rsh_schmaam">
-                    <button type="button" onclick="clearField('Rsh_schmaam')">נקה</button>
-                </div>
-
-                <div class="field-container">
-                    <label for="Rsh_schtotal">סך הכל:</label>
-                    <input type="text" id="Rsh_schtotal" name="Rsh_schtotal">
-                    <button type="button" onclick="clearField('Rsh_schtotal')">נקה</button>
-                </div>
-
-                <div class="field-container">
-                    <label for="Rsh_sochen">סוכן:</label>
-                    <input type="text" id="Rsh_sochen" name="Rsh_sochen">
-                    <button type="button" onclick="clearField('Rsh_sochen')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_status">סטטוס:</label>
-                    <input type="text" id="Rsh_status" name="Rsh_status">
-                    <button type="button" onclick="clearField('Rsh_status')">נקה</button>
-                </div>
-                <div class="field-container">
-                    <label for="Rsh_takziv">תזכיר:</label>
-                    <input type="text" id="Rsh_takziv" name="Rsh_takziv">
-                    <button type="button" onclick="clearField('Rsh_takziv')">נקה</button>
-                </div>
-            </form>
+        <div class="section" id="reshumotList">
+            <h2>רשומות</h2>
+            <!-- <p id="reshumotList">רשומות</p> -->
         </div>
 
         <div id="formContainer"></div> <!-- הוספת אלמנט זה -->
@@ -356,7 +291,6 @@
 
     <script>
         function getData() {
-            console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             getReshumot();
             getMaam();
 
@@ -499,9 +433,6 @@
 
                     // If amount is already entered, recalculate the VAT amount
                     const amount = document.getElementById('amount').value;
-                    // if (amount) {
-                    //     calculateVAT(amount, vatPercentage);
-                    // }
                 }
 
                 return maam;
@@ -510,18 +441,6 @@
                 return null;
             }
         }
-
-
-
-        // function exportToPDF() {
-        //     const element = document.querySelector('.container');
-        //     html2pdf()
-        //         .from(element)
-        //         .save('purchase_request.pdf')
-        //         .then(() => {
-        //             showNotification('PDF exported successfully!', 'success');
-        //         });
-        // }
 
         function exportToPDF() {
             const element = document.querySelector('.container');
@@ -598,18 +517,26 @@
 
             try {
                 if (existingRecord) {
+                    debugger
                     // If record exists, update it
-                    await updateReshumot(data);
+                    const response = await updateReshumot(data);
+                    console.log('Server response:', response);
                     showNotification('רשומה עודכנה בהצלחה!');
                 } else {
                     // If record does not exist, create it
-                    await createReshumot(data);
+                    const response = await createReshumot(data);
+                    console.log('Server response:', response);
                     showNotification('רשומה נשמרה בהצלחה!');
                 }
                 clearFields(); // Clear fields after saving
             } catch (error) {
                 console.error('Error saving Reshuma:', error);
-                showNotification('שגיאה בשמירת רשומה!');
+                console.error('Error details:', error.message);
+                if (error.response) {
+                    console.error('Response data:', error.response.data);
+                    console.error('Response status:', error.response.status);
+                }
+                showNotification('שגיאה בשמירת רשומה!', 'error');
             }
         }
 
@@ -622,23 +549,6 @@
         // פונקציה לטעינת רשומות
         async function getReshumot() {
             try {
-                if (typeof listAllReshumot !== 'function') {
-                    console.error('Error: listAllReshumot function is not defined');
-                    const reshumotListDiv = document.getElementById('reshumotList');
-                    if (reshumotListDiv) {
-                        reshumotListDiv.innerHTML = '<p>Error loading data: Function not available</p>';
-                    }
-                    return;
-                }
-
-                const reshumotListDiv = document.getElementById('reshumotList');
-                if (!reshumotListDiv) {
-                    console.error('reshumotList element not found');
-                    return;
-                }
-
-                reshumotListDiv.innerHTML = '<p>Loading data...</p>';
-
                 let reshumot;
                 try {
                     reshumot = await listAllReshumot();
@@ -656,17 +566,6 @@
                     return;
                 }
 
-                if (Array.isArray(reshumot)) {
-                    if (reshumot.length === 0) {
-                        reshumotListDiv.innerHTML = '<p>No records found</p>';
-                    } else {
-                        reshumotListDiv.innerHTML = reshumot.map(item => `<p>${item || 'Unnamed record'}</p>`).join('');
-                    }
-                } else {
-                    console.warn('Reshumot is not an array:', reshumot);
-                    reshumotListDiv.innerHTML = `<p>Data received in unexpected format</p>`;
-                    console.log('Data type:', typeof reshumot);
-                }
             } catch (error) {
                 console.error('Error in getReshumot function:', error);
                 const reshumotListDiv = document.getElementById('reshumotList');
@@ -705,93 +604,197 @@
                     field.value = '0';
                 }
             });
-
-            // calculateVAT();
         }
 
 
         function fillForm(data) {
-            document.getElementById('Rsh_proyktnam').value = data.proyktnam || '';
-            document.getElementById('Rsh_sapak').value = data.sapak || '';
-            document.getElementById('Rsh_schmaam').value = data.schmaam || '';
-            document.getElementById('Rsh_schoom').value = data.schoom || '';
-            document.getElementById('Rsh_schtotal').value = data.schtotal || '';
-            document.getElementById('Rsh_sochen').value = data.sochen || '';
-            document.getElementById('Rsh_status').value = data.status || '';
-            document.getElementById('Rsh_takziv').value = data.takziv || '';
-        }
-        // -----------------------------------
+            const formContainer = document.getElementById('formContainer');
+            formContainer.innerHTML = ''; // Clear previous content
 
+            const titleMapping = {
+        'Rsh_id': 'מספר רשומה',
+        'Rsh_date': 'תאריך',
+        'Rsh_mchlaka': 'מחלקה',
+        'Rsh_sapak': 'ספק',
+        'Rsh_patoor': 'פטור',
+        'Rsh_schoom': 'סכום',
+        'Rsh_maam': 'מע"מ',
+        'Rsh_schmaam': 'סכום מע"מ',
+        'Rsh_schtotal': 'סכום כולל',
+        'Rsh_aspaka': 'מקום אספקה',
+        'Rsh_proyktnam': 'שם פרויקט',
+        'Rsh_status': 'סטטוס',
+        'Rsh_sochen': 'סוכן',
+        'Rsh_takziv': 'תקציב',
+        'Rsh_cname': 'שם סוכן',
+        'Rsh_cnametl': 'טלפון סוכן',
+        'Rsh_cemail': 'מייל סוכן'
+    };
 
+            // Create a styled container for the records
+            const recordsContainer = document.createElement('div');
+            recordsContainer.className = 'records-container';
+            recordsContainer.style.display = 'flex';
+            recordsContainer.style.flexWrap = 'wrap';
+            recordsContainer.style.gap = '20px';
+            recordsContainer.style.justifyContent = 'center';
 
-        async function loadDocuments() {
-            // document.getElementById('documents-loading').classList.remove('hidden');
-            document.getElementById('documentsTable').classList.add('hidden');
-            // document.getElementById('empty-documents').classList.add('hidden');
+            data.forEach((item, index) => {
+                // Create a card for each record
+                const recordCard = document.createElement('div');
+                recordCard.className = 'record-card';
+                recordCard.style.border = '1px solid #ddd';
+                recordCard.style.borderRadius = '8px';
+                recordCard.style.padding = '15px';
+                recordCard.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                recordCard.style.backgroundColor = '#f9f9f9';
+                recordCard.style.width = '300px';
+                recordCard.style.margin = '10px';
+                recordCard.style.transition = 'transform 0.3s ease';
+                recordCard.style.cursor = 'pointer';
 
+                // Add hover effect
+                recordCard.onmouseover = function () {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+                };
+                recordCard.onmouseout = function () {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                };
 
-            const documents = await listAllMnilvim(); // קריאה לשרת
-            // document.getElementById('documents-loading').classList.add('hidden');
+                // Add card header with record number
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'card-header';
+                cardHeader.style.borderBottom = '1px solid #eee';
+                cardHeader.style.marginBottom = '10px';
+                cardHeader.style.paddingBottom = '10px';
+                cardHeader.style.textAlign = 'center';
 
-            const tbody = document.getElementById('documents-body');
-            tbody.innerHTML = ''; // ניקוי התוכן הקודם
+                const recordTitle = document.createElement('h3');
+                recordTitle.textContent = `רשומה ${index + 1}`;
+                recordTitle.style.margin = '0';
+                recordTitle.style.color = '#2c3e50';
+                cardHeader.appendChild(recordTitle);
+                recordCard.appendChild(cardHeader);
 
-            documents.forEach(doc => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${doc.MN_pratim}</td>
-                <td>${doc.MN_dateAdd}</td>
-                <td><button onclick="deleteDocument('${doc.MN_id}')">מחק</button></td>
-            `;
-                row.onclick = () => showDocumentPreview(doc.MN_location, doc.MN_type); // תצוגה מקדימה
-                tbody.appendChild(row);
+                // Create a list for the record details
+                const detailsList = document.createElement('ul');
+                detailsList.style.listStyleType = 'none';
+                detailsList.style.padding = '0';
+                detailsList.style.margin = '0';
+
+                // Add each field as a list item
+                for (const key in item) {
+                    if (item.hasOwnProperty(key) && titleMapping[key]) {
+                        const listItem = document.createElement('li');
+                        listItem.style.padding = '5px 0';
+                        listItem.style.borderBottom = '1px dashed #eee';
+
+                        const fieldLabel = document.createElement('strong');
+                        fieldLabel.textContent = titleMapping[key] + ': ';
+                        fieldLabel.style.color = '#3498db';
+
+                        const fieldValue = document.createElement('span');
+                        fieldValue.textContent = item[key] || 'לא צוין';
+
+                        listItem.appendChild(fieldLabel);
+                        listItem.appendChild(fieldValue);
+                        detailsList.appendChild(listItem);
+                    }
+                }
+
+                recordCard.appendChild(detailsList);
+
+                // Add action buttons
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'record-actions';
+                actionDiv.style.marginTop = '15px';
+                actionDiv.style.display = 'flex';
+                actionDiv.style.justifyContent = 'space-around';
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'עריכה';
+                editButton.className = 'btn-secondary';
+                editButton.style.padding = '5px 10px';
+                editButton.style.borderRadius = '4px';
+                editButton.style.cursor = 'pointer';
+                editButton.onclick = function () {
+                    // Load this record data into the form for editing
+                    loadRecordToForm(item);
+                };
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'מחיקה';
+                deleteButton.className = 'btn-danger';
+                deleteButton.style.padding = '5px 10px';
+                deleteButton.style.borderRadius = '4px';
+                deleteButton.style.cursor = 'pointer';
+                deleteButton.onclick = function () {
+                    Swal.fire({
+                        title: 'אישור מחיקה',
+                        text: 'האם אתה בטוח שברצונך למחוק רשומה זו?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'כן, מחק את זה!',
+                        cancelButtonText: 'לא, ביטול'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Delete record functionality would go here
+                            showNotification('הרשומה נמחקה בהצלחה');
+                            recordCard.remove();
+                        }
+                    });
+                };
+
+                actionDiv.appendChild(editButton);
+                actionDiv.appendChild(deleteButton);
+                recordCard.appendChild(actionDiv);
+
+                recordsContainer.appendChild(recordCard);
             });
-        }
 
-        function showDocumentPreview(url, type) {
-            const viewer = document.getElementById('document-viewer');
-            const displayArea = document.getElementById('document-display-area');
+            formContainer.appendChild(recordsContainer);
 
-            // נקה את התוכן הקודם
-            viewer.src = "about:blank";
-            displayArea.classList.remove('hidden');
+            // Add a helper function to load record data into the form
+            function loadRecordToForm(record) {
+                // Set form values from the record
+                if (document.getElementById('autoNumber')) document.getElementById('autoNumber').value = record.Rsh_id || '';
+                if (document.getElementById('timestamp')) document.getElementById('timestamp').value = record.Rsh_date || '';
+                if (document.getElementById('department')) document.getElementById('department').value = record.Rsh_mchlaka || '';
+                if (document.getElementById('supplierName')) document.getElementById('supplierName').value = record.Rsh_sapak || '';
+                if (document.getElementById('exempt')) document.getElementById('exempt').checked = record.Rsh_patoor === '1';
+                if (document.getElementById('amount')) document.getElementById('amount').value = record.Rsh_schoom || '';
+                if (document.getElementById('maam_id')) document.getElementById('maam_id').value = record.Rsh_maam || '';
+                if (document.getElementById('scmaan')) document.getElementById('scmaan').value = record.Rsh_schmaam || '';
+                if (document.getElementById('totalAmount')) document.getElementById('totalAmount').value = record.Rsh_schtotal || '';
+                if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = record.Rsh_aspaka || '';
+                if (document.getElementById('projectName')) document.getElementById('projectName').value = record.Rsh_proyktnam || '';
+                if (document.getElementById('contactEmail')) document.getElementById('contactEmail').value = record.Rsh_status || '';
+                if (document.getElementById('contactName')) document.getElementById('contactName').value = record.Rsh_cname || '';
+                if (document.getElementById('contactPhone')) document.getElementById('contactPhone').value = record.Rsh_cnametl || '';
+                if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = record.Rsh_takziv || '';
 
-            // בדוק את סוג הקובץ
+                // Scroll to the form
+                document.getElementById('input-form').scrollIntoView({ behavior: 'smooth' });
 
+                showNotification('הרשומה נטענה לעריכה', 'info');
+            }
 
-            switch (type) {
-                case 'pdf':
-                    // PDF יכול להיות מוצג ישירות
-                    viewer.src = url;
-
-
-                case 'doc':
-                case 'docx':
-                case 'xls':
-                case 'xlsx':
-                    // נסה להשתמש ב-Office Online Viewer (Microsoft)
-                    const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
-                    viewer.src = officeViewerUrl;
-                    break;
-
+            // If no data, show a message
+            if (data.length === 0) {
+                const noDataMsg = document.createElement('div');
+                noDataMsg.style.textAlign = 'center';
+                noDataMsg.style.padding = '20px';
+                noDataMsg.style.color = '#7f8c8d';
+                noDataMsg.innerHTML = '<i class="fas fa-info-circle"></i> אין רשומות להצגה';
+                formContainer.appendChild(noDataMsg);
             }
         }
 
-        // function showDocumentPreview(url) {
-        //     const viewer = document.getElementById('document-viewer');
-        //     viewer.src = url;
-        //     document.getElementById('document-display-area').classList.remove('hidden');
-        // }
 
-        async function deleteDocument(id) {
-            // כאן תוסיף את הקוד למחיקת המסמך מהשרת
-            alert(`מסמך עם ID ${id} נמחק!`);
-            loadDocuments(); // טען מחדש את המסמכים
-        }
-
-        // טען את המסמכים כאשר הדף נטען
-        window.onload = loadDocuments;
-        // ------------------------
 
         // function fillForm(data) {
         //     const container = document.getElementById('formContainer');

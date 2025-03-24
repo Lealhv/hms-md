@@ -2,11 +2,12 @@
 header("Content-Type: application/json");
 
 require '../models/Mnilvim.php'; // Ensure the model exists
-require '../config/Database.php'; // This will include the file and create $conn
+require '../config/database.php'; // This will include the file and create $conn
 
 class MnilvimController
 {
     private $conn;
+
 
     public function __construct()
     {

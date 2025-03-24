@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 
 require '../models/UserLog.php';
-require '../config/Database.php'; // This will include the file and create $conn
+require '../config/database.php'; // This will include the file and create $conn
 
 class UserLogController {
     private $conn;

@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 
 require '../models/Maam.php';
-require '../config/Database.php'; // This will include the file and create $conn
+require '../config/database.php'; // This will include the file and create $conn
 
 class MaamController {
     private $conn;

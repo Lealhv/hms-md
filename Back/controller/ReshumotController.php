@@ -215,7 +215,7 @@ if (count($requestUri) >= 1) {
         $controller->listAll(); // GET /reshumots
     } elseif ($requestUri[0] === "reshumot" && $_SERVER['REQUEST_METHOD'] === "POST") {
         $controller->create(); // POST /reshumot
-    } elseif ($requestUri[0] === "reshumot" && $_SERVER['REQUEST_METHOD'] === "PUT" && isset($requestUri[1])) {
+    } elseif ($requestUri[0] === "ReshumotController" && $_SERVER['REQUEST_METHOD'] === "PUT" && isset($requestUri[1])) {
         $controller->update($requestUri[1]); // PUT /reshumot/{id}
     } elseif ($requestUri[0] === "reshumot" && $_SERVER['REQUEST_METHOD'] === "DELETE" && isset($requestUri[1])) {
         $controller->delete($requestUri[1]); // DELETE /reshumot/{id}

@@ -10,7 +10,6 @@ async function listAllMnilvim() {
     }
 
     const data = await response.json();
-    console.log('Fetched mnilvim data:', data); // הוסף קונסול לוג כאן
     return data;
   } catch (error) {
     console.error('Error listing mnilvim:', error);

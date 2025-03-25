@@ -1,6 +1,7 @@
 <?php
 
-class Reshumot {
+class Reshumot
+{
     public $Rsh_id;
     public $Rsh_date;
     public $Rsh_mchlaka;
@@ -12,12 +13,9 @@ class Reshumot {
     public $Rsh_schtotal;
     public $Rsh_aspaka;
     public $Rsh_proyktnam;
-    public $Rsh_status;
     public $Rsh_sochen;
     public $Rsh_takziv;
     public $Rsh_cname;
     public $Rsh_cnametl;
     public $Rsh_cemail;
-
 }
-?>

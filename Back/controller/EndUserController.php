@@ -69,8 +69,6 @@ class EndUserController {
 
 // שיפור הניתוב
 $requestUri = $_SERVER['REQUEST_URI'];
-// הדפס את ה-URI המלא לצורכי דיבוג
-// echo "Full URI: " . $requestUri . "<br>";
 
 // הסר את שם הקובץ מה-URI אם הוא קיים
 $requestUri = str_replace('/EndUserController.php', '', $requestUri);
@@ -79,12 +77,8 @@ $basePath = '/project/hms-md/Back/controller'; // התאם לנתיב הבסיס
 
 // הסר את נתיב הבסיס מה-URI
 $requestUri = str_replace($basePath, '', $requestUri);
-// הדפס את ה-URI אחרי הסרת הנתיב הבסיסי לצורכי דיבוג
-// echo "URI after base path removal: " . $requestUri . "<br>";
 
 $requestUri = explode("/", trim($requestUri, "/"));
-// הדפס את המערך של חלקי ה-URI לצורכי דיבוג
-// echo "URI parts: "; print_r($requestUri); echo "<br>";
 
 $controller = new EndUserController();
 

@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="module" src="services/userLog.server.js"></script>
+        <script src="services/reshumot.server.js" defer></script>
+
     <link rel="stylesheet" href="admin.style.css">
 
 </head>
@@ -357,6 +359,29 @@
         document.addEventListener('DOMContentLoaded', function () {
             getReshumot();
         });
+
+        async function deleteRecord(recordId) {
+            const result = await Swal.fire({
+                title: 'אישור מחיקה',
+                text: 'האם אתה בטוח שברצונך למחוק רשומה זו?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'כן, מחק את זה!',
+                cancelButtonText: 'לא, ביטול'
+            });
+
+            if (result.isConfirmed) {
+                const res = await deleteReshumot(recordId);
+                if (res.message === "Reshumot deleted successfully") {
+                    showNotification('הרשומה נמחקה בהצלחה');
+                } else {
+                    showNotification('שגיאה במחיקת הרשומה');
+                }
+            }
+        }
+
 
     </script>
 </body>

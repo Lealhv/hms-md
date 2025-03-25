@@ -163,6 +163,4 @@ if (count($requestUri) >= 1) {
 }
 
 
-// http://localhost/project/hms-md/Back/controller/EndUserController.php/users
 
-// http://localhost/project/hms-md/Back/controller/MnilvimController.php/mnilvims

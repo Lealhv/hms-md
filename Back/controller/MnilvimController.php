@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 
 require '../models/Mnilvim.php'; // Ensure the model exists
-require '../config/database.php'; // This will include the file and create $conn
+require '../config/Database.php'; // This will include the file and create $conn
 
 class MnilvimController
 {
@@ -21,7 +21,7 @@ class MnilvimController
 
         // Check if all required keys exist
         if (!isset(
-            $data['MN_id'],
+            // $data['MN_id'],
             $data['MN_pratim'],
             $data['MN_location'],
             $data['MN_shyooch'],
@@ -34,12 +34,11 @@ class MnilvimController
         }
 
         // Create the Mnilvim object and save to database
-        $query = "INSERT INTO mnilvim (MN_id, MN_pratim, MN_location, MN_shyooch, MN_status, MN_dateAdd,MN_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO mnilvim ( MN_pratim, MN_location, MN_shyooch, MN_status, MN_dateAdd,MN_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "sssssss",
-            $data['MN_id'],
+            "ssssss",
             $data['MN_pratim'],
             $data['MN_location'],
             $data['MN_shyooch'],
@@ -49,7 +48,8 @@ class MnilvimController
         );
 
         if ($stmt->execute()) {
-            echo json_encode(["message" => "Mnilvim created successfully"]);
+            $new_id = $stmt->insert_id; // קבלת ה-ID החדש שנוצר
+            echo json_encode(["message" => "Reshumot created successfully", "MN_id" => $new_id]);
         } else {
             echo json_encode(["error" => "Failed to create Mnilvim: " . $stmt->error]);
         }

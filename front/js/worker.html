@@ -218,7 +218,7 @@
 
         <div class="card" id="documents-area">
             <h2><i class="fas fa-folder-open"></i>מסמכים נלווים</h2>
-            <table id="documentsTable">
+            <table id="documentsTable" style="display:none;">
                 <thead>
                     <tr>
                         <th>שם מסמך</th>
@@ -227,24 +227,9 @@
                     </tr>
                 </thead>
                 <tbody id="documents-body">
-                    <td><button onclick="deleteDocument()">מחק</button></td>
 
                 </tbody>
             </table>
-        </div>
-
-
-
-
-        <div class="card hidden" id="document-display-area">
-            <h2>
-                <i class="fas fa-file-alt"></i>
-                <span id="preview-document-name">תצוגה מקדימה של מסמך</span>
-                <button class="action-btn" onclick="closePreview()" style="margin-right: auto;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </h2>
-            <iframe id="document-viewer" width="100%" height="500px"></iframe>
         </div>
 
         <div class="section" id="reshumotList">
@@ -869,6 +854,7 @@
                 editButton.onclick = function () {
                     // Load this record data into the form for editing
                     loadRecordToForm(item);
+                    loadDocuments(data.Rsh_id);
                 };
 
                 const deleteButton = document.createElement('button');
@@ -968,89 +954,6 @@
             );
         });
         document.addEventListener('DOMContentLoaded', function () {
-            // Try to load mnilvim
-            if (typeof listAllMnilvim === 'function') {
-                listAllMnilvim()
-                    .then(documents => {
-                        console.log('Documents loaded:', documents); // לוג של המסמכים שהוטענו
-                        const tableBody = document.getElementById('documents-body');
-                        tableBody.innerHTML = ''; // ניקוי התוכן הקיים
-
-                        if (!documents || documents.length === 0) {
-                            const row = tableBody.insertRow();
-                            const cell = row.insertCell(0);
-                            cell.colSpan = 7; // עדכון למספר השדות
-                            cell.style.textAlign = 'center';
-                            cell.textContent = 'No documents available';
-                            return;
-                        }
-
-                        documents.forEach(doc => {
-                            const row = tableBody.insertRow();
-
-                            const idCell = row.insertCell(0);
-                            idCell.textContent = doc.MN_id || 'N/A'; // הנחה שיש שדה בשם 'MN_id'
-
-                            const pratimCell = row.insertCell(1);
-                            pratimCell.textContent = doc.MN_pratim || 'N/A'; // הנחה שיש שדה בשם 'MN_pratim'
-
-                            const locationCell = row.insertCell(2);
-                            locationCell.textContent = doc.MN_location || 'N/A'; // הנחה שיש שדה בשם 'MN_location'
-
-                            const MN_shyoochCell = row.insertCell(3);
-                            idCell.textContent = doc.MN_shyooch || 'N/A'; // הנחה שיש שדה בשם 'MN_id'
-
-                            const MN_statusCell = row.insertCell(4);
-                            pratimCell.textContent = doc.MN_status || 'N/A'; // הנחה שיש שדה בשם 'MN_pratim'
-
-                            const MN_dateAddCell = row.insertCell(5);
-                            locationCell.textContent = doc.MN_dateAdd || 'N/A'; // הנחה שיש שדה בשם 'MN_location'
-
-                            const MN_typeCell = row.insertCell(6);
-                            locationCell.textContent = doc.MN_type || 'N/A'; // הנחה שיש שדה בשם 'MN_location'
-
-                            // הוספת כפתורים לפעולות (אם יש צורך)
-                            const actionsCell = row.insertCell(6);
-                            const viewBtn = document.createElement('button');
-                            viewBtn.className = 'action-btn';
-                            viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
-                            viewBtn.title = 'View Document';
-                            viewBtn.onclick = function () {
-                                // הוסף כאן את הלוגיקה להצגת המסמך אם יש צורך
-                            };
-                            actionsCell.appendChild(viewBtn);
-
-                            const deleteBtn = document.createElement('button');
-                            deleteBtn.className = 'action-btn';
-                            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                            deleteBtn.title = 'Delete Document';
-                            deleteBtn.onclick = function () {
-                                Swal.fire({
-                                    title: 'Are you sure?',
-                                    text: "You won't be able to revert this!",
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#d33',
-                                    cancelButtonColor: '#3085d6',
-                                    confirmButtonText: 'Yes, delete it!'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        // הוסף כאן קוד למחיקת המסמך מהשרת
-                                        Swal.fire('Deleted!', 'Your document has been deleted.', 'success');
-                                        loadDocuments(); // טען מחדש את המסמכים
-                                    }
-                                });
-                            };
-                            actionsCell.appendChild(deleteBtn);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading documents:', error);
-                        showNotification('Failed to load documents', 'error');
-                    });
-            } else {
-                console.error('listAllMnilvim function is not available');
-            }
             checkPR();
             if (document.referrer.includes("login")) {
                 updateUser(localStorage.getItem('userId'), {
@@ -1072,164 +975,62 @@
         function goToAdmin() {
             window.location.href = 'admin.html';
         }
-
-
-        function closePreview() {
-            document.getElementById('document-display-area').classList.add('hidden');
+        async function fetchDocument(url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = ''; // זה יגרום לדפדפן להוריד את הקובץ
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
-        async function fetchDocument(url, type) {
-            const viewer = document.getElementById('document-viewer');
-            const displayArea = document.getElementById('document-display-area');
 
-            // הצג את אזור התצוגה המקדימה
-            displayArea.classList.remove('hidden');
-
-            console.log("Fetching document:", url, "Type:", type);
-
-            // בדיקה אם זה קובץ Word
-            if (type.toLowerCase() === 'word' || type.toLowerCase() === 'doc' || type.toLowerCase() === 'docx' || url.toLowerCase().endsWith('.docx') || url.toLowerCase().endsWith('.doc')) {
-                // עבור קבצי Word, נציג דף עם אפשרויות להורדה או פתיחה
-                viewer.srcdoc = `
-            <html>
-            <head>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        text-align: center;
-                        padding: 20px;
-                        direction: rtl;
-                        background-color: #f5f5f5;
-                    }
-                    .container {
-                        max-width: 500px;
-                        margin: 0 auto;
-                        background-color: white;
-                        padding: 30px;
-                        border-radius: 8px;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    }
-                    h2 {
-                        color: #333;
-                        margin-bottom: 20px;
-                    }
-                    p {
-                        color: #666;
-                        margin-bottom: 25px;
-                    }
-                    .button {
-                        display: inline-block;
-                        margin: 10px;
-                        padding: 12px 24px;
-                        background-color: #4285f4;
-                        color: white;
-                        text-decoration: none;
-                        border-radius: 4px;
-                        font-weight: bold;
-                        transition: background-color 0.3s;
-                    }
-                    .button:hover {
-                        background-color: #3367d6;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h2>מסמך Word</h2>
-                    <p>לא ניתן להציג תצוגה מקדימה של מסמך Word ישירות בדפדפן.</p>
-                    <a href="${url}" download class="button">הורד את המסמך</a>
-                </div>
-            </body>
-            </html>
-        `;
-            } else if (type.toLowerCase() === 'pdf' || url.toLowerCase().endsWith('.pdf')) {
-                // PDF יכול להיות מוצג ישירות
-                viewer.src = url;
+        
+        async function loadDocuments(id) {
+            const documentsArea = document.getElementById('documents-area');
+            const tbody = document.getElementById('documents-body');
+            const table = document.getElementById('documentsTable');
+            const documents = await listMnilvim(id); // קריאה לשרת
+            tbody.innerHTML = ''; // ניקוי התוכן הקודם
+            if (!Array.isArray(documents) || documents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3">יש לבחור רשומה על מנת לראות מסמכים</td></tr>';
+                table.style.display = 'none'; // מסתיר את הטבלה
             } else {
-                // עבור סוגי קבצים אחרים
-                viewer.srcdoc = `
-            <html>
-            <head>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        text-align: center;
-                        padding: 20px;
-                        direction: rtl;
-                        background-color: #f5f5f5;
-                    }
-                    .container {
-                        max-width: 500px;
-                        margin: 0 auto;
-                        background-color: white;
-                        padding: 30px;
-                        border-radius: 8px;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    }
-                    h2 {
-                        color: #333;
-                        margin-bottom: 20px;
-                    }
-                    p {
-                        color: #666;
-                        margin-bottom: 25px;
-                    }
-                    .button {
-                        display: inline-block;
-                        margin: 10px;
-                        padding: 12px 24px;
-                        background-color: #4285f4;
-                        color: white;
-                        text-decoration: none;
-                        border-radius: 4px;
-                        font-weight: bold;
-                        transition: background-color 0.3s;
-                    }
-                    .button:hover {
-                        background-color: #3367d6;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h2>הורדת קובץ</h2>
-                    <p>לא ניתן להציג תצוגה מקדימה של קובץ מסוג זה.</p>
-                    <a href="${url}" download class="button">הורד את הקובץ</a>
-                </div>
-            </body>
-            </html>
-        `;
+                table.style.display = 'table'; // מציג את הטבלה
+                documents.forEach(doc => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+        <td>${doc.MN_pratim}</td>
+        <td>${doc.MN_dateAdd}</td>
+        <td><button onclick="deleteDocument('${doc.MN_id}', event)"><i class="fas fa-trash"></i> מחק</button></td>
+    `;
+                    row.onclick = () => fetchDocument(doc.MN_location, doc.MN_type); // הורדה 
+                    tbody.appendChild(row);
+                });
+
+            }
+
+        }
+        async function deleteDocument(id) {
+            event.stopPropagation(); // מונע מהאירוע להתפשט ולגרום להורדת המסמך
+
+            const result = await Swal.fire({
+                title: 'אישור מחיקה',
+                text: 'האם אתה בטוח שברצונך למחוק מסמך זה?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'כן, מחק את זה!',
+                cancelButtonText: 'לא, ביטול'
+            });
+
+            if (result.isConfirmed) {
+                await deleteMnilvim(id);
+                Swal.fire('נמחק!', 'המסמך נמחק.', 'success');
+                loadDocuments(); // טען מחדש את המסמכים
             }
         }
 
-
-        async function loadDocuments() {
-            // document.getElementById('documents-loading').classList.remove('hidden');
-            document.getElementById('documentsTable').classList.add('hidden');
-            // document.getElementById('empty-documents').classList.add('hidden');
-
-
-            const documents = await listAllMnilvim(); // קריאה לשרת
-            // document.getElementById('documents-loading').classList.add('hidden');
-
-            const tbody = document.getElementById('documents-body');
-            tbody.innerHTML = ''; // ניקוי התוכן הקודם
-
-            documents.forEach(doc => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${doc.MN_pratim}</td>
-                <td>${doc.MN_dateAdd}</td>
-                <td><button onclick="deleteDocument('${doc.MN_id}')">מחק</button></td>
-            `;
-                row.onclick = () => fetchDocument(doc.MN_location, doc.MN_type); // תצוגה מקדימה
-                tbody.appendChild(row);
-            });
-        }
-        async function deleteDocument(id) {
-            // כאן תוסיף את הקוד למחיקת המסמך מהשרת
-            alert(`מסמך עם ID ${id} נמחק!`);
-            loadDocuments(); // טען מחדש את המסמכים
-        }
 
     </script>
 </body>

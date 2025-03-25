@@ -137,7 +137,6 @@
                 let reshumot;
                 try {
                     reshumot = await listAllReshumot();
-                    console.log('Received reshumot data:', reshumot);
                     fillForm(reshumot);
                 } catch (e) {
                     console.error('Error calling listAllReshumot:', e);
@@ -315,7 +314,6 @@
             // Add placeholder functions for edit and delete if they don't exist
             if (typeof window.editRecord !== 'function') {
                 window.editRecord = function (id) {
-                    console.log('Edit record:', id);
                     alert('עריכת רשומה: ' + id);
                 };
             }

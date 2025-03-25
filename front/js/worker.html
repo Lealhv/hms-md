@@ -82,9 +82,12 @@
 <body onload="getData()">
     <div class="container">
         <div class="section" id="header">
-            <h1>מערכת ניהול מסמכים</h1>
-            <button id="conditionalButton" class="btn" onclick="goToAdmin()">לעמוד מנהל</button>
+            <div class="header-container">
+                <h1>מערכת ניהול מסמכים</h1>
+                <button id="conditionalButton" class="admin-btn" onclick="goToAdmin()">לעמוד מנהל</button>
+            </div>
         </div>
+
 
         <div class="section" id="input-form">
 
@@ -145,7 +148,7 @@
 
                 <div class="form-group">
                     <label for="agentNumber">מס סוכן:</label>
-                    <input type="text" id="agentNumber" name="agentNumber" placeholder="הזן מספר סוכן">
+                    <input type="text" id="agentNumber" name="" placeholder="הזן מספר סוכן">
                     <div id="error-agentNumber" class="error-message" style="color: red;"></div>
                 </div>
 
@@ -193,7 +196,7 @@
                     </button>
                     <button type="button" class="btn-secondary"
                         onclick="document.getElementById('file-input').click();">
-                        <i class="fas fa-upload"></i> העלאת מסמכים
+                        <i class="fas fa-upload"></i> העלאת מסמכים נילווים
                     </button>
                     <button type="button" class="btn-secondary" onclick="printData()">
                         <i class="fas fa-print"></i> הדפסה
@@ -516,7 +519,6 @@
                 const maam = await listAllMaam();
 
                 // Log the object properly without string concatenation
-                console.log("Maam data:", maam);
 
                 // Check if maam data exists and has at least one entry
                 if (maam && maam.length > 0 && maam[0].maam_value) {
@@ -600,8 +602,8 @@
                     Rsh_schtotal: document.getElementById('totalAmount').value,
                     Rsh_aspaka: document.getElementById('deliveryPlace').value, // Changed from 'contactName' to 'deliveryPlace'
                     Rsh_proyktnam: document.getElementById('projectName').value,
-                    Rsh_status: document.getElementById('contactEmail').value,
-                    Rsh_sochen: document.getElementById('contactName').value, // Changed from 'contactPhone' to 'contactName'
+                    Rsh_email: document.getElementById('contactEmail').value,
+                    Rsh_sochen: document.getElementById('agentNumber').value, // Changed from 'contactPhone' to 'contactName'
                     Rsh_takziv: document.getElementById('budgetItem').value, // Changed from 'agentNumber' to 'budgetItem'
                     Rsh_cname: document.getElementById('contactName').value, // Changed from 'budgetItem' to 'contactName'
                     // Rsh_cnametl: document.getElementById('contactPhone').value, // Added this field
@@ -612,12 +614,13 @@
                     Rsh_cemail: document.getElementById('contactEmail').value
                 };
 
-                console.log('Data to save:', data);
                 try {
                     if (existingRecord) {
+                        data.Rsh_date = new Date().toLocaleString('sv-SE')
+                        // Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
+
                         // If record exists, update it
                         const response = await updateReshumot(data);
-                        console.log('Server response:', response);
                         if (response.message === "Reshumot updated successfully") {
                             showNotification('רשומה עודכנה בהצלחה!');
                             getReshumot()
@@ -626,7 +629,6 @@
                     } else {
                         // If record does not exist, create it
                         const response = await createReshumot(data);
-                        console.log('Server response:', response);
                         if (response.message === "Reshumot created successfully") {
                             showNotification('רשומה נשמרה בהצלחה!');
                             getReshumot()
@@ -661,7 +663,6 @@
                 let reshumot;
                 try {
                     reshumot = await listAllReshumot();
-                    console.log('Received reshumot data:', reshumot);
                     fillForm(reshumot);
                 } catch (e) {
                     console.error('Error calling listAllReshumot:', e);
@@ -715,30 +716,6 @@
             });
         }
 
-
-        /*************  ✨ Codeium Command ⭐  *************/
-        /**
-         * Populates a form container with record data in a card format.
-         *
-         * This function clears any existing content in the form container and
-         * creates a card for each record in the `data` array. Each card displays
-         * the record's details, including its title and data fields, using a
-         * pre-defined mapping for Hebrew field names. The cards also feature 
-         * hover effects for aesthetic purposes.
-         *
-         * Each card includes action buttons for editing and deleting the record. 
-         * Clicking the edit button loads the record's data into the form for 
-         * modification. Clicking the delete button prompts the user for 
-         * confirmation before attempting to delete the record.
-         *
-         * If there are no records to display, a message is shown instead.
-         *
-         * @param {Array} data - An array of record objects to be displayed.
-         *                       Each object should contain key-value pairs
-         *                       corresponding to specific record fields.
-         */
-
-        /******  4a975f3d-9e10-412d-9de6-aad31a4f7e06  *******/
         function fillForm(data) {
             const formContainer = document.getElementById('formContainer');
             formContainer.innerHTML = ''; // Clear previous content
@@ -755,7 +732,7 @@
                 'Rsh_schtotal': 'סכום כולל',
                 'Rsh_aspaka': 'מקום אספקה',
                 'Rsh_proyktnam': 'שם פרויקט',
-                'Rsh_status': 'סטטוס',
+                // 'Rsh_status': 'סטטוס',
                 'Rsh_sochen': 'סוכן',
                 'Rsh_takziv': 'תקציב',
                 'Rsh_cname': 'שם סוכן',
@@ -923,7 +900,8 @@
                 if (document.getElementById('totalAmount')) document.getElementById('totalAmount').value = record.Rsh_schtotal || '';
                 if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = record.Rsh_aspaka || '';
                 if (document.getElementById('projectName')) document.getElementById('projectName').value = record.Rsh_proyktnam || '';
-                if (document.getElementById('contactEmail')) document.getElementById('contactEmail').value = record.Rsh_status || '';
+                if (document.getElementById('agentNumber')) document.getElementById('agentNumber').value = record.Rsh_sochen || '';
+                if (document.getElementById('contactEmail')) document.getElementById('contactEmail').value = record.Rsh_cemail || '';
                 if (document.getElementById('contactName')) document.getElementById('contactName').value = record.Rsh_cname || '';
                 if (document.getElementById('contactPhone')) document.getElementById('contactPhone').value = record.Rsh_cnametl || '';
                 if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = record.Rsh_takziv || '';

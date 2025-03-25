@@ -19,12 +19,16 @@ class ReshumotController
         // קבלת הנתונים מה-BODY של הבקשה
         $data = json_decode(file_get_contents("php://input"));
 
-        $query = "INSERT INTO reshumot (Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_patoor, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_aspaka, Rsh_proyktnam, Rsh_status, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO reshumot (Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_patoor, Rsh_schoom, Rsh_maam, Rsh_schmaam, Rsh_schtotal, Rsh_aspaka, Rsh_proyktnam, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
+        if ($stmt === false) {
+            echo json_encode(["error" => "Prepare failed: " . $this->conn->error]);
+            return;
+        }
 
         $stmt->bind_param(
-            "ssssssssssssssss",
+            "ssssisddddsssss",
             $data->Rsh_date,
             $data->Rsh_mchlaka,
             $data->Rsh_sapak,
@@ -35,7 +39,6 @@ class ReshumotController
             $data->Rsh_schtotal,
             $data->Rsh_aspaka,
             $data->Rsh_proyktnam,
-            $data->Rsh_status,
             $data->Rsh_sochen,
             $data->Rsh_takziv,
             $data->Rsh_cname,
@@ -50,6 +53,7 @@ class ReshumotController
             echo json_encode(["error" => "Failed to create reshumot: " . $stmt->error]);
         }
     }
+
 
 
 
@@ -73,7 +77,10 @@ class ReshumotController
     {
         // קבלת הנתונים מה-BODY של הבקשה
         $data = json_decode(file_get_contents("php://input"));
-
+    
+        // Debug output to check the data
+        error_log("Data received: " . print_r($data, true));
+    
         $query = "UPDATE reshumot SET 
                     Rsh_date = ?, 
                     Rsh_mchlaka = ?, 
@@ -85,43 +92,56 @@ class ReshumotController
                     Rsh_schtotal = ?, 
                     Rsh_aspaka = ?, 
                     Rsh_proyktnam = ?, 
-                    Rsh_status = ?, 
                     Rsh_sochen = ?, 
                     Rsh_takziv = ?, 
                     Rsh_cname = ?, 
                     Rsh_cnametl = ?, 
                     Rsh_cemail = ? 
                   WHERE Rsh_id = ?";
-
+    
         $stmt = $this->conn->prepare($query);
-
+        if ($stmt === false) {
+            echo json_encode(["error" => "Prepare failed: " . $this->conn->error]);
+            return;
+        }
+    
+        // Explicitly convert numeric values to ensure proper binding
+        $schoom = floatval($data->Rsh_schoom);
+        $maam = floatval($data->Rsh_maam);
+        $schmaam = floatval($data->Rsh_schmaam);
+        $schtotal = floatval($data->Rsh_schtotal);
+        $sochen = strval($data->Rsh_sochen);
+        $takziv = strval($data->Rsh_takziv);
+        $id_param = intval($id);
+    
         $stmt->bind_param(
-            "ssssssssssssssssi",
+            "ssssddddsssssssi",
             $data->Rsh_date,
             $data->Rsh_mchlaka,
             $data->Rsh_sapak,
             $data->Rsh_patoor,
-            $data->Rsh_schoom,
-            $data->Rsh_maam,
-            $data->Rsh_schmaam,
-            $data->Rsh_schtotal,
+            $schoom,
+            $maam,
+            $schmaam,
+            $schtotal,
             $data->Rsh_aspaka,
             $data->Rsh_proyktnam,
-            $data->Rsh_status,
-            $data->Rsh_sochen,
-            $data->Rsh_takziv,
+            $sochen,
+            $takziv,
             $data->Rsh_cname,
             $data->Rsh_cnametl,
             $data->Rsh_cemail,
-            $id // ה-ID של הרשומה לעדכון
+            $id_param
         );
-
+    
         if ($stmt->execute()) {
             echo json_encode(["message" => "Reshumot updated successfully"]);
         } else {
             echo json_encode(["error" => "Failed to update reshumot: " . $stmt->error]);
         }
     }
+    
+    
 
 
 

@@ -85,8 +85,15 @@
         <div class="section" id="header">
             <div class="header-container">
                 <h1>מערכת ניהול מסמכים</h1>
-                <button id="conditionalButton" class="admin-btn" onclick="goToAdmin()">לעמוד מנהל</button>
+                <!-- <button id="conditionalButton" class="admin-btn" onclick="goToAdmin()">לעמוד מנהל</button> -->
             </div>
+        </div>
+
+        <div class="header-buttons">
+            <button type="button" class="btn-danger" onclick="exit()">
+                <i class="fas fa-sign-out-alt"></i> יציאה
+            </button>
+            <button id="conditionalButton" class="admin-btn" onclick="goToAdmin()">לעמוד מנהל</button>
         </div>
 
 
@@ -192,30 +199,30 @@
 
                 <!-- Buttons -->
                 <div class="btn-container">
-                    <button type="button" class="btn-primary" onclick="saveData()">
-                        <i class="fas fa-save"></i> שמירת נתונים
-                    </button>
-                    <button type="button" class="btn-secondary"
-                        onclick="document.getElementById('file-input').click();">
-                        <i class="fas fa-upload"></i> העלאת מסמכים נילווים
-                    </button>
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('document').click();">
-                        <i class="fas fa-file-upload"></i> הוספת מסמכים
-                    </button>
+                    <!-- Replace the entire buttons section with this: -->
+                    <div class="btn-container">
+                        <button type="button" class="btn-primary form-action-btn" onclick="saveData()">
+                            <i class="fas fa-save"></i> שמירת נתונים
+                        </button>
+                        <button type="button" class="btn-secondary form-action-btn"
+                            onclick="document.getElementById('file-input').click();">
+                            <i class="fas fa-upload"></i> העלאת מסמכים נילווים
+                        </button>
+                        <button type="button" class="btn-secondary form-action-btn" onclick="printData()">
+                            <i class="fas fa-print"></i> הדפסה
+                        </button>
+                        <button type="button" class="btn-secondary form-action-btn" onclick="exportToPDF()">
+                            <i class="fas fa-file-pdf"></i> ייצוא PDF
+                        </button>
+                        <button type="button" class="btn-secondary form-action-btn" onclick="exportToExcel()">
+                            <i class="fas fa-file-excel"></i> ייצוא EXCEL
+                        </button>
+                        <button type="button" class="btn-secondary"
+                            style="padding: 10px 19px; margin: 5px; font-size: 16px;" onclick="clearFields()">
+                            <i class="fas fa-eraser"></i> ניקוי
+                        </button>
+                    </div>
 
-                    <button type="button" class="btn-secondary" onclick="exportToPDF()">
-                        <i class="fas fa-file-pdf"></i> ייצוא PDF
-                    </button>
-                    <button type="button" class="btn-secondary" onclick="exportToExcel()">
-                        <i class="fas fa-file-excel"></i> ייצוא EXCEL
-                    </button>
-                    <button type="button" class="btn-secondary" onclick="clearFields()">
-                        <i class="fas fa-eraser"></i> ניקוי
-                    </button>
-
-                    <button type="button" class="btn-danger" onclick="exit()">
-                        <i class="fas fa-sign-out-alt"></i> יציאה
-                    </button>
                 </div>
             </form>
         </div>
@@ -269,6 +276,63 @@
             document.getElementById('scmaan').value = vat;
             document.getElementById('totalAmount').value = parseFloat(amount) + vat;
         }
+        // Function to check if all required fields are filled
+        function checkFormCompletion() {
+            const requiredFields = [
+                'department',
+                'supplierName',
+                'amount',
+                'deliveryPlace',
+                'agentNumber',
+                'contactName',
+                'contactPhone',
+                'contactEmail',
+                'projectName',
+                'budgetItem'
+            ];
+
+            let allFilled = true;
+
+            for (const fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field || !field.value.trim()) {
+                    allFilled = false;
+                    break;
+                }
+            }
+
+            // Special validation for phone and email
+            const phone = document.getElementById('contactPhone').value;
+            const email = document.getElementById('contactEmail').value;
+
+            if (!validatePhone(phone) || !validateEmail(email)) {
+                allFilled = false;
+            }
+
+            // Update buttons state
+            const actionButtons = document.querySelectorAll('.form-action-btn');
+            actionButtons.forEach(button => {
+                if (allFilled) {
+                    button.classList.remove('disabled-btn');
+                    button.disabled = false;
+                } else {
+                    button.classList.add('disabled-btn');
+                    button.disabled = true;
+                }
+            });
+        }
+
+        // Add event listeners to all form fields to check completion on input
+        document.addEventListener('DOMContentLoaded', function () {
+            const formFields = document.querySelectorAll('#documentForm input, #documentForm select');
+            formFields.forEach(field => {
+                field.addEventListener('input', checkFormCompletion);
+            });
+
+            // Initial check
+            checkFormCompletion();
+        });
+
 
         function validateForm() {
             const department = document.getElementById("department").value;
@@ -371,9 +435,18 @@
 
         // הוסף מאזיני אירועים לכל שדה
         document.querySelectorAll('input, select').forEach(element => {
+            setupErrorClearingListeners();
             element.addEventListener('input', clearErrorMessages);
         });
 
+
+
+        function setupErrorClearingListeners() {
+            document.querySelectorAll('input, select').forEach(element => {
+                // Remove the debugger statement
+                element.addEventListener('input', clearErrorMessages);
+            });
+        }
 
         function clearErrorMessages() {
             const errorIds = [
@@ -432,6 +505,7 @@
 
             // If you have a checkbox for exempt, you might want to uncheck it
             if (document.getElementById('exempt')) document.getElementById('exempt').checked = false;
+            checkFormCompletion();
         }
 
 
@@ -912,6 +986,7 @@
             formContainer.appendChild(recordsContainer);
 
             // Add a helper function to load record data into the form
+            // Update the loadRecordToForm function to call checkFormCompletion
             function loadRecordToForm(record) {
                 // Set form values from the record
                 if (document.getElementById('autoNumber')) document.getElementById('autoNumber').value = record.Rsh_id || '';
@@ -943,11 +1018,23 @@
                 if (document.getElementById('contactPhone')) document.getElementById('contactPhone').value = record.Rsh_cnametl || '';
                 if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = record.Rsh_takziv || '';
 
+                // Clear any existing error messages
+                clearErrorMessages();
+
+                // Call checkFormCompletion to update button states based on the loaded data
+                checkFormCompletion();
+
+                // Recalculate VAT if amount is present
+                if (document.getElementById('amount').value) {
+                    calculateVAT();
+                }
+
                 // Scroll to the form
                 document.getElementById('input-form').scrollIntoView({ behavior: 'smooth' });
 
                 showNotification('הרשומה נטענה לעריכה', 'info');
             }
+
 
             // If no data, show a message
             if (data.length === 0) {

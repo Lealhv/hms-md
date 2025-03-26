@@ -58,7 +58,7 @@ async function addMnilvim(document) {
       },
       body: JSON.stringify(document),
     });
-
+   
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

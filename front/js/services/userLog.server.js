@@ -1,7 +1,6 @@
 
 function updateUser(id, userData) {
     const url =`http://localhost/project/hms-md/Back/controller/UserLogController.php/log/${id} `;
-    debugger
   console.log("start")
     fetch(url, {
         method: 'PATCH',

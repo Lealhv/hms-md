@@ -70,6 +70,7 @@
     <script src="services/reshumot.server.js" defer></script>
     <script src="services/maam.server.js" defer></script>
     <script src="services/mnilvim.server.js" defer></script>
+    <script src="services/userLog.server.js" defer></script>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -198,9 +199,10 @@
                         onclick="document.getElementById('file-input').click();">
                         <i class="fas fa-upload"></i> העלאת מסמכים נילווים
                     </button>
-                    <button type="button" class="btn-secondary" onclick="printData()">
-                        <i class="fas fa-print"></i> הדפסה
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('document').click();">
+                        <i class="fas fa-file-upload"></i> הוספת מסמכים
                     </button>
+
                     <button type="button" class="btn-secondary" onclick="exportToPDF()">
                         <i class="fas fa-file-pdf"></i> ייצוא PDF
                     </button>
@@ -210,6 +212,7 @@
                     <button type="button" class="btn-secondary" onclick="clearFields()">
                         <i class="fas fa-eraser"></i> ניקוי
                     </button>
+
                     <button type="button" class="btn-danger" onclick="exit()">
                         <i class="fas fa-sign-out-alt"></i> יציאה
                     </button>
@@ -220,7 +223,8 @@
         <!-- ---------------------------------------------------- -->
 
         <div class="card" id="documents-area">
-            <h2><i class="fas fa-folder-open"></i>מסמכים נלווים</h2>
+            <h2><i class="fas fa-folder-open"></i> מסמכים נלווים</h2>
+            <div id="message" style="display:none; color:red;"></div> <!-- הודעה נפרדת -->
             <table id="documentsTable" style="display:none;">
                 <thead>
                     <tr>
@@ -230,10 +234,10 @@
                     </tr>
                 </thead>
                 <tbody id="documents-body">
-
                 </tbody>
             </table>
         </div>
+
 
         <div class="section" id="reshumotList">
             <h2>רשומות</h2>
@@ -242,14 +246,19 @@
         <div id="formContainer"></div> <!-- הוספת אלמנט זה -->
 
         <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)">
+        <input type="file" id="document" style="display: none;" onchange="MnilvimUpload(event)">
 
     </div>
 
     <script>
+        let isFunctionCalled = false; // משתנה גלובלי לבדוק אם הפונקציה זומנה
+
+        var RSH_ID = 0;
         function getData() {
             getReshumot();
             getMaam();
-            loadDocuments();
+            checkFunctionCall();
+            //  loadDocuments();
 
         }
         function calculateVAT() {
@@ -436,6 +445,33 @@
 
         function exit() {
             window.location.href = 'login.html'; // דף הלוגאין
+        }
+        function MnilvimUpload(event) {
+            event.preventDefault(); // למנוע את שליחת הטופס הרגילה
+
+            const fileInput = document.getElementById('document');
+            const data = {};
+
+            // הוסף את המידע הנוסף
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                data.MN_pratim = file.name; // שם הקובץ
+                data.MN_location = fileInput.value; // מיקום הקובץ במחשב
+                data.MN_shyooch = RSH_ID; // לדוגמה, RSH_ID
+                data.MN_status = 1; // סטטוס
+                data.MN_dateAdd = new Date().toISOString().split('T')[0]; // תאריך של היום
+                data.MN_type = file.type; // סוג הקובץ
+            }
+
+            addMnilvim(data)
+                .then(response => {
+                    // הנח את ההודעה כאן אם ההוספה הצליחה
+                    showNotification("הקובץ נוסף בהצלחה!");
+                })
+                .catch(error => {
+                    // הנח את ההודעה כאן אם הייתה שגיאה
+                    showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
+                });
         }
 
         function handleFileUpload(event) {
@@ -717,6 +753,7 @@
         }
 
         function fillForm(data) {
+            RSH_ID = data.Rsh_id;
             const formContainer = document.getElementById('formContainer');
             formContainer.innerHTML = ''; // Clear previous content
 
@@ -962,32 +999,44 @@
             document.body.removeChild(a);
         }
 
-        
+
         async function loadDocuments(id) {
+            isFunctionCalled = true; // עדכון המשתנה כאשר הפונקציה זומנה
+
             const documentsArea = document.getElementById('documents-area');
             const tbody = document.getElementById('documents-body');
             const table = document.getElementById('documentsTable');
+            const messageDiv = document.getElementById('message');
             const documents = await listMnilvim(id); // קריאה לשרת
             tbody.innerHTML = ''; // ניקוי התוכן הקודם
+            messageDiv.style.display = 'none'; // הסתרת הודעה
+
             if (!Array.isArray(documents) || documents.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3">יש לבחור רשומה על מנת לראות מסמכים</td></tr>';
+                messageDiv.innerHTML = ' אין מסמכים נילווים';
+                messageDiv.style.display = 'block'; // הצגת הודעה
                 table.style.display = 'none'; // מסתיר את הטבלה
             } else {
                 table.style.display = 'table'; // מציג את הטבלה
                 documents.forEach(doc => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-        <td>${doc.MN_pratim}</td>
-        <td>${doc.MN_dateAdd}</td>
-        <td><button onclick="deleteDocument('${doc.MN_id}', event)"><i class="fas fa-trash"></i> מחק</button></td>
-    `;
+                <td>${doc.MN_pratim}</td>
+                <td>${doc.MN_dateAdd}</td>
+                <td><button onclick="deleteDocument('${doc.MN_id}', event)"><i class="fas fa-trash"></i> מחק</button></td>
+            `;
                     row.onclick = () => fetchDocument(doc.MN_location, doc.MN_type); // הורדה 
                     tbody.appendChild(row);
                 });
-
             }
-
         }
+
+        function checkFunctionCall() {
+    if (!isFunctionCalled) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = ' יש לבחור רשומה על מנת להציג מסמכים ';
+        messageDiv.style.display = 'block'; // הצגת הודעה
+    }
+}
         async function deleteDocument(id) {
             event.stopPropagation(); // מונע מהאירוע להתפשט ולגרום להורדת המסמך
 

@@ -34,11 +34,11 @@ class MnilvimController
         }
 
         // Create the Mnilvim object and save to database
-        $query = "INSERT INTO mnilvim ( MN_pratim, MN_location, MN_shyooch, MN_status, MN_dateAdd,MN_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
+        // $query = "INSERT INTO mnilvim ( MN_pratim, MN_location, MN_shyooch, MN_status, MN_dateAdd,MN_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO mnilvim (MN_pratim, MN_location, MN_shyooch, MN_status, MN_dateAdd, MN_type) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param(
-            "ssssss",
+            "ssisss",
             $data['MN_pratim'],
             $data['MN_location'],
             $data['MN_shyooch'],
@@ -161,6 +161,3 @@ if (count($requestUri) >= 1) {
 } else {
     echo json_encode(["error" => "Invalid request"]);
 }
-
-
-

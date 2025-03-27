@@ -3,18 +3,25 @@ const mnilvimApiUrl = 'http://localhost/project/hms-md/Back/controller/MnilvimCo
 
 // Function to list all mnilvim
 async function listMnilvim(id) {
+  console.log("List")
+  debugger
   try {
+    console.log(`Fetching data for ID: ${id}`); // לוג של ה-ID
     const response = await fetch(`${mnilvimApiUrl}/${id}`);
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('Data received:', data); // לוג של הנתונים שהתקבלו
     return data;
   } catch (error) {
+    console.error('Error fetching data:', error); // לוג של השגיאה
     throw error;
   }
 }
+
 async function deleteMnilvim(id) {
   try {
     const response = await fetch(`${mnilvimApiUrl}/${id}`, {
@@ -58,7 +65,7 @@ async function addMnilvim(document) {
       },
       body: JSON.stringify(document),
     });
-   
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -71,10 +78,10 @@ async function addMnilvim(document) {
 }
 
 
-window.updateMnilvim = updateMnilvim ;
+window.updateMnilvim = updateMnilvim;
 
-window.addMnilvim = addMnilvim ;
+window.addMnilvim = addMnilvim;
 
-window.deleteMnilvim = deleteMnilvim ;
+window.deleteMnilvim = deleteMnilvim;
 
 window.listMnilvim = listMnilvim;

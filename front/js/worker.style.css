@@ -112,7 +112,8 @@ body {
 }
 
 /* Base button styles */
-.btn-primary,  .btn-danger {
+.btn-primary,
+.btn-danger {
     padding: 10px 15px;
     border-radius: 5px;
     border: none;
@@ -125,7 +126,8 @@ body {
     position: relative;
 }
 
-.btn-primary i, .btn-danger i {
+.btn-primary i,
+.btn-danger i {
     margin-left: 8px;
 }
 
@@ -157,8 +159,30 @@ body {
     transform: translateY(-2px);
 }
 
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px 0;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    text-align: center;
+    font-weight: 700;
+    font-size: 2rem;
+}
 
 
+/* 
 .container {
     width: 95%;
     max-width: 1000px;
@@ -166,7 +190,7 @@ body {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-}
+} */
 
 /* Compact Form Styling */
 #documentForm {

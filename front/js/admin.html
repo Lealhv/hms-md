@@ -9,12 +9,207 @@
     <title>מערכת ניהול מסמכים מאובטחת</title>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Add SweetAlert2 CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script type="module" src="services/userLog.server.js"></script>
-        <script src="services/reshumot.server.js" defer></script>
+    <script src="services/reshumot.server.js" defer></script>
+
+    <!-- Existing head content -->
+
+    <style>
+        /* Modal Dialog Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 800px;
+            animation: slideDown 0.4s;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-title {
+            margin: 0;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.2s;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        #documentForm {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="email"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-container label {
+            margin-left: 10px;
+            margin-bottom: 0;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-container {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .form-action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a7bc8;
+        }
+
+        .btn-secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e1e1e1;
+        }
+
+        .error-message {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
 
     <link rel="stylesheet" href="admin.style.css">
-
 </head>
+\
 
 <body>
     <header>
@@ -47,10 +242,10 @@
             <h2><i class="fas fa-file-alt"></i> רשימת רשומות</h2>
             <div id="listAllReshumot"></div>
         </div>
-
+        <!-- 
         <div class="status" id="statusMessage">
             <i class="fas fa-info-circle"></i> סטטוס: לא נבחר מסמך
-        </div>
+        </div> -->
 
         <div class="card">
             <h2><i class="fas fa-file-pdf"></i> תצוגה מקדימה של המסמך</h2>
@@ -64,6 +259,121 @@
         </div>
 
     </div>
+
+    <div id="editDialog" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"> עריכת רשומה </h2>
+                <button type="button" class="close" onclick="closeEditDialog()" aria-label="סגור">&times;</button>
+            </div>
+            <form id="documentForm">
+                <!-- Row 1 -->
+                <div class="form-group">
+                    <label for="editDepartment">מחלקה:</label>
+                    <input type="text" id="editDepartment" name="department" placeholder="הזן שם מחלקה">
+                    <div id="error-department" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="supplierName">שם הספק:</label>
+                    <select id="supplierName" name="supplierName">
+                        <option value="" disabled selected>בחר ספק</option>
+                        <option value="ספק 1">ספק 1</option>
+                        <option value="ספק 2">ספק 2</option>
+                    </select>
+                    <div id="error-supplierName" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group checkbox-container">
+                    <label for="exempt">עוסק פטור:</label>
+                    <input type="checkbox" id="exempt" name="exempt">
+                    <div id="error-exempt" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">סכום:</label>
+                    <input type="number" id="amount" name="amount" onchange="calculateVAT()" placeholder="הזן סכום">
+                    <div id="error-amount" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="maam_id">מע"מ:</label>
+                    <input type="number" id="maam_id" name="vat" readonly>
+                    <div id="error-maam_id" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="scmaan">סכום מע"מ:</label>
+                    <input type="number" id="scmaan" name="scmaan" readonly>
+                    <div id="error-scmaan" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalAmount">סכום כולל:</label>
+                    <input type="number" id="totalAmount" name="totalAmount" readonly>
+                    <div id="error-totalAmount" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="deliveryPlace">מקום אספקה:</label>
+                    <input type="text" id="deliveryPlace" name="deliveryPlace" placeholder="הזן מקום אספקה">
+                    <div id="error-deliveryPlace" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="agentNumber">מס סוכן:</label>
+                    <input type="text" id="agentNumber" name="agentNumber" placeholder="הזן מספר סוכן">
+                    <div id="error-agentNumber" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactName">שם סוכן:</label>
+                    <input type="text" id="contactName" name="contactName" placeholder="הזן שם סוכן">
+                    <div id="error-contactName" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactPhone">טלפון סוכן:</label>
+                    <input type="text" id="contactPhone" name="contactPhone" placeholder="הזן טלפון סוכן">
+                    <div id="error-contactPhone" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactEmail">מייל סוכן:</label>
+                    <input type="email" id="contactEmail" name="contactEmail" placeholder="הזן מייל סוכן">
+                    <div id="error-contactEmail" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="projectName">שם פרויקט:</label>
+                    <input type="text" id="projectName" name="projectName" placeholder="הזן שם פרויקט">
+                    <div id="error-projectName" class="error-message" style="color: red;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="budgetItem">תקציב:</label>
+                    <input type="number" id="budgetItem" name="budgetItem" placeholder="הזן תקציב">
+                    <div id="error-budgetItem" class="error-message" style="color: red;"></div>
+                </div>
+
+                <!-- Hidden fields -->
+                <input type="hidden" id="autoNumber" name="autoNumber">
+                <input type="hidden" id="timestamp" name="timestamp">
+
+                <div id="error-message" class="error-message" style="color: red;"></div>
+
+                <!-- Buttons -->
+                <div class="btn-container">
+                   
+                    <button type="button" class="btn-primary form-action-btn" onclick="saveData()">
+                        <i class="fas fa-save"></i> שמירת נתונים
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
 
     <script>
         if (document.referrer.includes("login")) {
@@ -101,21 +411,21 @@
             alert("מסנן רשומות...");
         }
 
-        function loadDocument(documentId) {
-            // לוגיקה לטעינה והצגת המסמך
-            document.getElementById('statusMessage').innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ' + documentId + ' נטען בהצלחה.';
+        // function loadDocument(documentId) {
+        //     // לוגיקה לטעינה והצגת המסמך
+        //     document.getElementById('statusMessage').innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ' + documentId + ' נטען בהצלחה.';
 
-            // דוגמה להצגת תוכן מסמך
-            document.getElementById('documentPreview').innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <h3>מסמך ${documentId}</h3>
-                    <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
-                        <p>זוהי תצוגה מקדימה של מסמך ${documentId}.</p>
-                        <p>כאן יוצג תוכן המסמך האמיתי.</p>
-                    </div>
-                </div>
-            `;
-        }
+        //     // דוגמה להצגת תוכן מסמך
+        //     document.getElementById('documentPreview').innerHTML = `
+        //         <div style="text-align: center; padding: 20px;">
+        //             <h3>מסמך ${documentId}</h3>
+        //             <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
+        //                 <p>זוהי תצוגה מקדימה של מסמך ${documentId}.</p>
+        //                 <p>כאן יוצג תוכן המסמך האמיתי.</p>
+        //             </div>
+        //         </div>
+        //     `;
+        // }
 
         function goToEmployeePage(variable) {
             localStorage.setItem('PR', variable);
@@ -131,44 +441,55 @@
             alert("מתנתק מהמערכת...");
             window.location.href = 'login.html'; // הפניה לדף התחברות
         }
-
         async function getReshumot() {
             try {
+                console.log("Starting getReshumot function");
+                const reshumotListDiv = document.getElementById('listAllReshumot');
+
+                // Check if the div exists
+                if (!reshumotListDiv) {
+                    console.error('listAllReshumot div not found in the DOM');
+                    return;
+                }
+
+                // Show loading indicator
+                reshumotListDiv.innerHTML = '<p>Loading data...</p>';
+
                 let reshumot;
                 try {
+                    console.log("Calling listAllReshumot API");
                     reshumot = await listAllReshumot();
-                    fillForm(reshumot);
+                    console.log("API response:", reshumot);
+
+                    if (reshumot && Array.isArray(reshumot) && reshumot.length > 0) {
+                        console.log(`Received ${reshumot.length} records`);
+                        fillForm(reshumot);
+                    } else {
+                        console.warn('No records returned from API');
+                        reshumotListDiv.innerHTML = '<p>אין נתונים להצגה</p>';
+                    }
                 } catch (e) {
                     console.error('Error calling listAllReshumot:', e);
-                    reshumotListDiv.innerHTML = '<p>Error fetching data: ' + e.message + '</p>';
-                    return;
+                    reshumotListDiv.innerHTML = '<p>שגיאה בטעינת נתונים: ' + e.message + '</p>';
                 }
-
-                if (!reshumot) {
-                    console.warn('Reshumot data is null or undefined');
-                    reshumotListDiv.innerHTML = '<p>No data available</p>';
-                    return;
-                }
-
             } catch (error) {
                 console.error('Error in getReshumot function:', error);
-                const reshumotListDiv = document.getElementById('reshumotList');
+                const reshumotListDiv = document.getElementById('listAllReshumot');
                 if (reshumotListDiv) {
-                    reshumotListDiv.innerHTML = '<p>Error loading data: ' + error.message + '</p>';
+                    reshumotListDiv.innerHTML = '<p>שגיאה בטעינת נתונים: ' + error.message + '</p>';
                 }
             }
-        }
-
-        function fillForm(reshumot) {
+        } function fillForm(reshumot) {
+            console.log("Starting fillForm function with", reshumot.length, "records");
             const reshumotListDiv = document.getElementById('listAllReshumot');
 
             if (!reshumot || reshumot.length === 0) {
+                console.warn('No records to display in fillForm');
                 reshumotListDiv.innerHTML = '<p>אין נתונים להצגה</p>';
                 return;
             }
 
             const titleMapping = {
-                'Rsh_id': 'מספר רשומה',
                 'Rsh_date': 'תאריך',
                 'Rsh_mchlaka': 'מחלקה',
                 'Rsh_sapak': 'ספק',
@@ -179,184 +500,227 @@
                 'Rsh_schtotal': 'סכום כולל',
                 'Rsh_aspaka': 'מקום אספקה',
                 'Rsh_proyktnam': 'שם פרויקט',
-                'Rsh_status': 'סטטוס',
                 'Rsh_sochen': 'סוכן',
-                'Rsh_takziv': 'תזכיר',
-                'Rsh_cname': 'שם לקוח',
-                'Rsh_cnametl': 'טלפון לקוח',
-                'Rsh_cemail': 'מייל לקוח'
+                'Rsh_cname': 'שם סוכן',
+                'Rsh_cnametl': 'טלפון סוכן',
+                'Rsh_cemail': 'מייל סוכן',
+                'Rsh_takziv': 'תקציב'
+
             };
 
-            // Create table
-            let tableHTML = '<div class="table-responsive"><table class="records-table">';
+            // Columns to hide from display
+            const hiddenColumns = ['Rsh_id', 'Rsh_status'];
 
-            // Create header row
-            tableHTML += '<thead><tr>';
-            tableHTML += `<th>פעולות</th>`; // Add Actions column header
-            for (const key in titleMapping) {
-                if (key !== 'Rsh_id') { // Skip ID as it's not needed in the header
-                    tableHTML += `<th>${titleMapping[key]}</th>`;
-                }
-            }
-            tableHTML += '</tr></thead>';
+            try {
+                // Create table
+                let tableHTML = '<div class="table-responsive"><table class="records-table">';
 
-            // Create table body
-            tableHTML += '<tbody>';
-            reshumot.forEach(record => {
-                tableHTML += `<tr data-id="${record.Rsh_id}">`;
-
-                // First cell with action buttons
-                tableHTML += `<td>
-            <div class="action-buttons">
-                <button class="btn-action btn-edit" onclick="editRecord('${record.Rsh_id}')">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-action btn-delete" onclick="deleteRecord('${record.Rsh_id}')">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-                <button class="btn-action btn-view" onclick="loadDocument('${record.Rsh_id}')">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-        </td>`;
-
-                // Rest of the cells
+                // Create header row
+                tableHTML += '<thead><tr>';
                 for (const key in titleMapping) {
-                    if (key === 'Rsh_id') continue; // Skip ID as it's already in the first cell
-
-                    // Format date if the field is a date
-                    if (key === 'Rsh_date' && record[key]) {
-                        const date = new Date(record[key]);
-                        if (!isNaN(date)) {
-                            tableHTML += `<td>${date.toLocaleDateString('he-IL')}</td>`;
-                        } else {
-                            tableHTML += `<td>${record[key] || ''}</td>`;
-                        }
-                    } else {
-                        tableHTML += `<td>${record[key] || ''}</td>`;
+                    if (!hiddenColumns.includes(key)) {
+                        tableHTML += `<th>${titleMapping[key]}</th>`;
                     }
                 }
+                tableHTML += '</tr></thead>';
 
-                tableHTML += '</tr>';
+                // Create table body
+                tableHTML += '<tbody>';
+                reshumot.forEach(record => {
+                    // Create row with data attributes
+                    tableHTML += `<tr class="record-row" data-id="${record.Rsh_id}" data-status="${record.Rsh_status || ''}" onclick="selectRow(this)">`;
+
+                    // Add cells excluding hidden columns
+                    for (const key in titleMapping) {
+                        if (!hiddenColumns.includes(key)) {
+                            tableHTML += `<td class="data-cell"><span class="cell-content">${record[key] || ''}</span></td>`;
+                        }
+                    }
+                    tableHTML += '</tr>';
+                });
+
+                tableHTML += '</tbody></table></div>';
+
+                // Add table to the DOM
+                console.log("Setting HTML content to listAllReshumot div");
+                reshumotListDiv.innerHTML = tableHTML;
+                console.log("Table HTML set successfully");
+
+            } catch (error) {
+                console.error("Error in fillForm:", error);
+                reshumotListDiv.innerHTML = '<p>שגיאה בעיבוד הנתונים: ' + error.message + '</p>';
+            }
+        }
+
+
+        // Replace toggleActions with selectRow
+        function selectRow(row) {
+            const recordId = row.getAttribute('data-id');
+            console.log("selectRow")
+            console.log(recordId)
+            // עדכון ה-ID של הרשומה הנבחרת
+            document.getElementById('autoNumber').value = recordId;
+            const recordStatus = row.getAttribute('data-status');
+
+            console.log("selectRow called for record:", recordId);
+
+            // Remove action buttons from all rows
+            document.querySelectorAll('.action-buttons-overlay').forEach(overlay => {
+                overlay.remove();
             });
 
-            tableHTML += '</tbody></table></div>';
+            // Highlight the selected row
+            const allRows = document.querySelectorAll('.records-table tbody tr');
+            allRows.forEach(r => {
+                r.classList.remove('selected-row');
+            });
 
-            // Add table to the DOM
-            reshumotListDiv.innerHTML = tableHTML;
+            row.classList.add('selected-row');
 
-            // Add some styling for better table appearance
-            const style = document.createElement('style');
-            style.textContent = `
-        .table-responsive {
-            overflow-x: auto;
-            margin-bottom: 20px;
-        }
-        .records-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        .records-table th, .records-table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: right;
-            position: relative;
-        }
-        .records-table th {
-            background-color: #3498db;
-            color: white;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-        }
-        .records-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .records-table tr:hover {
-            background-color: #e9e9e9;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        .btn-action {
-            border: none;
-            border-radius: 4px;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-edit {
-            background-color: #3498db;
-            color: white;
-        }
-        .btn-delete {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .btn-view {
-            background-color: #2ecc71;
-            color: white;
-        }
-        .btn-action:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
+            // Create action buttons overlay
+            const actionButtonsOverlay = document.createElement('div');
+            actionButtonsOverlay.className = 'action-buttons-overlay';
+            actionButtonsOverlay.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="editRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-edit"></i> עריכה</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-trash-alt"></i> מחיקה</button>
     `;
-            document.head.appendChild(style);
 
-            // Add placeholder functions for edit and delete if they don't exist
-            if (typeof window.editRecord !== 'function') {
-                window.editRecord = function (id) {
-                    alert('עריכת רשומה: ' + id);
-                };
+            // Append the overlay to the row
+            row.appendChild(actionButtonsOverlay);
+
+            // Update status message with the selected document ID
+            // document.getElementById('statusMessage').innerHTML =
+            //     `<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ${recordId} נבחר`;
+
+            // Update document preview
+            document.getElementById('documentPreview').innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <h3>מסמך ${recordId}</h3>
+            <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
+                <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
+                <p>סטטוס: ${recordStatus || 'לא מוגדר'}</p>
+            </div>
+        </div>
+    `;
+        }
+
+
+
+
+        // Define the toggleActions function in the global scope
+        function toggleActions(row) {
+            const recordId = row.getAttribute('data-id');
+            const recordStatus = row.getAttribute('data-status');
+
+            console.log("toggleActions called for record:", recordId);
+
+            // Highlight the selected row
+            const allRows = document.querySelectorAll('.records-table tbody tr');
+            allRows.forEach(r => {
+                r.classList.remove('selected-row');
+            });
+            row.classList.add('selected-row');
+
+            // Update status message with the selected document ID
+            document.getElementById('statusMessage').innerHTML =
+                `<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ${recordId} נבחר`;
+
+            // Update document preview
+            document.getElementById('documentPreview').innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <h3>מסמך ${recordId}</h3>
+            <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
+                <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
+                <p>סטטוס: ${recordStatus || 'לא מוגדר'}</p>
+            </div>
+        </div>
+    `;
+
+            // Show action buttons
+            const actionButtonsContainer = document.getElementById('action-buttons-container');
+            if (actionButtonsContainer) {
+                actionButtonsContainer.style.display = 'flex';
+                actionButtonsContainer.setAttribute('data-for-record', recordId);
+            }
+        }
+
+        // Add the editRecord function
+        function editRecord(recordId) {
+            console.log("Edit record:", recordId);
+
+            // Retrieve the selected record data
+            const selectedRow = document.querySelector(`tr[data-id="${recordId}"]`);
+            const record = {
+                Rsh_mchlaka: selectedRow.querySelector('td:nth-child(2)').innerText, // מחלקה
+                Rsh_sapak: selectedRow.querySelector('td:nth-child(3)').innerText, // ספק
+                Rsh_patoor: selectedRow.querySelector('td:nth-child(4)').innerText === 'עוסק פטור' ? '1' : '0', // פטור
+                Rsh_schoom: selectedRow.querySelector('td:nth-child(5)').innerText, // סכום
+                Rsh_maam: selectedRow.querySelector('td:nth-child(6)').innerText, // מע"מ
+                Rsh_schmaam: selectedRow.querySelector('td:nth-child(7)').innerText, // סכום מע"מ
+                Rsh_schtotal: selectedRow.querySelector('td:nth-child(8)').innerText, // סכום כולל
+                Rsh_aspaka: selectedRow.querySelector('td:nth-child(9)').innerText, // מקום אספקה
+                Rsh_proyktnam: selectedRow.querySelector('td:nth-child(10)').innerText, // שם פרויקט
+                Rsh_sochen: selectedRow.querySelector('td:nth-child(11)').innerText, // מס סוכן
+                Rsh_cname: selectedRow.querySelector('td:nth-child(12)').innerText, // שם סוכן
+                Rsh_cnametl: selectedRow.querySelector('td:nth-child(13)').innerText, // טלפון סוכן
+                Rsh_cemail: selectedRow.querySelector('td:nth-child(14)').innerText, // מייל סוכן
+                Rsh_takziv: selectedRow.querySelector('td:nth-child(15)').innerText // תקציב
+            };
+            console.log("Selected record:", record);
+            console.log("!!!!" + record.Rsh_mchlaka);
+            debugger
+
+
+            if (document.getElementById('editDepartment')) {
+                document.getElementById('editDepartment').value = record.Rsh_mchlaka || '';
+                console.log("Department field set to:", record.Rsh_mchlaka); // לוג נוסף
             }
 
-            // if (typeof window.deleteRecord !== 'function') {
-            //     window.deleteRecord = function (id) {
-            //         console.log('Delete record:', id);
-            //         if (confirm('האם אתה בטוח שברצונך למחוק את רשומה ' + id + '?')) {
-            //             alert('רשומה ' + id + ' נמחקה בהצלחה');
-            //         }
-            //     };
-            // }
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'מחיקה';
-            deleteButton.className = 'btn-danger';
-            deleteButton.style.padding = '5px 10px';
-            deleteButton.style.borderRadius = '4px';
-            deleteButton.style.cursor = 'pointer';
-            deleteButton.onclick = function () {
-                Swal.fire({
-                    title: 'אישור מחיקה',
-                    text: 'האם אתה בטוח שברצונך למחוק רשומה זו?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'כן, מחק את זה!',
-                    cancelButtonText: 'לא, ביטול'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Delete record functionality would go here
-                        showNotification('הרשומה נמחקה בהצלחה');
-                        recordCard.remove();
-                    }
-                });
-            };
 
+            // if (document.getElementById('department')) document.getElementById('department').value = record.Rsh_mchlaka || '';
+            if (document.getElementById('supplierName')) document.getElementById('supplierName').value = record.Rsh_sapak || '';
+            if (document.getElementById('exempt')) document.getElementById('exempt').checked = record.Rsh_patoor === '1';
+            if (document.getElementById('amount')) document.getElementById('amount').value = record.Rsh_schoom || '';
+            if (document.getElementById('maam_id')) document.getElementById('maam_id').value = record.Rsh_maam || '';
+            if (document.getElementById('scmaan')) document.getElementById('scmaan').value = record.Rsh_schmaam || '';
+            if (document.getElementById('totalAmount')) document.getElementById('totalAmount').value = record.Rsh_schtotal || '';
+            if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = record.Rsh_aspaka || '';
+            if (document.getElementById('projectName')) document.getElementById('projectName').value = record.Rsh_proyktnam || '';
+            if (document.getElementById('agentNumber')) document.getElementById('agentNumber').value = record.Rsh_sochen || '';
+            if (document.getElementById('contactEmail')) document.getElementById('contactEmail').value = record.Rsh_cemail || '';
+            if (document.getElementById('contactName')) document.getElementById('contactName').value = record.Rsh_cname || '';
+            if (document.getElementById('contactPhone')) document.getElementById('contactPhone').value = record.Rsh_cnametl || '';
+            if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = record.Rsh_takziv || '';
+
+            // Show the edit dialog
+            const modal = document.getElementById("editDialog");
+            modal.style.display = "block";
         }
 
 
-        document.addEventListener('DOMContentLoaded', function () {
-            getReshumot();
-        });
+        // Function to close the edit dialog
+        function closeEditDialog() {
+            document.getElementById("editDialog").style.display = "none";
+        }
+
+        // Function to save the edited record
+        function saveRecord() {
+            const recordId = document.querySelector('.selected-row').getAttribute('data-id');
+            const updatedDate = document.getElementById('editRsh_date').value;
+            const updatedDepartment = document.getElementById('editRsh_mchlaka').value;
+            const updatedSupplier = document.getElementById('editRsh_sapak').value;
+
+            // Here you would typically send the updated data to the server
+            console.log("Saving record:", recordId, updatedDate, updatedDepartment, updatedSupplier);
+
+            // Close the dialog
+            closeEditDialog();
+
+            // Optionally refresh the data or update the table
+            getReshumot(); // Refresh the records
+        }
+
+
 
         async function deleteRecord(recordId) {
             const result = await Swal.fire({
@@ -374,11 +738,151 @@
                 const res = await deleteReshumot(recordId);
                 if (res.message === "Reshumot deleted successfully") {
                     showNotification('הרשומה נמחקה בהצלחה');
+                    getReshumot()
                 } else {
                     showNotification('שגיאה במחיקת הרשומה');
                 }
             }
         }
+
+        async function saveData() {
+            debugger
+
+            const recordId = document.getElementById('autoNumber').value;
+
+            if (!recordId) {
+                console.error("recordId is not found or is empty");
+                return; // טיפול בשגיאה אם ה-ID לא נמצא
+            }
+
+            // Fetch all records to check if the record already exists
+            const records = await listAllReshumot();
+            console.log("records =")
+            console.log(records);
+            const existingRecord = records.find(record => record.Rsh_id === recordId);
+
+            const data = {
+                Rsh_id: recordId,
+                Rsh_date: document.getElementById('timestamp').value,
+                Rsh_mchlaka: document.getElementById('editDepartment').value,
+                Rsh_sapak: document.getElementById('supplierName').value,
+                Rsh_patoor: document.getElementById('exempt').checked ? '1' : '0', // Use the checkbox value
+                Rsh_schoom: document.getElementById('amount').value,
+                Rsh_maam: document.getElementById('maam_id').value, // Changed from 'vat' to 'maam_id'
+                Rsh_schmaam: document.getElementById('scmaan').value, // Changed from 'totalAmount' to 'scmaan'
+                Rsh_schtotal: document.getElementById('totalAmount').value,
+                Rsh_aspaka: document.getElementById('deliveryPlace').value, // Changed from 'contactName' to 'deliveryPlace'
+                Rsh_proyktnam: document.getElementById('projectName').value,
+                Rsh_email: document.getElementById('contactEmail').value,
+                Rsh_sochen: document.getElementById('agentNumber').value, // Changed from 'contactPhone' to 'contactName'
+                Rsh_takziv: document.getElementById('budgetItem').value, // Changed from 'agentNumber' to 'budgetItem'
+                Rsh_cname: document.getElementById('contactName').value, // Changed from 'budgetItem' to 'contactName'
+                // Rsh_cnametl: document.getElementById('contactPhone').value, // Added this field
+
+                // שדות אחרים
+                Rsh_cnametl: document.getElementById('contactPhone').value ? '0' + document.getElementById('contactPhone').value : '', // הוספת 0 בהתחלה
+                // שדות אחרים
+                Rsh_cemail: document.getElementById('contactEmail').value
+            };
+            console.log("data:")
+            console.log(data)
+            debugger
+            try {
+                data.Rsh_date = new Date().toLocaleString('sv-SE')
+                // Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
+                // If record exists, update it
+                const response = await updateReshumot(data);
+                if (response.message === "Reshumot updated successfully") {
+                    showNotification('רשומה עודכנה בהצלחה!', 'success');
+                    getReshumot()
+                    // location.reload();
+                }
+                else {
+                    showNotification('שגיאה בעדכון הרשומה', 'error');
+
+                }
+                // If record does not exist, create it
+                closeEditDialog();
+
+                // showNotification('רשומה נשמרה בהצלחה!');
+            }
+            // clearFields(); // Clear fields after saving
+            catch (error) {
+                console.error('Error updating record:', error);
+                showNotification('שגיאה בעדכון הרשומה: ' + error.message, 'error');
+            }
+        }
+
+        /**
+   * Shows a notification popup at the top of the page
+   * @param {string} message - The message to display
+   * @param {string} type - The type of notification: 'success', 'error', 'info', or 'warning'
+   * @param {number} duration - How long to show the notification in milliseconds (default: 3000ms)
+   */
+        /**
+         * Shows a notification popup at the top of the page
+         * @param {string} message - The message to display
+         * @param {string} type - The type of notification: 'success', 'error', 'info', or 'warning'
+         * @param {number} duration - How long to show the notification in milliseconds (default: 3000ms)
+         */
+        function showNotification(message, type = 'success', duration = 3000) {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.remove();
+            });
+
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+
+            // Set icon based on notification type
+            let icon = '';
+            switch (type) {
+                case 'success':
+                    icon = 'fa-check-circle';
+                    break;
+                case 'error':
+                    icon = 'fa-exclamation-circle';
+                    break;
+                case 'info':
+                    icon = 'fa-info-circle';
+                    break;
+                case 'warning':
+                    icon = 'fa-exclamation-triangle';
+                    break;
+            }
+
+            // Create notification content
+            notification.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <span class="message">${message}</span>
+        <button class="close-notification" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+
+            // Add to DOM
+            document.body.appendChild(notification);
+
+            // Auto-remove after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.classList.add('fade-out');
+                        setTimeout(() => notification.remove(), 500);
+                    }
+                }, duration);
+            }
+        }
+
+
+        // Make sure the document is ready before calling getReshumot
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("DOM fully loaded, calling getReshumot");
+            getReshumot();
+        });
+
 
 
     </script>

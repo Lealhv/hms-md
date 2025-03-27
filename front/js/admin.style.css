@@ -1,13 +1,4 @@
-:root {
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
-    --accent-color: #e74c3c;
-    --light-color: #ecf0f1;
-    --dark-color: #34495e;
-    --success-color: #2ecc71;
-    --warning-color: #f39c12;
-}
-
+/* Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -15,76 +6,87 @@
 }
 
 body {
-    font-family: 'Heebo', Arial, sans-serif;
-    background-color: #f5f7fa;
+    font-family: 'Heebo', sans-serif;
+    background-color: #f5f5f5;
     color: #333;
-    line-height: 1.6;
+    direction: rtl;
 }
 
 .container {
-    width: 90%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 0 15px;
 }
 
+/* Header */
 header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-color: #2c3e50;
     color: white;
-    padding: 20px 0;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
 }
 
 header h1 {
-    text-align: center;
-    font-weight: 700;
-    font-size: 2rem;
+    font-size: 1.8rem;
+    font-weight: 500;
 }
 
+/* Cards */
 .card {
-    background: white;
+    background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
 }
 
-.filter-area {
+.card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
     align-items: center;
 }
 
-.filter-area input,
-.filter-area button {
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: 'Heebo', Arial, sans-serif;
+.card h2 i {
+    margin-left: 0.5rem;
+    color: #3498db;
 }
 
-.filter-area input {
+/* Filter Area */
+.filter-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.filter-area input,
+.filter-area select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
     flex: 1;
     min-width: 150px;
 }
 
+/* Buttons */
 .btn {
-    background-color: var(--primary-color);
+    background-color: #3498db;
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 4px;
+    padding: 0.6rem 1.2rem;
     cursor: pointer;
+    font-family: 'Heebo', sans-serif;
     transition: background-color 0.3s;
-    font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+}
+
+.btn i {
+    margin-left: 0.5rem;
 }
 
 .btn:hover {
@@ -100,95 +102,754 @@ header h1 {
 }
 
 .btn-danger {
-    background-color: var(--accent-color);
+    background-color: #e74c3c;
 }
 
 .btn-danger:hover {
     background-color: #c0392b;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-th,
-td {
-    padding: 15px;
-    text-align: right;
-}
-
-th {
-    background-color: var(--secondary-color);
-    color: white;
-    font-weight: 500;
-}
-
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-tr:hover {
-    background-color: #e9f7fe;
-}
-
-.yellow-bg {
-    background-color: #fff9c4;
-}
-
+/* Status Message */
 .status {
-    padding: 15px;
-    border-radius: 8px;
-    background-color: var(--light-color);
-    margin: 20px 0;
-    font-weight: 500;
+    background-color: #f8f9fa;
+    border-right: 4px solid #3498db;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 4px;
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .status i {
-    color: var(--primary-color);
+    margin-left: 0.5rem;
+    color: #3498db;
 }
 
+/* Document Preview */
 #documentPreview {
     min-height: 300px;
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f9fa;
 }
 
+/* Footer Actions */
 .footer-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    margin-top: 30px;
+    margin-bottom: 2rem;
 }
 
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.records-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.records-table th {
+    background-color: #f8f9fa;
+    padding: 0.5rem 0.6rem;
+    text-align: right;
+    border-bottom: 2px solid #ddd;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.records-table td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.records-table tbody tr {
+    height: 2.2rem;
+}
+
+.records-table tbody tr:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+/* Selected Row and Action Buttons */
+.selected-row {
+    background-color: #f0f8ff !important;
+    position: relative;
+}
+
+.action-buttons-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(240, 248, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.data-cell {
+    position: relative;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    background-color: rgba(240, 248, 255, 0.9);
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+#table-container {
+    position: relative;
+}
+
+/* Modal Dialog Styles - Even smaller */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 1.5% auto;
+    /* Further reduced top margin */
+    padding: 15px 20px;
+    /* Further reduced padding */
+    border: none;
+    border-radius: 10px;
+    /* Reduced radius */
+    width: 80%;
+    /* Reduced width */
+    max-width: 700px;
+    max-height: 92vh;
+    /* Increased max height */
+    overflow-y: auto;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.4s ease;
+    direction: rtl;
+    font-size: 0.8rem;
+    /* Further reduced base font size */
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    /* Further reduced margin */
+    padding-bottom: 10px;
+    /* Further reduced padding */
+    border-bottom: 1px solid #f0f0f0;
+    /* Thinner border */
+    font-size: 1.2rem;
+    /* Further reduced heading size */
+    display: flex;
+    align-items: center;
+}
+
+.modal-content h2::before {
+    content: '\f044';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    margin-left: 6px;
+    /* Further reduced margin */
+    color: #3498db;
+    font-size: 1rem;
+    /* Reduced icon size */
+}
+
+.close-button {
+    color: #aaa;
+    float: left;
+    font-size: 20px;
+    /* Further reduced size */
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #e74c3c;
+    text-decoration: none;
+}
+
+/* Ultra-compact Form Styling */
+form {
+    margin-bottom: 10px;
+    /* Further reduced margin */
+}
+
+.form-group {
+    margin-bottom: 8px;
+    /* Further reduced margin */
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 3px;
+    /* Further reduced margin */
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.75rem;
+    /* Further reduced font size */
+    transition: color 0.3s;
+}
+
+.form-group:focus-within label {
+    color: #3498db;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 6px 8px;
+    /* Further reduced padding */
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    /* Further reduced radius */
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.75rem;
+    /* Further reduced font size */
+    color: #333;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    height: 28px;
+    /* Fixed height for inputs */
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    /* Smaller shadow */
+    outline: none;
+}
+
+.form-group input:required,
+.form-group select:required {
+    border-right: 2px solid #3498db;
+    /* Thinner border */
+}
+
+.form-group input[type="date"] {
+    padding-right: 6px;
+    /* Further reduced padding */
+}
+
+.form-group textarea {
+    min-height: 60px;
+    /* Further reduced height */
+    resize: vertical;
+    height: auto;
+    /* Override fixed height for textareas */
+}
+
+.form-group .input-icon {
+    position: absolute;
+    top: 28px;
+    /* Adjusted position */
+    right: 8px;
+    /* Adjusted position */
+    color: #95a5a6;
+    transition: color 0.3s;
+    font-size: 0.75rem;
+    /* Further reduced size */
+}
+
+.form-group:focus-within .input-icon {
+    color: #3498db;
+}
+
+.form-group .helper-text {
+    display: block;
+    margin-top: 2px;
+    /* Further reduced margin */
+    font-size: 0.7rem;
+    /* Further reduced font size */
+    color: #7f8c8d;
+}
+
+.form-group.error input,
+.form-group.error select,
+.form-group.error textarea {
+    border-color: #e74c3c;
+}
+
+.form-group.error .error-message {
+    color: #e74c3c;
+    font-size: 0.7rem;
+    /* Further reduced font size */
+    margin-top: 2px;
+    /* Further reduced margin */
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    /* Further reduced gap */
+    margin-bottom: 6px;
+    /* Further reduced margin */
+}
+
+.form-row .form-group {
+    flex: 1;
+    min-width: 150px;
+    /* Further reduced min-width */
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    /* Further reduced gap */
+    margin-top: 15px;
+    /* Further reduced margin */
+    padding-top: 10px;
+    /* Further reduced padding */
+    border-top: 1px solid #f0f0f0;
+}
+
+.form-actions .btn {
+    min-width: 80px;
+    /* Further reduced width */
+    padding: 6px 12px;
+    /* Further reduced padding */
+    font-size: 0.8rem;
+    /* Further reduced font size */
+    font-weight: 500;
+    border-radius: 4px;
+    /* Further reduced radius */
+    transition: all 0.3s ease;
+}
+
+.form-actions .btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.form-actions .btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+    /* Smaller transform */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Smaller shadow */
+}
+
+.form-actions .btn-secondary {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border: 1px solid #ddd;
+}
+
+.form-actions .btn-secondary:hover {
+    background-color: #e9ecef;
+    transform: translateY(-1px);
+    /* Smaller transform */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Smaller shadow */
+}
+
+/* Form inside modal */
+.modal-content form {
+    margin-bottom: 0;
+}
+
+#editForm {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Changed to 3 columns for more compact layout */
+    gap: 10px;
+    /* Further reduced gap */
+}
+
+#editForm .form-group:nth-child(1),
+/* Date */
+#editForm .form-group:nth-child(12)
+
+/* Takziv */
+    {
+    grid-column: span 3;
+    /* Span all 3 columns */
+}
+
+#editForm .form-group:nth-child(9),
+/* Aspaka */
+#editForm .form-group:nth-child(10)
+
+/* Project Name */
+    {
+    grid-column: span 2;
+    /* Span 2 columns */
+}
+
+#editForm .form-actions {
+    grid-column: span 3;
+    /* Span all 3 columns */
+}
+
+/* Form field animations - Smaller scale */
+@keyframes formFieldFocus {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.01);
+    }
+
+    /* Smaller scale effect */
+    100% {
+        transform: scale(1);
+    }
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    animation: formFieldFocus 0.3s ease;
+}
+
+/* Checkbox and radio styling */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    /* Further reduced margin */
+}
+
+.form-check input[type="checkbox"],
+.form-check input[type="radio"] {
+    width: auto;
+    margin-left: 6px;
+    /* Further reduced margin */
+}
+
+.form-check label {
+    margin-bottom: 0;
+    font-size: 0.75rem;
+    /* Further reduced font size */
+}
+
+/* Form section dividers */
+.form-section {
+    margin: 15px 0 10px;
+    /* Further reduced margins */
+    padding-bottom: 6px;
+    /* Further reduced padding */
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.form-section h3 {
+    font-size: 1.1rem;
+    /* Reduced font size */
+    color: #2c3e50;
+    margin-bottom: 10px;
+    /* Reduced margin */
+}
+
+/* Input groups */
+.input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group input {
+    border-radius: 8px 0 0 8px;
+    flex: 1;
+}
+
+.input-group-append {
+    display: flex;
+}
+
+.input-group-text {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-right: none;
+    border-radius: 0 8px 8px 0;
+    color: #7f8c8d;
+}
+
+/* Custom styling for specific form elements */
+input[type="number"] {
+    text-align: left;
+    direction: ltr;
+}
+
+/* Button Container Styling */
+.btn-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Form Action Buttons */
+.form-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-action-btn i {
+    margin-left: 8px;
+    font-size: 1rem;
+}
+
+/* Primary Button */
+.btn-primary.form-action-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary.form-action-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary.form-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Secondary Button */
+.btn-secondary.form-action-btn {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border: 1px solid #ddd;
+}
+
+.btn-secondary.form-action-btn:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary.form-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Focus State */
+.form-action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .btn-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-action-btn {
+        width: 100%;
+    }
+}
+
+
+
+
+/* Adding notification styling to the existing CSS */
+
+/* Notification System */
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 300px;
+    max-width: 80%;
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideInDown 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+    direction: rtl;
+}
+
+.notification.success {
+    background-color: #2ecc71;
+    border-right: 4px solid #27ae60;
+}
+
+.notification.error {
+    background-color: #e74c3c;
+    border-right: 4px solid #c0392b;
+}
+
+.notification.info {
+    background-color: #3498db;
+    border-right: 4px solid #2980b9;
+}
+
+.notification.warning {
+    background-color: #f39c12;
+    border-right: 4px solid #e67e22;
+}
+
+.notification i {
+    margin-left: 10px;
+    font-size: 1.1rem;
+}
+
+.notification .close-notification {
+    background: none;
+    border: none;
+    color: white;
+    opacity: 0.7;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0;
+    margin-right: 5px;
+    transition: opacity 0.2s;
+}
+
+.notification .close-notification:hover {
+    opacity: 1;
+}
+
+.notification .message {
+    flex: 1;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translate(-50%, -20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
     .filter-area {
         flex-direction: column;
-        align-items: stretch;
     }
 
-    .filter-area input {
+    .filter-area input,
+    .filter-area select {
         width: 100%;
     }
 
-    .footer-actions {
-        flex-direction: column;
+    .card {
+        padding: 1rem;
     }
 
-    .btn {
-        width: 100%;
-        margin-bottom: 10px;
-        justify-content: center;
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    #editForm {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group:nth-child(1),
+    .form-group:nth-child(9),
+    .form-group:nth-child(10),
+    .form-group:nth-child(12) {
+        grid-column: span 1;
+    }
+
+    .form-actions {
+        grid-column: span 1;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
     }
 }

@@ -8,7 +8,6 @@ class MnilvimController
 {
     private $conn;
 
-
     public function __construct()
     {
         global $conn; // Use the connection created in Database.php
@@ -49,7 +48,7 @@ class MnilvimController
 
         if ($stmt->execute()) {
             $new_id = $stmt->insert_id; // קבלת ה-ID החדש שנוצר
-            echo json_encode(["message" => "Reshumot created successfully", "MN_id" => $new_id]);
+            echo json_encode(["message" => "MNilvim created successfully", "MN_id" => $new_id]);
         } else {
             echo json_encode(["error" => "Failed to create Mnilvim: " . $stmt->error]);
         }

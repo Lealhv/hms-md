@@ -48,27 +48,32 @@ class MnilvimController
 
         if ($stmt->execute()) {
             $new_id = $stmt->insert_id; // קבלת ה-ID החדש שנוצר
-            echo json_encode(["message" => "MNilvim created successfully", "MN_id" => $new_id]);
+            echo json_encode(["message" => "Mnilvim created successfully", "MN_id" => $new_id]);
         } else {
             echo json_encode(["error" => "Failed to create Mnilvim: " . $stmt->error]);
         }
     }
 
-    public function read($MN_id)
+    public function read($MN_shyooch)
     {
-        $query = "SELECT * FROM mnilvim WHERE MN_id = ?";
+        $query = "SELECT * FROM mnilvim WHERE MN_shyooch = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $MN_id);
+        $stmt->bind_param("s", $MN_shyooch);
         $stmt->execute();
         $result = $stmt->get_result();
-
+    
+        $mnilvimArray = []; // Initialize an empty array to hold the results
+    
         if ($result->num_rows > 0) {
-            $mnilvim = $result->fetch_assoc();
-            echo json_encode($mnilvim);
+            while ($row = $result->fetch_assoc()) {
+                $mnilvimArray[] = $row; // Add each row to the array
+            }
+            echo json_encode($mnilvimArray); // Return the array as JSON
         } else {
             echo json_encode(["error" => "Mnilvim not found"]);
         }
     }
+    
 
     public function update($MN_id)
     {

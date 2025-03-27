@@ -211,6 +211,10 @@
                             onclick="document.getElementById('file-input').click();">
                             <i class="fas fa-upload"></i> העלאת מסמכים נילווים
                         </button>
+                        <button type="button" class="btn-secondary form-action-btn"
+                            onclick="document.getElementById('document').click();">
+                            <i class="fas fa-file-upload"></i> הוספת מסמכים נילווים
+                        </button>
                         <button type="button" class="btn-secondary form-action-btn" onclick="printData()">
                             <i class="fas fa-print"></i> הדפסה
                         </button>
@@ -537,21 +541,24 @@
             // הוסף את המידע הנוסף
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                data.MN_pratim = file.name; // שם הקובץ
+                const lastDotIndex = file.name.lastIndexOf('.');
+                const fileNameWithoutExtension = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
+                data.MN_pratim = fileNameWithoutExtension;
                 data.MN_location = fileInput.value; // מיקום הקובץ במחשב
                 data.MN_shyooch = RSH_ID; // לדוגמה, RSH_ID
                 data.MN_status = 1; // סטטוס
                 data.MN_dateAdd = new Date().toISOString().split('T')[0]; // תאריך של היום
                 data.MN_type = file.type; // סוג הקובץ
             }
-
             addMnilvim(data)
                 .then(response => {
-                    console.log(response);
-                    // הנח את ההודעה כאן אם ההוספה הצליחה
-                    showNotification("הקובץ נוסף בהצלחה!");
+                    if (response.message === "Mnilvim created successfully")
+                        // הנח את ההודעה כאן אם ההוספה הצליחה
+                        showNotification("הקובץ נוסף בהצלחה!");
+                    loadDocuments(RSH_ID);
                 })
                 .catch(error => {
+
                     // הנח את ההודעה כאן אם הייתה שגיאה
                     showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
                 });
@@ -837,7 +844,6 @@
         }
 
         function fillForm(data) {
-            RSH_ID = data.Rsh_id;
             const formContainer = document.getElementById('formContainer');
             formContainer.innerHTML = ''; // Clear previous content
 
@@ -950,9 +956,12 @@
                 editButton.style.borderRadius = '4px';
                 editButton.style.cursor = 'pointer';
                 editButton.onclick = function () {
+                    
+                    RSH_ID = data[0].Rsh_id;
                     // Load this record data into the form for editing
                     loadRecordToForm(item);
-                    loadDocuments(data.Rsh_id);
+                    loadDocuments(data[0].Rsh_id);
+
                 };
 
                 const deleteButton = document.createElement('button');
@@ -1099,7 +1108,6 @@
 
         async function loadDocuments(id) {
             isFunctionCalled = true; // עדכון המשתנה כאשר הפונקציה זומנה
-            debugger
             const documentsArea = document.getElementById('documents-area');
             const tbody = document.getElementById('documents-body');
             const table = document.getElementById('documentsTable');
@@ -1107,9 +1115,10 @@
             const documents = await listMnilvim(id); // קריאה לשרת
             tbody.innerHTML = ''; // ניקוי התוכן הקודם
             messageDiv.style.display = 'none'; // הסתרת הודעה
-            debugger
-            if (!Array.isArray(documents) || documents.length === 0) {
-                messageDiv.innerHTML = ' אין מסמכים נילווים';
+
+            console.log(documents, "doc", id); // בדוק מה מוחזר
+            if (documents.length === 0) {
+                messageDiv.innerHTML = ' אין מסמכים נלווים';
                 messageDiv.style.display = 'block'; // הצגת הודעה
                 table.style.display = 'none'; // מסתיר את הטבלה
             } else {
@@ -1151,7 +1160,7 @@
             if (result.isConfirmed) {
                 await deleteMnilvim(id);
                 Swal.fire('נמחק!', 'המסמך נמחק.', 'success');
-                loadDocuments(); // טען מחדש את המסמכים
+                loadDocuments(RSH_ID); // טען מחדש את המסמכים
             }
         }
 

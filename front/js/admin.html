@@ -713,7 +713,10 @@
 
         // Modified toggleAccordion function to support forced open/close
         function toggleAccordion(row, forceState) {
+
             const recordId = row.getAttribute('data-id');
+            document.getElementById('autoNumber').value = recordId;
+
             const accordionRow = document.getElementById(`accordion-${recordId}`);
 
             if (!accordionRow) return;
@@ -730,6 +733,7 @@
 
         // Replace toggleActions with selectRow
         function selectRow(row) {
+            debugger
             const recordId = row.getAttribute('data-id');
             // Update the ID of the selected record
             document.getElementById('autoNumber').value = recordId;
@@ -810,17 +814,22 @@
                 }
             }
         }
-
         async function saveData() {
+            debugger
+
             const recordId = document.getElementById('autoNumber').value;
 
             if (!recordId) {
                 console.error("recordId is not found or is empty");
                 return; // טיפול בשגיאה אם ה-ID לא נמצא
             }
-
+            debugger
+            console.log("recordId =")
+            console.log(recordId);
             // Fetch all records to check if the record already exists
             const records = await listAllReshumot();
+            console.log("records =")
+            console.log(records);
             const existingRecord = records.find(record => record.Rsh_id === recordId);
 
             const data = {
@@ -839,25 +848,43 @@
                 Rsh_sochen: document.getElementById('agentNumber').value, // Changed from 'contactPhone' to 'contactName'
                 Rsh_takziv: document.getElementById('budgetItem').value, // Changed from 'agentNumber' to 'budgetItem'
                 Rsh_cname: document.getElementById('contactName').value, // Changed from 'budgetItem' to 'contactName'
+                // Rsh_cnametl: document.getElementById('contactPhone').value, // Added this field
+
+                // שדות אחרים
                 Rsh_cnametl: document.getElementById('contactPhone').value ? '0' + document.getElementById('contactPhone').value : '', // הוספת 0 בהתחלה
+                // שדות אחרים
                 Rsh_cemail: document.getElementById('contactEmail').value
             };
+            console.log("data:")
+            console.log(data)
+            debugger
             try {
-                data.Rsh_date = new Date().toLocaleString('sv-SE');
+                data.Rsh_date = new Date().toLocaleString('sv-SE')
+                // Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
                 // If record exists, update it
                 const response = await updateReshumot(data);
                 if (response.message === "Reshumot updated successfully") {
                     showNotification('רשומה עודכנה בהצלחה!', 'success');
-                    getReshumot();
-                } else {
-                    showNotification('שגיאה בעדכון הרשומה', 'error');
+                    getReshumot()
+                    // location.reload();
                 }
+                else {
+                    showNotification('שגיאה בעדכון הרשומה', 'error');
+
+                }
+                // If record does not exist, create it
                 closeEditDialog();
-            } catch (error) {
+
+                // showNotification('רשומה נשמרה בהצלחה!');
+            }
+            // clearFields(); // Clear fields after saving
+            catch (error) {
                 console.error('Error updating record:', error);
                 showNotification('שגיאה בעדכון הרשומה: ' + error.message, 'error');
             }
         }
+
+
 
         function showNotification(message, type = 'success', duration = 3000) {
             // Remove any existing notifications

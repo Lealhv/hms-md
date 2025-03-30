@@ -455,7 +455,6 @@
 
         function setupErrorClearingListeners() {
             document.querySelectorAll('input, select').forEach(element => {
-                // Remove the debugger statement
                 element.addEventListener('input', clearErrorMessages);
             });
         }
@@ -552,7 +551,6 @@
             }
             addMnilvim(data)
                 .then(response => {
-                    debugger
                     if (response.message === "Mnilvim added successfully")
                         // הנח את ההודעה כאן אם ההוספה הצליחה
                         showNotification("הקובץ נוסף בהצלחה!");
@@ -1116,8 +1114,6 @@
             const documents = await listMnilvim(id); // קריאה לשרת
             tbody.innerHTML = ''; // ניקוי התוכן הקודם
             messageDiv.style.display = 'none'; // הסתרת הודעה
-
-            console.log(documents, "doc", id); // בדוק מה מוחזר
             if (documents.length === 0) {
                 messageDiv.innerHTML = ' אין מסמכים נלווים';
                 messageDiv.style.display = 'block'; // הצגת הודעה

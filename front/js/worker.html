@@ -204,10 +204,7 @@
                         <button type="button" class="btn-primary form-action-btn" onclick="saveData()">
                             <i class="fas fa-save"></i> שמירת נתונים
                         </button>
-                        <button type="button" class="btn-secondary form-action-btn"
-                            onclick="document.getElementById('file-input').click();">
-                            <i class="fas fa-upload"></i> העלאת מסמכים נילווים
-                        </button>
+
                         <button type="button" class="btn-secondary form-action-btn"
                             onclick="document.getElementById('document').click();">
                             <i class="fas fa-file-upload"></i> הוספת מסמכים נילווים
@@ -221,8 +218,7 @@
                         <button type="button" class="btn-secondary form-action-btn" onclick="exportToExcel()">
                             <i class="fas fa-file-excel"></i> ייצוא EXCEL
                         </button>
-                        <button type="button" class="btn-secondary"
-                            style="padding: 10px 19px; margin: 5px; font-size: 16px;" onclick="clearFields()">
+                        <button type="button" class="btn-secondary" onclick="clearFields()">
                             <i class="fas fa-eraser"></i> ניקוי
                         </button>
                     </div>
@@ -232,6 +228,7 @@
         </div>
 
         <!-- ---------------------------------------------------- -->
+
 
         <div class="card" id="documents-area">
             <h2><i class="fas fa-folder-open"></i> מסמכים נלווים</h2>
@@ -249,14 +246,18 @@
             </table>
         </div>
 
-
         <div class="section" id="reshumotList">
             <h2>רשומות</h2>
         </div>
 
         <div id="formContainer"></div> <!-- הוספת אלמנט זה -->
 
-        <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)">
+
+        <!-- להעביר למנהל -->
+        <!-- <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)"> -->
+
+
+
         <input type="file" id="document" style="display: none;" onchange="MnilvimUpload(event)">
 
     </div>
@@ -510,6 +511,7 @@
             // If you have a checkbox for exempt, you might want to uncheck it
             if (document.getElementById('exempt')) document.getElementById('exempt').checked = false;
             checkFormCompletion();
+            loadDocuments();
         }
 
 
@@ -524,6 +526,8 @@
         function exit() {
             window.location.href = 'login.html'; // דף הלוגאין
         }
+
+
         function MnilvimUpload(event) {
             event.preventDefault(); // למנוע את שליחת הטופס הרגילה
 
@@ -555,6 +559,7 @@
                     showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
                 });
         }
+
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
@@ -947,7 +952,7 @@
                 editButton.style.borderRadius = '4px';
                 editButton.style.cursor = 'pointer';
                 editButton.onclick = function () {
-                    
+
                     RSH_ID = data[0].Rsh_id;
                     // Load this record data into the form for editing
                     loadRecordToForm(item);
@@ -1087,9 +1092,59 @@
         function goToAdmin() {
             window.location.href = 'admin.html';
         }
+
+
+
+        async function loadDocuments(id) {
+    isFunctionCalled = true;
+    const documentsArea = document.getElementById('documents-area');
+    const tbody = document.getElementById('documents-body');
+    const table = document.getElementById('documentsTable');
+    const messageDiv = document.getElementById('message');
+    
+    // Clear previous content
+    tbody.innerHTML = '';
+    
+    // Handle undefined ID case
+    if (id === undefined) {
+        documentsArea.classList.add('empty');
+        messageDiv.innerHTML = '<i class="fas fa-info-circle"></i> יש לבחור רשומה על מנת להציג מסמכים';
+        messageDiv.style.display = 'block';
+        table.style.display = 'none';
+        isFunctionCalled = false;
+        checkFunctionCall();
+        return;
+    }
+    
+    // Fetch documents
+    const documents = await listMnilvim(id);
+    
+    if (documents.length === 0) {
+        documentsArea.classList.add('empty');
+        messageDiv.innerHTML = '<i class="fas fa-info-circle"></i> אין מסמכים נלווים';
+        messageDiv.style.display = 'block';
+        table.style.display = 'none';
+    } else {
+        documentsArea.classList.remove('empty');
+        messageDiv.style.display = 'none';
+        table.style.display = 'table';
+        documents.forEach(doc => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${doc.MN_pratim}</td>
+                <td>${doc.MN_dateAdd}</td>
+                <td><button onclick="deleteDocument('${doc.MN_id}', event)"><i class="fas fa-trash"></i> מחק</button></td>
+            `;
+            row.onclick = () => fetchDocument(doc.MN_location, doc.MN_pratim);
+            tbody.appendChild(row);
+        });
+    }
+}
+
         async function fetchDocument(url) {
+            const httpUrl = url.replace(/^file:\/\//, 'http://localhost/');
             const a = document.createElement('a');
-            a.href = url;
+            a.href = httpUrl;
             a.download = ''; // זה יגרום לדפדפן להוריד את הקובץ
             document.body.appendChild(a);
             a.click();
@@ -1097,43 +1152,19 @@
         }
 
 
-        async function loadDocuments(id) {
-            isFunctionCalled = true; // עדכון המשתנה כאשר הפונקציה זומנה
-            const documentsArea = document.getElementById('documents-area');
-            const tbody = document.getElementById('documents-body');
-            const table = document.getElementById('documentsTable');
-            const messageDiv = document.getElementById('message');
-            const documents = await listMnilvim(id); // קריאה לשרת
-            tbody.innerHTML = ''; // ניקוי התוכן הקודם
-            messageDiv.style.display = 'none'; // הסתרת הודעה
-
-            console.log(documents, "doc", id); // בדוק מה מוחזר
-            if (documents.length === 0) {
-                messageDiv.innerHTML = ' אין מסמכים נלווים';
-                messageDiv.style.display = 'block'; // הצגת הודעה
-                table.style.display = 'none'; // מסתיר את הטבלה
-            } else {
-                table.style.display = 'table'; // מציג את הטבלה
-                documents.forEach(doc => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                <td>${doc.MN_pratim}</td>
-                <td>${doc.MN_dateAdd}</td>
-                <td><button onclick="deleteDocument('${doc.MN_id}', event)"><i class="fas fa-trash"></i> מחק</button></td>
-            `;
-                    row.onclick = () => fetchDocument(doc.MN_location, doc.MN_type); // הורדה 
-                    tbody.appendChild(row);
-                });
-            }
-        }
-
         function checkFunctionCall() {
-            if (!isFunctionCalled) {
-                const messageDiv = document.getElementById('message');
-                messageDiv.innerHTML = ' יש לבחור רשומה על מנת להציג מסמכים ';
-                messageDiv.style.display = 'block'; // הצגת הודעה
-            }
-        }
+    if (!isFunctionCalled) {
+        const documentsArea = document.getElementById('documents-area');
+        const messageDiv = document.getElementById('message');
+        const table = document.getElementById('documentsTable');
+        
+        documentsArea.classList.add('empty');
+        messageDiv.innerHTML = 'יש לבחור רשומה על מנת להציג מסמכים';
+        messageDiv.style.display = 'block';
+        table.style.display = 'none';
+    }
+}
+
         async function deleteDocument(id) {
             event.stopPropagation(); // מונע מהאירוע להתפשט ולגרום להורדת המסמך
 

@@ -486,16 +486,19 @@
 
         async function loadSuppliers() {
             const suppliers = await getAllSuppliers(); // הנחה שהפונקציה מחזירה את הספקים
+            console.log(suppliers); // הוסף לוג כאן כדי לבדוק מה מוחזר
+            debugger
             const supplierSelect = document.getElementById('supplierName');
             supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
 
             suppliers.forEach(supplier => {
                 const option = document.createElement('option');
-                option.value = supplier.name; // הנח כאן את השם של הספק
-                option.textContent = supplier.name; // הנח כאן את השם של הספק
+                option.value = supplier.SP_name; // הנח כאן את השם של הספק
+                option.textContent = supplier.SP_name; // הנח כאן את השם של הספק
                 supplierSelect.appendChild(option);
             });
         }
+
 
         // קרא לפונקציה בעת טעינת הדף
         document.addEventListener('DOMContentLoaded', loadSuppliers);
@@ -733,6 +736,8 @@
 
             // Add action buttons without highlighting
             addActionButtons(row, recordId);
+
+
         }
 
         // Add the editRecord function
@@ -996,35 +1001,58 @@
         function loadCSV(file) {
             Papa.parse(file, {
                 header: true,
-                complete: function (results) {
-                    displaySuppliers(results.data);
+                complete: async function (results) {
+                    for (const supplier of results.data) {
+                        try {
+                            const response = await createSupplier(supplier); // שלח כל ספק ל-createSupplier
+                            if (response.status === 200) {
+                                // אם השרת החזיר סטטוס 200, הוסף את הספק לרשימה
+                                displaySuppliers([supplier.SP_name]); // הנח כאן את השם של הספק
+                            } else {
+                                console.error('Failed to create supplier:', response);
+                            }
+                        } catch (error) {
+                            console.error('Error creating supplier:', error);
+                        }
+                    }
                 },
                 error: function (error) {
                     console.error('Error loading CSV:', error);
                 }
             });
         }
-
         function loadExcel(file) {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = async function (e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-                const suppliers = jsonData.map(row => row[0]);
-                displaySuppliers(suppliers);
+                // הנחה שהשמות נמצאים בעמודה הראשונה
+                const suppliers = jsonData.map(row => ({ SP_name: row[0] }));
+
+                for (const supplier of suppliers) {
+                    try {
+                        debugger
+                        const response = await createSupplier(supplier); // שלח כל ספק ל-createSupplier
+                        if (response.status === 200) {
+                            // אם השרת החזיר סטטוס 200, הוסף את הספק לרשימה
+                            displaySuppliers([supplier.SP_name]); // הנח כאן את השם של הספק
+                        } else {
+                            console.error('Failed to create supplier:', response);
+                        }
+                    } catch (error) {
+                        console.error('Error creating supplier:', error);
+                    }
+                }
             };
             reader.readAsArrayBuffer(file);
         }
 
         function displaySuppliers(suppliers) {
             const supplierListDiv = document.getElementById('supplierList');
-            supplierListDiv.innerHTML = '';
-
             const supplierSelect = document.getElementById('supplierName');
-            supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>';
 
             suppliers.forEach(supplier => {
                 const supplierElement = document.createElement('div');
@@ -1037,6 +1065,7 @@
                 supplierSelect.appendChild(option);
             });
         }
+
         // Make sure the document is ready before calling getReshumot
         document.addEventListener('DOMContentLoaded', function () {
             getReshumot();

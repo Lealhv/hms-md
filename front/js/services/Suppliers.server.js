@@ -21,24 +21,31 @@ async function getAllSuppliers() {
     }
 }
 
-// פונקציה ליצירת ספק חדש
-async function createSupplier(supplierName) {
+// פונקציה ליצירת ספק חדשa 
+ async function createSupplier(supplier) {
     try {
-        const response = await fetch('http://localhost/project/hms-md/Back/controller/SuppliersController.php/supplier', {
+        const response = await fetch('/api/suppliers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ SP_name: supplierName })
+            body: JSON.stringify(supplier)
         });
+        
+        // Check if the response is OK before trying to parse JSON
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const result = await response.json();
-        console.log(result); // כאן תוכל להציג את התגובה מהשרת
+        
+        const data = await response.json();
+        return { status: response.status, data };
     } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
+        console.error('Error in createSupplier:', error);
+        // Return a structured error object instead of throwing
+        return { status: 500, error: error.message };
     }
 }
 
+
 window.getAllSuppliers = getAllSuppliers;
+window.createSupplier = createSupplier;

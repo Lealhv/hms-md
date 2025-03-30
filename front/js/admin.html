@@ -13,14 +13,41 @@
     <!-- Add SweetAlert2 CSS and JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script type="module" src="services/userLog.server.js"></script>
-    <script src="services/reshumot.server.js" defer></script>
+    <script src="services/mnilvim.server.js" defer></script>
+    <script src="services/Suppliers.server.js" defer></script>
 
-    <!-- Existing head content -->
 
     <style>
         /* Modal Dialog Styling */
+        /* Add these rules to the existing style section */
+        html,
+        body {
+            height: auto;
+            min-height: 100%;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        /* Make sure modals don't affect main page scrolling */
+        .modal-content {
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        /* Ensure the page content can grow beyond viewport */
+        body>.container {
+            padding-bottom: 50px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -90,7 +117,7 @@
             border: none;
             font-size: 24px;
             font-weight: bold;
-            color: #666;
+            color: #d50b0b;
             cursor: pointer;
             transition: color 0.2s;
             width: 30px;
@@ -205,19 +232,38 @@
             font-size: 12px;
             margin-top: 5px;
         }
+
+        .action-buttons-overlay {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            justify-content: flex-end;
+        }
+
+        .record-row {
+            position: relative;
+        }
+
+        /* Remove the highlighting styles */
+        .selected-row {
+            background-color: transparent !important;
+        }
+
+        /* Make sure buttons are visible */
+        .btn-sm {
+            padding: 3px 8px;
+            font-size: 0.8rem;
+        }
     </style>
 
     <link rel="stylesheet" href="admin.style.css">
 </head>
-\
 
 <body>
     <header>
         <div class="container">
             <h1>מערכת ניהול מסמכים מאובטחת</h1>
         </div>
-
-
     </header>
 
     <div class="container">
@@ -230,34 +276,20 @@
         <div class="card">
             <h2><i class="fas fa-filter"></i> סינון מסמכים</h2>
             <div class="filter-area">
-                <input type="text" id="orderNumber" placeholder="מספר הזמנה">
-                <input type="text" id="department" placeholder="מחלקה">
-                <input type="date" id="date">
+                <input type="text" id="supplierFilter" placeholder="שם ספק">
+                <input type="text" id="agentFilter" placeholder="שם סוכן">
                 <button class="btn btn-secondary" onclick="clearFilters()"><i class="fas fa-eraser"></i> נקה</button>
                 <button class="btn" onclick="filterRecords()"><i class="fas fa-search"></i> סנן</button>
             </div>
         </div>
+        <input type="file" id="fileInput" accept=".csv, .xls, .xlsx" />
+        <button onclick="loadFile()">טעון קובץ</button>
+        <div id="supplierList"></div>
 
         <div class="card">
-            <h2><i class="fas fa-file-alt"></i> רשימת רשומות</h2>
+            <h2><i class="fas fa-file-alt"></i> רשומות</h2>
             <div id="listAllReshumot"></div>
         </div>
-        <!-- 
-        <div class="status" id="statusMessage">
-            <i class="fas fa-info-circle"></i> סטטוס: לא נבחר מסמך
-        </div> -->
-
-        <div class="card">
-            <h2><i class="fas fa-file-pdf"></i> תצוגה מקדימה של המסמך</h2>
-            <div id="documentPreview">
-                <!-- תצוגה מקדימה של המסמך תוצג כאן -->
-                <div style="text-align: center; padding: 100px 0; color: #aaa;">
-                    <i class="fas fa-file-pdf" style="font-size: 48px;"></i>
-                    <p>בחר מסמך מהרשימה לצפייה</p>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <div id="editDialog" class="modal">
@@ -274,6 +306,9 @@
                     <div id="error-department" class="error-message" style="color: red;"></div>
                 </div>
 
+
+                <div id="supplierList"></div>
+
                 <div class="form-group">
                     <label for="supplierName">שם הספק:</label>
                     <select id="supplierName" name="supplierName">
@@ -283,6 +318,14 @@
                     </select>
                     <div id="error-supplierName" class="error-message" style="color: red;"></div>
                 </div>
+                <!-- 
+                <div class="form-group">
+                    <label for="supplierName">שם הספק:</label>
+                    <select id="supplierName" name="supplierName">
+                        <option value="" disabled selected>בחר ספק</option>
+                    </select>
+                    <div id="error-supplierName" class="error-message" style="color: red;"></div>
+                </div> -->
 
                 <div class="form-group checkbox-container">
                     <label for="exempt">עוסק פטור:</label>
@@ -364,16 +407,18 @@
 
                 <!-- Buttons -->
                 <div class="btn-container">
-                   
+                    <button type="button" class="btn-secondary form-action-btn" onclick="closeEditDialog()">
+                        <i class="fas fa-times-circle"></i>
+                        ביטול
+                    </button>
                     <button type="button" class="btn-primary form-action-btn" onclick="saveData()">
                         <i class="fas fa-save"></i> שמירת נתונים
                     </button>
                 </div>
             </form>
         </div>
+        <input type="file" id="document" style="display: none;" onchange="MnilvimUpload(event)">
     </div>
-
-
 
     <script>
         if (document.referrer.includes("login")) {
@@ -400,50 +445,8 @@
 
         inactivityTime();
 
-        function clearFilters() {
-            document.getElementById('orderNumber').value = '';
-            document.getElementById('department').value = '';
-            document.getElementById('date').value = '';
-        }
-
-        function filterRecords() {
-            // לוגיקה לסינון רשומות על בסיס שדות הקלט
-            alert("מסנן רשומות...");
-        }
-
-        // function loadDocument(documentId) {
-        //     // לוגיקה לטעינה והצגת המסמך
-        //     document.getElementById('statusMessage').innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ' + documentId + ' נטען בהצלחה.';
-
-        //     // דוגמה להצגת תוכן מסמך
-        //     document.getElementById('documentPreview').innerHTML = `
-        //         <div style="text-align: center; padding: 20px;">
-        //             <h3>מסמך ${documentId}</h3>
-        //             <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
-        //                 <p>זוהי תצוגה מקדימה של מסמך ${documentId}.</p>
-        //                 <p>כאן יוצג תוכן המסמך האמיתי.</p>
-        //             </div>
-        //         </div>
-        //     `;
-        // }
-
-        function goToEmployeePage(variable) {
-            localStorage.setItem('PR', variable);
-            window.location.href = "worker.html";
-        }
-
-
-        function logout() {
-            updateUser(localStorage.getItem('userId'), {
-                Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
-                Lg_status: 0
-            });
-            alert("מתנתק מהמערכת...");
-            window.location.href = 'login.html'; // הפניה לדף התחברות
-        }
         async function getReshumot() {
             try {
-                console.log("Starting getReshumot function");
                 const reshumotListDiv = document.getElementById('listAllReshumot');
 
                 // Check if the div exists
@@ -457,12 +460,12 @@
 
                 let reshumot;
                 try {
-                    console.log("Calling listAllReshumot API");
                     reshumot = await listAllReshumot();
-                    console.log("API response:", reshumot);
-
                     if (reshumot && Array.isArray(reshumot) && reshumot.length > 0) {
-                        console.log(`Received ${reshumot.length} records`);
+                        // Store the data in a global variable for filtering
+                        window.allReshumotData = reshumot;
+
+                        // Display all data initially
                         fillForm(reshumot);
                     } else {
                         console.warn('No records returned from API');
@@ -479,8 +482,160 @@
                     reshumotListDiv.innerHTML = '<p>שגיאה בטעינת נתונים: ' + error.message + '</p>';
                 }
             }
-        } function fillForm(reshumot) {
-            console.log("Starting fillForm function with", reshumot.length, "records");
+        }
+
+        async function loadSuppliers() {
+            const suppliers = await getAllSuppliers(); // הנחה שהפונקציה מחזירה את הספקים
+            console.log(suppliers); // הוסף לוג כאן כדי לבדוק מה מוחזר
+            debugger
+            const supplierSelect = document.getElementById('supplierName');
+            supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
+
+            suppliers.forEach(supplier => {
+                const option = document.createElement('option');
+                option.value = supplier.SP_name; // הנח כאן את השם של הספק
+                option.textContent = supplier.SP_name; // הנח כאן את השם של הספק
+                supplierSelect.appendChild(option);
+            });
+        }
+
+
+        // קרא לפונקציה בעת טעינת הדף
+        document.addEventListener('DOMContentLoaded', loadSuppliers);
+
+
+        // Separate function for filtering data
+        function filterRecords() {
+            // Check if we have data to filter
+            if (!window.allReshumotData || !Array.isArray(window.allReshumotData)) {
+                console.error('No data available for filtering');
+                return;
+            }
+
+            // Get filter values with null checks
+            const supplierFilterEl = document.getElementById('supplierFilter');
+            const agentFilterEl = document.getElementById('agentFilter');
+
+            const supplierName = supplierFilterEl ? supplierFilterEl.value.trim() : '';
+            const agentName = agentFilterEl ? agentFilterEl.value.trim() : '';
+
+            // Check if any filter is applied
+            const hasFilters = supplierName !== '' || agentName !== '';
+
+            if (!hasFilters) {
+                // If no filters, show all data
+                fillForm(window.allReshumotData);
+                return;
+            }
+
+            // Apply filters
+            const filteredData = window.allReshumotData.filter(record => {
+                // Check supplier filter
+                if (supplierName && !(record.Rsh_sapak && record.Rsh_sapak.toLowerCase().includes(supplierName.toLowerCase()))) {
+                    return false;
+                }
+
+                // Check agent name filter
+                if (agentName && !(record.Rsh_cname && record.Rsh_cname.toLowerCase().includes(agentName.toLowerCase()))) {
+                    return false;
+                }
+
+                // If we get here, the record passed all filters
+                return true;
+            });
+            // Display filtered data
+            fillForm(filteredData);
+
+            // Show message if no results
+            if (filteredData.length === 0) {
+                const reshumotListDiv = document.getElementById('listAllReshumot');
+                reshumotListDiv.innerHTML = '<p class="no-results">אין תוצאות מתאימות לחיפוש שלך</p>';
+            }
+        }
+
+        function clearFilters() {
+            // Reset filter input values
+            const supplierFilterEl = document.getElementById('supplierFilter');
+            const agentFilterEl = document.getElementById('agentFilter');
+
+            if (supplierFilterEl) supplierFilterEl.value = '';
+            if (agentFilterEl) agentFilterEl.value = '';
+
+            // Check if we have data to display
+            if (window.allReshumotData && Array.isArray(window.allReshumotData)) {
+                // Display all records by calling fillForm with the complete dataset
+                fillForm(window.allReshumotData);
+            } else {
+                // If no data is available, refresh from the server
+                getReshumot();
+            }
+
+            // Provide user feedback
+            showNotification('הסינון נוקה', 'info', 2000);
+        }
+
+
+        function goToEmployeePage(variable) {
+            localStorage.setItem('PR', variable);
+            window.location.href = "worker.html";
+        }
+
+        function logout() {
+            updateUser(localStorage.getItem('userId'), {
+                Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
+                Lg_status: 0
+            });
+            alert("מתנתק מהמערכת...");
+            window.location.href = 'login.html'; // הפניה לדף התחברות
+        }
+
+        let selectedRow = null; // משתנה לשמור על השורה הנבחרת
+
+        function handleRowClick(row) {
+            const recordId = row.getAttribute('data-id');
+
+            // If the same row is clicked again, just toggle the accordion
+            if (selectedRow === row) {
+                toggleAccordion(row);
+                return;
+            }
+
+            // If there's a previously selected row, remove its action buttons and close its accordion
+            if (selectedRow) {
+                const previousButtons = selectedRow.querySelector('.action-buttons-overlay');
+                if (previousButtons) previousButtons.remove();
+                toggleAccordion(selectedRow, 'close'); // Force close the previous accordion
+            }
+
+            // Update the selected row reference
+            selectedRow = row;
+
+            // Add action buttons without highlighting the row
+            addActionButtons(row, recordId);
+
+            // Open the accordion for this row
+            toggleAccordion(row, 'open');
+        }
+
+        function addActionButtons(row, recordId) {
+            // Remove any existing action buttons
+            const existingButtons = row.querySelector('.action-buttons-overlay');
+            if (existingButtons) existingButtons.remove();
+
+            // Create action buttons overlay
+            const actionButtonsOverlay = document.createElement('div');
+            actionButtonsOverlay.className = 'action-buttons-overlay';
+            actionButtonsOverlay.innerHTML = `
+                <button class="btn btn-primary btn-sm" onclick="editRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-edit"></i> עריכה</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-trash-alt"></i> מחיקה</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('document').click(); event.stopPropagation();">
+                    <i class="fas fa-file-upload"></i> הוספת מסמכים נילווים
+                </button>
+            `;
+            row.appendChild(actionButtonsOverlay);
+        }
+
+        function fillForm(reshumot) {
             const reshumotListDiv = document.getElementById('listAllReshumot');
 
             if (!reshumot || reshumot.length === 0) {
@@ -505,17 +660,12 @@
                 'Rsh_cnametl': 'טלפון סוכן',
                 'Rsh_cemail': 'מייל סוכן',
                 'Rsh_takziv': 'תקציב'
-
             };
 
-            // Columns to hide from display
             const hiddenColumns = ['Rsh_id', 'Rsh_status'];
 
             try {
-                // Create table
                 let tableHTML = '<div class="table-responsive"><table class="records-table">';
-
-                // Create header row
                 tableHTML += '<thead><tr>';
                 for (const key in titleMapping) {
                     if (!hiddenColumns.includes(key)) {
@@ -524,27 +674,36 @@
                 }
                 tableHTML += '</tr></thead>';
 
-                // Create table body
                 tableHTML += '<tbody>';
                 reshumot.forEach(record => {
-                    // Create row with data attributes
-                    tableHTML += `<tr class="record-row" data-id="${record.Rsh_id}" data-status="${record.Rsh_status || ''}" onclick="selectRow(this)">`;
+                    const recordId = record.Rsh_id;
 
-                    // Add cells excluding hidden columns
+                    // עדכון לקריאה לפונקציה החדשה
+                    tableHTML += `<tr class="record-row" data-id="${recordId}" onclick="handleRowClick(this)">`;
                     for (const key in titleMapping) {
                         if (!hiddenColumns.includes(key)) {
                             tableHTML += `<td class="data-cell"><span class="cell-content">${record[key] || ''}</span></td>`;
                         }
                     }
                     tableHTML += '</tr>';
+
+                    // אקורדיון עבור תוכן של viewMnilvim
+                    tableHTML += `<tr class="accordion-content" id="accordion-${recordId}" style="display:none;">
+                        <td colspan="${Object.keys(titleMapping).length}">
+                            <div id="details-${recordId}">Loading details...</div>
+                        </td>
+                    </tr>`;
                 });
 
                 tableHTML += '</tbody></table></div>';
-
-                // Add table to the DOM
-                console.log("Setting HTML content to listAllReshumot div");
                 reshumotListDiv.innerHTML = tableHTML;
-                console.log("Table HTML set successfully");
+
+                // טען את הפרטים עבור כל רשומה
+                reshumot.forEach(record => {
+                    viewMnilvim(record.Rsh_id).then(details => {
+                        document.getElementById(`details-${record.Rsh_id}`).innerHTML = details; // עדכן את תוכן האקורדיון
+                    });
+                });
 
             } catch (error) {
                 console.error("Error in fillForm:", error);
@@ -552,102 +711,41 @@
             }
         }
 
+        // Modified toggleAccordion function to support forced open/close
+        function toggleAccordion(row, forceState) {
+
+            const recordId = row.getAttribute('data-id');
+            document.getElementById('autoNumber').value = recordId;
+
+            const accordionRow = document.getElementById(`accordion-${recordId}`);
+
+            if (!accordionRow) return;
+
+            if (forceState === 'open') {
+                accordionRow.style.display = "table-row";
+            } else if (forceState === 'close') {
+                accordionRow.style.display = "none";
+            } else {
+                // Toggle as before
+                accordionRow.style.display = accordionRow.style.display === "none" ? "table-row" : "none";
+            }
+        }
 
         // Replace toggleActions with selectRow
         function selectRow(row) {
+            debugger
             const recordId = row.getAttribute('data-id');
-            console.log("selectRow")
-            console.log(recordId)
-            // עדכון ה-ID של הרשומה הנבחרת
+            // Update the ID of the selected record
             document.getElementById('autoNumber').value = recordId;
-            const recordStatus = row.getAttribute('data-status');
 
-            console.log("selectRow called for record:", recordId);
-
-            // Remove action buttons from all rows
-            document.querySelectorAll('.action-buttons-overlay').forEach(overlay => {
-                overlay.remove();
-            });
-
-            // Highlight the selected row
-            const allRows = document.querySelectorAll('.records-table tbody tr');
-            allRows.forEach(r => {
-                r.classList.remove('selected-row');
-            });
-
-            row.classList.add('selected-row');
-
-            // Create action buttons overlay
-            const actionButtonsOverlay = document.createElement('div');
-            actionButtonsOverlay.className = 'action-buttons-overlay';
-            actionButtonsOverlay.innerHTML = `
-        <button class="btn btn-primary btn-sm" onclick="editRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-edit"></i> עריכה</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-trash-alt"></i> מחיקה</button>
-    `;
-
-            // Append the overlay to the row
-            row.appendChild(actionButtonsOverlay);
-
-            // Update status message with the selected document ID
-            // document.getElementById('statusMessage').innerHTML =
-            //     `<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ${recordId} נבחר`;
-
-            // Update document preview
-            document.getElementById('documentPreview').innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-            <h3>מסמך ${recordId}</h3>
-            <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
-                <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
-                <p>סטטוס: ${recordStatus || 'לא מוגדר'}</p>
-            </div>
-        </div>
-    `;
-        }
+            // Add action buttons without highlighting
+            addActionButtons(row, recordId);
 
 
-
-
-        // Define the toggleActions function in the global scope
-        function toggleActions(row) {
-            const recordId = row.getAttribute('data-id');
-            const recordStatus = row.getAttribute('data-status');
-
-            console.log("toggleActions called for record:", recordId);
-
-            // Highlight the selected row
-            const allRows = document.querySelectorAll('.records-table tbody tr');
-            allRows.forEach(r => {
-                r.classList.remove('selected-row');
-            });
-            row.classList.add('selected-row');
-
-            // Update status message with the selected document ID
-            document.getElementById('statusMessage').innerHTML =
-                `<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ${recordId} נבחר`;
-
-            // Update document preview
-            document.getElementById('documentPreview').innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-            <h3>מסמך ${recordId}</h3>
-            <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
-                <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
-                <p>סטטוס: ${recordStatus || 'לא מוגדר'}</p>
-            </div>
-        </div>
-    `;
-
-            // Show action buttons
-            const actionButtonsContainer = document.getElementById('action-buttons-container');
-            if (actionButtonsContainer) {
-                actionButtonsContainer.style.display = 'flex';
-                actionButtonsContainer.setAttribute('data-for-record', recordId);
-            }
         }
 
         // Add the editRecord function
         function editRecord(recordId) {
-            console.log("Edit record:", recordId);
-
             // Retrieve the selected record data
             const selectedRow = document.querySelector(`tr[data-id="${recordId}"]`);
             const record = {
@@ -666,18 +764,10 @@
                 Rsh_cemail: selectedRow.querySelector('td:nth-child(14)').innerText, // מייל סוכן
                 Rsh_takziv: selectedRow.querySelector('td:nth-child(15)').innerText // תקציב
             };
-            console.log("Selected record:", record);
-            console.log("!!!!" + record.Rsh_mchlaka);
-            debugger
-
-
             if (document.getElementById('editDepartment')) {
                 document.getElementById('editDepartment').value = record.Rsh_mchlaka || '';
-                console.log("Department field set to:", record.Rsh_mchlaka); // לוג נוסף
             }
 
-
-            // if (document.getElementById('department')) document.getElementById('department').value = record.Rsh_mchlaka || '';
             if (document.getElementById('supplierName')) document.getElementById('supplierName').value = record.Rsh_sapak || '';
             if (document.getElementById('exempt')) document.getElementById('exempt').checked = record.Rsh_patoor === '1';
             if (document.getElementById('amount')) document.getElementById('amount').value = record.Rsh_schoom || '';
@@ -697,30 +787,10 @@
             modal.style.display = "block";
         }
 
-
         // Function to close the edit dialog
         function closeEditDialog() {
             document.getElementById("editDialog").style.display = "none";
         }
-
-        // Function to save the edited record
-        function saveRecord() {
-            const recordId = document.querySelector('.selected-row').getAttribute('data-id');
-            const updatedDate = document.getElementById('editRsh_date').value;
-            const updatedDepartment = document.getElementById('editRsh_mchlaka').value;
-            const updatedSupplier = document.getElementById('editRsh_sapak').value;
-
-            // Here you would typically send the updated data to the server
-            console.log("Saving record:", recordId, updatedDate, updatedDepartment, updatedSupplier);
-
-            // Close the dialog
-            closeEditDialog();
-
-            // Optionally refresh the data or update the table
-            getReshumot(); // Refresh the records
-        }
-
-
 
         async function deleteRecord(recordId) {
             const result = await Swal.fire({
@@ -744,7 +814,6 @@
                 }
             }
         }
-
         async function saveData() {
             debugger
 
@@ -754,7 +823,9 @@
                 console.error("recordId is not found or is empty");
                 return; // טיפול בשגיאה אם ה-ID לא נמצא
             }
-
+            debugger
+            console.log("recordId =")
+            console.log(recordId);
             // Fetch all records to check if the record already exists
             const records = await listAllReshumot();
             console.log("records =")
@@ -813,18 +884,8 @@
             }
         }
 
-        /**
-   * Shows a notification popup at the top of the page
-   * @param {string} message - The message to display
-   * @param {string} type - The type of notification: 'success', 'error', 'info', or 'warning'
-   * @param {number} duration - How long to show the notification in milliseconds (default: 3000ms)
-   */
-        /**
-         * Shows a notification popup at the top of the page
-         * @param {string} message - The message to display
-         * @param {string} type - The type of notification: 'success', 'error', 'info', or 'warning'
-         * @param {number} duration - How long to show the notification in milliseconds (default: 3000ms)
-         */
+
+
         function showNotification(message, type = 'success', duration = 3000) {
             // Remove any existing notifications
             const existingNotifications = document.querySelectorAll('.notification');
@@ -855,12 +916,12 @@
 
             // Create notification content
             notification.innerHTML = `
-        <i class="fas ${icon}"></i>
-        <span class="message">${message}</span>
-        <button class="close-notification" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
+                <i class="fas ${icon}"></i>
+                <span class="message">${message}</span>
+                <button class="close-notification" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
 
             // Add to DOM
             document.body.appendChild(notification);
@@ -876,15 +937,167 @@
             }
         }
 
+        async function viewMnilvim(id) {
+            try {
+                const data = await listMnilvim(id); // קבל את המידע
+
+                // אם יש מינלווים, הצג את המידע
+                if (Array.isArray(data) && data.length > 0) {
+                    return data.map(mnilvim => `
+                        <div>
+                            <h4>פרטי מסמך ${mnilvim.MN_id}</h4>
+                            <p>תאריך הוספה: ${mnilvim.MN_dateAdd}</p>
+                            <p>מיקום: ${mnilvim.MN_location}</p>
+                            <p>פרטים: ${mnilvim.MN_pratim}</p>
+                            <p>שימוש: ${mnilvim.MN_shyooch}</p>
+                            <p>סטטוס: ${mnilvim.MN_status}</p>
+                            <p>סוג: ${mnilvim.MN_type}</p>
+                        </div>
+                    `).join(''); // חבר את כל המידע למחרוזת אחת
+                } else {
+                    // במידה ואין מינלווים, הצג הודעת שגיאה באקורדיון
+                    return `
+                        <div class="accordion">
+                            <h4>אין מסמכים נילווים</h4>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error fetching mnilvim details:', error);
+                // במידה ויש שגיאה, הצג הודעה באקורדיון
+                return `
+                    <div class="accordion">
+                        <h4>אין מסמכים נילווים</h4>
+                    </div>
+                `;
+            }
+        }
+
+        function MnilvimUpload(event) {
+            event.preventDefault(); // למנוע את שליחת הטופס הרגילה
+
+            const fileInput = document.getElementById('document');
+            const data = {};
+
+            // הוסף את המידע הנוסף
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const lastDotIndex = file.name.lastIndexOf('.');
+                const fileNameWithoutExtension = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
+                data.MN_pratim = fileNameWithoutExtension;
+                data.MN_location = fileInput.value; // מיקום הקובץ במחשב
+                data.MN_shyooch = RSH_ID; // לדוגמה, RSH_ID
+                data.MN_status = 1; // סטטוס
+                data.MN_dateAdd = new Date().toISOString().split('T')[0]; // תאריך של היום
+                data.MN_type = file.type; // סוג הקובץ
+            }
+            addMnilvim(data)
+                .then(response => {
+                    if (response.message === "Mnilvim added successfully")
+                        // הנח את ההודעה כאן אם ההוספה הצליחה
+                        showNotification("הקובץ נוסף בהצלחה!");
+                    listMnilvim(RSH_ID);
+                })
+                .catch(error => {
+                    // הנח את ההודעה כאן אם הייתה שגיאה
+                    showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
+                });
+        }
+
+
+        function loadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('אנא בחר קובץ.');
+                return;
+            }
+
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+
+            if (fileExtension === 'csv') {
+                loadCSV(file);
+            } else if (fileExtension === 'xls' || fileExtension === 'xlsx') {
+                loadExcel(file);
+            } else {
+                alert('פורמט קובץ לא נתמך. אנא בחר קובץ CSV או Excel.');
+            }
+        }
+
+        function loadCSV(file) {
+            Papa.parse(file, {
+                header: true,
+                complete: async function (results) {
+                    for (const supplier of results.data) {
+                        try {
+                            const response = await createSupplier(supplier); // שלח כל ספק ל-createSupplier
+                            if (response.status === 200) {
+                                // אם השרת החזיר סטטוס 200, הוסף את הספק לרשימה
+                                displaySuppliers([supplier.SP_name]); // הנח כאן את השם של הספק
+                            } else {
+                                console.error('Failed to create supplier:', response);
+                            }
+                        } catch (error) {
+                            console.error('Error creating supplier:', error);
+                        }
+                    }
+                },
+                error: function (error) {
+                    console.error('Error loading CSV:', error);
+                }
+            });
+        }
+        function loadExcel(file) {
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                // הנחה שהשמות נמצאים בעמודה הראשונה
+                const suppliers = jsonData.map(row => ({ SP_name: row[0] }));
+
+                for (const supplier of suppliers) {
+                    try {
+                        debugger
+                        const response = await createSupplier(supplier); // שלח כל ספק ל-createSupplier
+                        if (response.status === 200) {
+                            // אם השרת החזיר סטטוס 200, הוסף את הספק לרשימה
+                            displaySuppliers([supplier.SP_name]); // הנח כאן את השם של הספק
+                        } else {
+                            console.error('Failed to create supplier:', response);
+                        }
+                    } catch (error) {
+                        console.error('Error creating supplier:', error);
+                    }
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function displaySuppliers(suppliers) {
+            const supplierListDiv = document.getElementById('supplierList');
+            const supplierSelect = document.getElementById('supplierName');
+
+            suppliers.forEach(supplier => {
+                const supplierElement = document.createElement('div');
+                supplierElement.textContent = supplier;
+                supplierListDiv.appendChild(supplierElement);
+
+                const option = document.createElement('option');
+                option.value = supplier;
+                option.textContent = supplier;
+                supplierSelect.appendChild(option);
+            });
+        }
 
         // Make sure the document is ready before calling getReshumot
         document.addEventListener('DOMContentLoaded', function () {
-            console.log("DOM fully loaded, calling getReshumot");
             getReshumot();
+            loadSuppliers();
         });
-
-
-
     </script>
 </body>
 

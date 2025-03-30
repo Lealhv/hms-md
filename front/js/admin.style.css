@@ -10,6 +10,9 @@ body {
     background-color: #f5f5f5;
     color: #333;
     direction: rtl;
+    overflow: hidden;
+    /* מונע גלילה בזמן העלאת קובץ */
+
 }
 
 .container {
@@ -174,25 +177,7 @@ header h1 {
     cursor: pointer;
 }
 
-/* Selected Row and Action Buttons */
-.selected-row {
-    background-color: #f0f8ff !important;
-    position: relative;
-}
 
-.action-buttons-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(240, 248, 255, 0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    z-index: 10;
-}
 
 .btn-sm {
     padding: 0.25rem 0.5rem;
@@ -707,7 +692,7 @@ input[type="number"] {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .form-action-btn {
         width: 100%;
     }
@@ -852,4 +837,21 @@ input[type="number"] {
         margin: 5% auto;
         padding: 20px;
     }
+}
+
+/* Selected Row and Action Buttons */
+
+
+.action-buttons-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(218, 14, 14, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
 }

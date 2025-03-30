@@ -12,9 +12,7 @@ async function createReshumot(data) {
       });
       
       // Get the raw text response for debugging
-      const rawText = await response.text();
-      console.log('Raw server response:', rawText);
-      
+      const rawText = await response.text();      
       // Try to parse it as JSON
       try {
         const result = JSON.parse(rawText);
@@ -100,8 +98,6 @@ async function listAllReshumot() {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log("!!!!!!!!")
-        console.log(data);
         return data;
     } catch (error) {
         console.error('Failed to fetch data:', error);

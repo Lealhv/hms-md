@@ -8,7 +8,6 @@ class MnilvimController
 {
     private $conn;
 
-
     public function __construct()
     {
         global $conn; // Use the connection created in Database.php

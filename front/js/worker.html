@@ -12,10 +12,10 @@
             font-family: Arial, sans-serif;
         }
 
-        .container {
+        /* .container {
             width: 80%;
             margin: auto;
-        }
+        } */
 
         .section {
             margin: 20px 0;
@@ -71,6 +71,8 @@
     <script src="services/maam.server.js" defer></script>
     <script src="services/mnilvim.server.js" defer></script>
     <script src="services/userLog.server.js" defer></script>
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
+
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -83,6 +85,7 @@
 <body onload="getData()">
     <div class="container">
         <div class="section" id="header">
+
             <div class="header-container">
                 <h1>מערכת ניהול מסמכים</h1>
                 <!-- <button id="conditionalButton" class="admin-btn" onclick="goToAdmin()">לעמוד מנהל</button> -->
@@ -448,7 +451,6 @@
 
         function setupErrorClearingListeners() {
             document.querySelectorAll('input, select').forEach(element => {
-                // Remove the debugger statement
                 element.addEventListener('input', clearErrorMessages);
             });
         }
@@ -548,7 +550,7 @@
             }
             addMnilvim(data)
                 .then(response => {
-                    if (response.message === "Mnilvim created successfully")
+                    if (response.message === "Mnilvim added successfully")
                         // הנח את ההודעה כאן אם ההוספה הצליחה
                         showNotification("הקובץ נוסף בהצלחה!");
                     loadDocuments(RSH_ID);
@@ -750,6 +752,7 @@
                             // location.reload();
                         }
                     } else {
+                        data.Rsh_date = new Date().toLocaleString('sv-SE')
                         // If record does not exist, create it
                         const response = await createReshumot(data);
                         if (response.message === "Reshumot created successfully") {
@@ -844,7 +847,7 @@
             formContainer.innerHTML = ''; // Clear previous content
 
             const titleMapping = {
-                'Rsh_id': 'מספר רשומה',
+                // 'Rsh_id': 'מספר רשומה',
                 'Rsh_date': 'תאריך',
                 'Rsh_mchlaka': 'מחלקה',
                 'Rsh_sapak': 'ספק',
@@ -946,7 +949,7 @@
                 actionDiv.style.justifyContent = 'space-around';
 
                 const editButton = document.createElement('button');
-                editButton.textContent = 'עריכה';
+                editButton.innerHTML = '<i class="fas fa-edit"></i> עריכה'; // Added edit icon
                 editButton.className = 'btn-secondary';
                 editButton.style.padding = '5px 10px';
                 editButton.style.borderRadius = '4px';
@@ -961,7 +964,7 @@
                 };
 
                 const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'מחיקה';
+                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> מחיקה'; // Added trash icon
                 deleteButton.className = 'btn-danger';
                 deleteButton.style.padding = '5px 10px';
                 deleteButton.style.borderRadius = '4px';

@@ -552,7 +552,8 @@
             }
             addMnilvim(data)
                 .then(response => {
-                    if (response.message === "Mnilvim created successfully")
+                    debugger
+                    if (response.message === "Mnilvim added successfully")
                         // הנח את ההודעה כאן אם ההוספה הצליחה
                         showNotification("הקובץ נוסף בהצלחה!");
                     loadDocuments(RSH_ID);

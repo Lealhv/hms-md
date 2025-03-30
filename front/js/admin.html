@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script type="module" src="services/userLog.server.js"></script>
-    <script src="services/reshumot.server.js" defer></script>
+    <script src="services/mnilvim.server.js" defer></script>
 
     <!-- Existing head content -->
 
@@ -90,7 +90,7 @@
             border: none;
             font-size: 24px;
             font-weight: bold;
-            color: #666;
+            color: #d50b0b;
             cursor: pointer;
             transition: color 0.2s;
             width: 30px;
@@ -242,21 +242,9 @@
             <h2><i class="fas fa-file-alt"></i> רשימת רשומות</h2>
             <div id="listAllReshumot"></div>
         </div>
-        <!-- 
-        <div class="status" id="statusMessage">
-            <i class="fas fa-info-circle"></i> סטטוס: לא נבחר מסמך
-        </div> -->
 
-        <div class="card">
-            <h2><i class="fas fa-file-pdf"></i> תצוגה מקדימה של המסמך</h2>
-            <div id="documentPreview">
-                <!-- תצוגה מקדימה של המסמך תוצג כאן -->
-                <div style="text-align: center; padding: 100px 0; color: #aaa;">
-                    <i class="fas fa-file-pdf" style="font-size: 48px;"></i>
-                    <p>בחר מסמך מהרשימה לצפייה</p>
-                </div>
-            </div>
-        </div>
+
+
 
     </div>
 
@@ -364,13 +352,18 @@
 
                 <!-- Buttons -->
                 <div class="btn-container">
-                   
+                    <button type="button" class="btn-secondary form-action-btn" onclick="closeEditDialog()">
+                        <i class="fas fa-times-circle"></i>
+                        ביטול
+                    </button>
                     <button type="button" class="btn-primary form-action-btn" onclick="saveData()">
                         <i class="fas fa-save"></i> שמירת נתונים
                     </button>
                 </div>
             </form>
         </div>
+        <input type="file" id="document" style="display: none;" onchange="MnilvimUpload(event)">
+
     </div>
 
 
@@ -464,6 +457,7 @@
                     if (reshumot && Array.isArray(reshumot) && reshumot.length > 0) {
                         console.log(`Received ${reshumot.length} records`);
                         fillForm(reshumot);
+                        // viewMnilvim(Rsh_id)
                     } else {
                         console.warn('No records returned from API');
                         reshumotListDiv.innerHTML = '<p>אין נתונים להצגה</p>';
@@ -479,7 +473,31 @@
                     reshumotListDiv.innerHTML = '<p>שגיאה בטעינת נתונים: ' + error.message + '</p>';
                 }
             }
-        } function fillForm(reshumot) {
+        }
+        let selectedRow = null; // משתנה לשמור על השורה הנבחרת
+
+        function handleRowClick(row) {
+            const recordId = row.getAttribute('data-id');
+
+            // אם השורה הנבחרת היא השורה הנוכחית, ביטול הבחירה
+            if (selectedRow === row) {
+                selectedRow.classList.remove('selected-row'); // הסרת הבחירה
+                selectedRow = null; // אפס את משתנה השורה הנבחרת
+                toggleAccordion(row); // סגור את האקורדיון
+            } else {
+                // אם יש שורה נבחרת אחרת, הסר את הבחירה שלה
+                if (selectedRow) {
+                    selectedRow.classList.remove('selected-row');
+                    toggleAccordion(selectedRow); // סגור את האקורדיון של השורה הקודמת
+                }
+
+                // בחר את השורה החדשה
+                selectRow(row);
+                selectedRow = row; // עדכן את משתנה השורה הנבחרת
+                toggleAccordion(row); // פתח את האקורדיון
+            }
+        }
+        function fillForm(reshumot) {
             console.log("Starting fillForm function with", reshumot.length, "records");
             const reshumotListDiv = document.getElementById('listAllReshumot');
 
@@ -505,17 +523,12 @@
                 'Rsh_cnametl': 'טלפון סוכן',
                 'Rsh_cemail': 'מייל סוכן',
                 'Rsh_takziv': 'תקציב'
-
             };
 
-            // Columns to hide from display
             const hiddenColumns = ['Rsh_id', 'Rsh_status'];
 
             try {
-                // Create table
                 let tableHTML = '<div class="table-responsive"><table class="records-table">';
-
-                // Create header row
                 tableHTML += '<thead><tr>';
                 for (const key in titleMapping) {
                     if (!hiddenColumns.includes(key)) {
@@ -524,27 +537,36 @@
                 }
                 tableHTML += '</tr></thead>';
 
-                // Create table body
                 tableHTML += '<tbody>';
                 reshumot.forEach(record => {
-                    // Create row with data attributes
-                    tableHTML += `<tr class="record-row" data-id="${record.Rsh_id}" data-status="${record.Rsh_status || ''}" onclick="selectRow(this)">`;
+                    const recordId = record.Rsh_id;
 
-                    // Add cells excluding hidden columns
+                    // עדכון לקריאה לפונקציה החדשה
+                    tableHTML += `<tr class="record-row" data-id="${recordId}" onclick="handleRowClick(this)">`;
                     for (const key in titleMapping) {
                         if (!hiddenColumns.includes(key)) {
                             tableHTML += `<td class="data-cell"><span class="cell-content">${record[key] || ''}</span></td>`;
                         }
                     }
                     tableHTML += '</tr>';
+
+                    // אקורדיון עבור תוכן של viewMnilvim
+                    tableHTML += `<tr class="accordion-content" id="accordion-${recordId}" style="display:none;">
+                <td colspan="${Object.keys(titleMapping).length}">
+                    <div id="details-${recordId}">Loading details...</div>
+                </td>
+            </tr>`;
                 });
 
                 tableHTML += '</tbody></table></div>';
-
-                // Add table to the DOM
-                console.log("Setting HTML content to listAllReshumot div");
                 reshumotListDiv.innerHTML = tableHTML;
-                console.log("Table HTML set successfully");
+
+                // טען את הפרטים עבור כל רשומה
+                reshumot.forEach(record => {
+                    viewMnilvim(record.Rsh_id).then(details => {
+                        document.getElementById(`details-${record.Rsh_id}`).innerHTML = details; // עדכן את תוכן האקורדיון
+                    });
+                });
 
             } catch (error) {
                 console.error("Error in fillForm:", error);
@@ -553,16 +575,28 @@
         }
 
 
+        function toggleAccordion(row) {
+            const recordId = row.getAttribute('data-id');
+            const accordionRow = document.getElementById(`accordion-${recordId}`);
+
+            if (accordionRow.style.display === "none") {
+                accordionRow.style.display = "table-row"; // פתח את האקורדיון
+            } else {
+                accordionRow.style.display = "none"; // סגור את האקורדיון
+            }
+        }
+
+
+
+
+
         // Replace toggleActions with selectRow
         function selectRow(row) {
             const recordId = row.getAttribute('data-id');
-            console.log("selectRow")
-            console.log(recordId)
+            console.log("selectRow called for record:", recordId);
+
             // עדכון ה-ID של הרשומה הנבחרת
             document.getElementById('autoNumber').value = recordId;
-            const recordStatus = row.getAttribute('data-status');
-
-            console.log("selectRow called for record:", recordId);
 
             // Remove action buttons from all rows
             document.querySelectorAll('.action-buttons-overlay').forEach(overlay => {
@@ -583,66 +617,65 @@
             actionButtonsOverlay.innerHTML = `
         <button class="btn btn-primary btn-sm" onclick="editRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-edit"></i> עריכה</button>
         <button class="btn btn-danger btn-sm" onclick="deleteRecord('${recordId}'); event.stopPropagation();"><i class="fas fa-trash-alt"></i> מחיקה</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('document').click();">
+    <i class="fas fa-file-upload"></i> הוספת מסמכים נילווים
+</button>
+
     `;
 
             // Append the overlay to the row
             row.appendChild(actionButtonsOverlay);
 
-            // Update status message with the selected document ID
-            // document.getElementById('statusMessage').innerHTML =
-            //     `<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ${recordId} נבחר`;
-
-            // Update document preview
-            document.getElementById('documentPreview').innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-            <h3>מסמך ${recordId}</h3>
-            <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
-                <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
-                <p>סטטוס: ${recordStatus || 'לא מוגדר'}</p>
-            </div>
-        </div>
-    `;
+            //         // Update document preview
+            //         document.getElementById('documentPreview').innerHTML = `
+            //     <div style="text-align: center; padding: 20px;">
+            //         <h3>מסמך ${recordId}</h3>
+            //         <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
+            //             <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
+            //         </div>
+            //     </div>
+            // `;
         }
 
 
 
 
-        // Define the toggleActions function in the global scope
-        function toggleActions(row) {
-            const recordId = row.getAttribute('data-id');
-            const recordStatus = row.getAttribute('data-status');
+        //     // Define the toggleActions function in the global scope
+        //     function toggleActions(row) {
+        //         const recordId = row.getAttribute('data-id');
+        //         const recordStatus = row.getAttribute('data-status');
 
-            console.log("toggleActions called for record:", recordId);
+        //         console.log("toggleActions called for record:", recordId);
 
-            // Highlight the selected row
-            const allRows = document.querySelectorAll('.records-table tbody tr');
-            allRows.forEach(r => {
-                r.classList.remove('selected-row');
-            });
-            row.classList.add('selected-row');
+        //         // Highlight the selected row
+        //         const allRows = document.querySelectorAll('.records-table tbody tr');
+        //         allRows.forEach(r => {
+        //             r.classList.remove('selected-row');
+        //         });
+        //         row.classList.add('selected-row');
 
-            // Update status message with the selected document ID
-            document.getElementById('statusMessage').innerHTML =
-                `<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ${recordId} נבחר`;
+        //         // Update status message with the selected document ID
+        //         document.getElementById('statusMessage').innerHTML =
+        //             `<i class="fas fa-check-circle" style="color: #2ecc71;"></i> סטטוס: מסמך ${recordId} נבחר`;
 
-            // Update document preview
-            document.getElementById('documentPreview').innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-            <h3>מסמך ${recordId}</h3>
-            <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
-                <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
-                <p>סטטוס: ${recordStatus || 'לא מוגדר'}</p>
-            </div>
-        </div>
-    `;
+        //         // Update document preview
+        //         document.getElementById('documentPreview').innerHTML = `
+        //     <div style="text-align: center; padding: 20px;">
+        //         <h3>מסמך ${recordId}</h3>
+        //         <div style="border: 1px solid #ddd; padding: 20px; margin-top: 20px;">
+        //             <p>זוהי תצוגה מקדימה של מסמך ${recordId}.</p>
+        //             <p>סטטוס: ${recordStatus || 'לא מוגדר'}</p>
+        //         </div>
+        //     </div>
+        // `;
 
-            // Show action buttons
-            const actionButtonsContainer = document.getElementById('action-buttons-container');
-            if (actionButtonsContainer) {
-                actionButtonsContainer.style.display = 'flex';
-                actionButtonsContainer.setAttribute('data-for-record', recordId);
-            }
-        }
+        //         // Show action buttons
+        //         const actionButtonsContainer = document.getElementById('action-buttons-container');
+        //         if (actionButtonsContainer) {
+        //             actionButtonsContainer.style.display = 'flex';
+        //             actionButtonsContainer.setAttribute('data-for-record', recordId);
+        //         }
+        //     }
 
         // Add the editRecord function
         function editRecord(recordId) {
@@ -813,18 +846,7 @@
             }
         }
 
-        /**
-   * Shows a notification popup at the top of the page
-   * @param {string} message - The message to display
-   * @param {string} type - The type of notification: 'success', 'error', 'info', or 'warning'
-   * @param {number} duration - How long to show the notification in milliseconds (default: 3000ms)
-   */
-        /**
-         * Shows a notification popup at the top of the page
-         * @param {string} message - The message to display
-         * @param {string} type - The type of notification: 'success', 'error', 'info', or 'warning'
-         * @param {number} duration - How long to show the notification in milliseconds (default: 3000ms)
-         */
+
         function showNotification(message, type = 'success', duration = 3000) {
             // Remove any existing notifications
             const existingNotifications = document.querySelectorAll('.notification');
@@ -875,6 +897,77 @@
                 }, duration);
             }
         }
+
+
+        async function viewMnilvim(id) {
+            try {
+                const data = await listMnilvim(id); // קבל את המידע
+
+                // אם יש מינלווים, הצג את המידע
+                if (Array.isArray(data) && data.length > 0) {
+                    return data.map(mnilvim => `
+                <div>
+                    <h4>פרטי מסמך ${mnilvim.MN_id}</h4>
+                    <p>תאריך הוספה: ${mnilvim.MN_dateAdd}</p>
+                    <p>מיקום: ${mnilvim.MN_location}</p>
+                    <p>פרטים: ${mnilvim.MN_pratim}</p>
+                    <p>שימוש: ${mnilvim.MN_shyooch}</p>
+                    <p>סטטוס: ${mnilvim.MN_status}</p>
+                    <p>סוג: ${mnilvim.MN_type}</p>
+                </div>
+            `).join(''); // חבר את כל המידע למחרוזת אחת
+                } else {
+                    // במידה ואין מינלווים, הצג הודעת שגיאה באקורדיון
+                    return `
+                <div class="accordion">
+                    <h4>אין מסמכים נילווים</h4>
+                </div>
+            `;
+                }
+            } catch (error) {
+                console.error('Error fetching mnilvim details:', error);
+                // במידה ויש שגיאה, הצג הודעה באקורדיון
+                return `
+            <div class="accordion">
+                <h4>אין מסמכים נילווים</h4>
+            </div>
+        `;
+            }
+        }
+
+        function MnilvimUpload(event) {
+            event.preventDefault(); // למנוע את שליחת הטופס הרגילה
+
+            const fileInput = document.getElementById('document');
+            const data = {};
+
+            // הוסף את המידע הנוסף
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const lastDotIndex = file.name.lastIndexOf('.');
+                const fileNameWithoutExtension = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
+                data.MN_pratim = fileNameWithoutExtension;
+                data.MN_location = fileInput.value; // מיקום הקובץ במחשב
+                data.MN_shyooch = RSH_ID; // לדוגמה, RSH_ID
+                data.MN_status = 1; // סטטוס
+                data.MN_dateAdd = new Date().toISOString().split('T')[0]; // תאריך של היום
+                data.MN_type = file.type; // סוג הקובץ
+            }
+            addMnilvim(data)
+                .then(response => {
+                    if (response.message === "Mnilvim added successfully")
+                        // הנח את ההודעה כאן אם ההוספה הצליחה
+                        showNotification("הקובץ נוסף בהצלחה!");
+                    // loadDocuments(RSH_ID);
+                    listMnilvim(RSH_ID);
+                })
+                .catch(error => {
+
+                    // הנח את ההודעה כאן אם הייתה שגיאה
+                    showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
+                });
+        }
+
 
 
         // Make sure the document is ready before calling getReshumot

@@ -240,6 +240,12 @@
             justify-content: flex-end;
         }
 
+        .section {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
         .record-row {
             position: relative;
         }
@@ -254,26 +260,267 @@
             padding: 3px 8px;
             font-size: 0.8rem;
         }
+
+        /* Header section styles */
+        #header {
+            background-color: #3498db;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-container h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* This would be for the commented-out admin button */
+        .admin-btn {
+            background-color: #13518f;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .admin-btn:hover {
+            background-color: #1a252f;
+        }
+
+        /* Header styling */
+        #header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 25px;
+            border: none;
+            padding: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-container {
+            padding: 20px 30px;
+            position: relative;
+        }
+
+        .title-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-area h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            margin: 5px 0 0;
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* Add a decorative element */
+        .header-container:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 15px;
+            }
+
+            .title-area h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Upload Section Styling */
+        .upload-section {
+            background: linear-gradient(to left, #f8f9fa, #ffffff);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-right: 4px solid #3498db;
+        }
+
+        .upload-title {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .upload-button-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .upload-button-wrapper:hover {
+            transform: translateY(-3px);
+        }
+
+        .upload-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid #3498db;
+            color: #3498db;
+            border-radius: 8px;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 150px;
+            height: 100px;
+        }
+
+        .upload-btn:hover {
+            background: #3498db;
+            color: white;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .upload-btn i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            margin-top: 8px;
+            color: #7f8c8d;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .upload-buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .upload-btn {
+                width: 130px;
+                height: 90px;
+            }
+        }
+
+        /* Header actions styling */
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 1;
+            clear: both;
+        }
+
+        .header-actions .btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header-actions .btn i {
+            font-size: 0.9rem;
+        }
+
+        .header-actions .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .header-actions .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .header-actions .btn:not(.btn-danger) {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .header-actions .btn:not(.btn-danger):hover {
+            background-color: #2980b9;
+        }
     </style>
 
     <link rel="stylesheet" href="admin.style.css">
 </head>
 
 <body>
-    <header>
-        <div class="container">
-            <h1>מערכת ניהול מסמכים מאובטחת</h1>
-        </div>
-    </header>
-
     <div class="container">
-        <button class="btn" onclick="goToEmployeePage(2)">לעמוד עובד</button>
 
-        <div class="footer-actions">
-            <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> התנתק</button>
+        <div class="section" id="header">
+            <div class="header-container">
+                <div class="logo-area">
+                </div>
+                <div class="title-area">
+                    <h1>מערכת ניהול מסמכים</h1>
+                    <p class="subtitle">המערכת המתקדמת לניהול ומעקב אחר מסמכים</p>
+                </div>
+            </div>
         </div>
 
-        <div class="card">
+        <div class="header-actions">
+            <button class="btn" onclick="goToEmployeePage(2)"><i class="fas fa-user"></i> לעמוד עובד</button>
+            <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> יציאה</button>
+        </div>
+
+
+        <div class="upload-section">
             <h2><i class="fas fa-filter"></i> סינון רשומות</h2>
             <div class="filter-area">
                 <input type="text" id="supplierFilter" placeholder="שם ספק">
@@ -284,8 +531,7 @@
         </div>
         <!-- <label for="fileInput" class="btn">טעינת רשימת ספקים</label>
         <input type="file" id="fileInput" accept=".csv, .xls, .xlsx" style="display: none;" /> -->
-
-        <!-- הוסף כפתור לטעינת רשומות -->
+        <!-- <div class="btn-upload">
         <button type="button" class="btn-secondary form-action-btn"
             onclick="document.getElementById('recordsFile').click();">
             <i class="fas fa-file-upload"></i> טעינת רשומות
@@ -295,8 +541,34 @@
         <input type="file" id="recordsFile" style="display: none;" accept=".xls,.xlsx" onchange="loadRecords(event)">
         <button type="button" class="btn-secondary form-action-btn"
             onclick="document.getElementById('Suppliers').click();">
-            <i class="fas fa-file-upload"></i> הוספת רשימת ספקים
+            <i class="fas fa-file-upload"></i> טעינת  ספקים
         </button>
+
+        </div> -->
+
+        <div class="upload-section">
+            <div class="upload-buttons-container">
+                <div class="upload-button-wrapper">
+                    <button type="button" class="upload-btn" onclick="document.getElementById('recordsFile').click();">
+                        <i class="fas fa-file-upload"></i>
+                        <span>טעינת רשומות</span>
+                    </button>
+                    <input type="file" id="recordsFile" style="display: none;" accept=".csv, .xls, .xlsx"
+                        onchange="loadRecords(event)">
+                </div>
+
+                <div class="upload-button-wrapper">
+                    <button type="button" class="upload-btn" onclick="document.getElementById('Suppliers').click();">
+                        <i class="fas fa-users"></i>
+                        <span>טעינת ספקים</span>
+                    </button>
+                    <input type="file" id="Suppliers" style="display: none;" accept=".csv, .xls, .xlsx"
+                        onchange="loadFile(event)">
+                </div>
+            </div>
+        </div>
+
+
         <!-- <button onclick="loadFile()">טעון קובץ</button> -->
         <div id="supplierList"></div>
 
@@ -327,20 +599,9 @@
                     <label for="supplierName">שם הספק:</label>
                     <select id="supplierName" name="supplierName">
                         <option value="" disabled selected>בחר ספק</option>
-                        <option value="ספק 1">ספק 1</option>
-                        <option value="ספק 2">ספק 2</option>
                     </select>
                     <div id="error-supplierName" class="error-message" style="color: red;"></div>
                 </div>
-                <!-- 
-                <div class="form-group">
-                    <label for="supplierName">שם הספק:</label>
-                    <select id="supplierName" name="supplierName">
-                        <option value="" disabled selected>בחר ספק</option>
-                    </select>
-                    <div id="error-supplierName" class="error-message" style="color: red;"></div>
-                </div> -->
-
                 <div class="form-group checkbox-container">
                     <label for="exempt">עוסק פטור:</label>
                     <input type="checkbox" id="exempt" name="exempt">
@@ -590,6 +851,14 @@
             showNotification('הסינון נוקה', 'info', 2000);
         }
 
+        function calculateVAT() {
+            const amount = document.getElementById('amount').value;
+            let maam = document.getElementById('maam_id').value;
+            maam = maam / 100;
+            const vat = amount * maam; // לדוגמה, מע"מ 17%
+            document.getElementById('scmaan').value = vat;
+            document.getElementById('totalAmount').value = parseFloat(amount) + vat;
+        }
 
         function goToEmployeePage(variable) {
             localStorage.setItem('PR', variable);
@@ -1050,9 +1319,6 @@
         }
 
 
-
-
-
         function loadFile(event) {
             const fileInput = event.target; // קבלת שדה הקלט מתוך האירוע
             const file = fileInput.files[0];
@@ -1073,7 +1339,6 @@
             }
         }
 
-
         function loadCSV(file) {
             Papa.parse(file, {
                 header: true,
@@ -1085,14 +1350,14 @@
                         if (response.status === 200) {
                             loadSuppliers(); // עדכן את רשימת הספקים כאן
                         } else {
-                            console.error('Failed to create suppliers:', response);
+                            showNotification('נכשלה יצירת הספקים: ' + response.statusText);
                         }
                     } catch (error) {
-                        console.error('Error creating suppliers:', error);
+                        showNotification('שגיאה ביצירת ספקים: ' + error.message);
                     }
                 },
                 error: function (error) {
-                    console.error('Error loading CSV:', error);
+                    showNotification('שגיאה בטעינת CSV: ' + error.message);
                 }
             });
         }
@@ -1112,11 +1377,12 @@
                     const response = await createSupplier(suppliers); // שלח את כל הספקים ל-createSuppliers
                     if (response.status === 200) {
                         loadSuppliers(); // עדכן את רשימת הספקים כאן
+                        showNotification('הספקים נוספו בהצלחה!');
                     } else {
-                        console.error('Failed to create suppliers:', response);
+                        showNotification('נכשלה יצירת הספקים: ' + response.statusText);
                     }
                 } catch (error) {
-                    console.error('Error creating suppliers:', error);
+                    showNotification('שגיאה ביצירת ספקים: ' + error.message);
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1163,31 +1429,28 @@
             Papa.parse(file, {
                 header: true,
                 complete: async function (results) {
-                    const records = results.data.map(row => ({
-                      
-//      $Rsh_id ,
-//      $Rsh_date,
-//      $Rsh_mchlaka,
-//  $Rsh_sapak,
-//      $Rsh_patoor,
-//      $Rsh_schoom,
-//      $Rsh_maam
-//      $Rsh_schmaam;
-//      $Rsh_schtotal;
-//      $Rsh_aspaka;
-//      $Rsh_proyktnam;
-//      $Rsh_sochen;
-//      $Rsh_takziv;
-//      $Rsh_cname;
-//      $Rsh_cnametl;
-//      $Rsh_cemail = ;
+                    const records = results.data.map(row => {
+                        console.log(row);
+                        debugger; // עצור כאן כדי לבדוק את הערכים של row
+                        return {
+                            Rsh_id: row["Record Number"], // מיפוי ל-Rsh_id
+                            Rsh_date: row["Timestamp"], // מיפוי ל-Rsh_date
+                            Rsh_mchlaka: row["Department"], // מיפוי ל-Rsh_mchlaka
+                            Rsh_sapak: row["Supplier Name"], // מיפוי ל-Rsh_sapak
+                            Rsh_patoor: row["Contact Phone"], // מיפוי ל-Rsh_patoor
+                            Rsh_schoom: row["Amount"], // מיפוי ל-Rsh_schoom
+                            Rsh_maam: row["VAT"], // מיפוי ל-Rsh_maam
+                            Rsh_schmaam: row["Total Amount"], // מיפוי ל-Rsh_schmaam
+                            Rsh_aspaka: row["Delivery Location"], // מיפוי ל-Rsh_aspaka
+                            Rsh_proyktnam: row["Project Name"], // מיפוי ל-Rsh_proyktnam
+                            Rsh_sochen: row["Contact Name"], // מיפוי ל-Rsh_sochen
+                            Rsh_takziv: row["Contact Email"], // מיפוי ל-Rsh_takziv
+                            Rsh_cname: row["Delivery Location"], // מיפוי ל-Rsh_cname
+                            Rsh_cnametl: row["Delivery Location"], // אם יש צורך בשדה נוסף
+                        };
+                    });
 
 
-                        // הנח כאן את מיפוי השדות שלך
-                        field1: row.field1, // לדוגמה
-                        field2: row.field2, // לדוגמה
-                        // הוסף שדות נוספים לפי הצורך
-                    }));
                     console.log(records);
                     debugger
                     try {

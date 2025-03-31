@@ -515,8 +515,8 @@
             if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = '';
 
             // If you have a checkbox for exempt, you might want to uncheck it
-            if (document.getElementById('exempt')) document.getElementById('exempt').checked = false;
-            checkFormCompletion();
+            // if (document.getElementById('exempt')) document.getElementById('exempt').checked = false;
+            // checkFormCompletion();
         }
 
 
@@ -634,11 +634,6 @@
             }, 5000);
         }
 
-
-        function deleteDocument() {
-            alert("המסמך נמחק.");
-        }
-
         async function getMaam() {
             try {
                 const maam = await listAllMaam();
@@ -673,36 +668,37 @@
         }
 
         function exportToExcel() {
-            const data = [
-                ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Amount', 'VAT', 'Total Amount', 'Delivery Location', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Agent Number', 'Budget Item'],
-                [
-                    document.getElementById('autoNumber').value,
-                    document.getElementById('timestamp').value,
-                    document.getElementById('department').value,
-                    document.getElementById('supplierName').value,
-                    document.getElementById('amount').value,
-                    document.getElementById('vat').value,
-                    document.getElementById('totalAmount').value,
-                    document.getElementById('deliveryPlace').value,
-                    document.getElementById('contactName').value,
-                    document.getElementById('contactPhone').value,
-                    document.getElementById('contactEmail').value,
-                    document.getElementById('projectName').value,
-                    document.getElementById('agentNumber').value,
-                    document.getElementById('budgetItem').value
-                ]
-            ];
+    const data = [
+        ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Amount', 'VAT', 'Total Amount', 'Delivery Location', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Agent Number', 'Budget Item'],
+        [
+            document.getElementById('autoNumber').value,
+            document.getElementById('timestamp').value,
+            document.getElementById('department').value,
+            document.getElementById('supplierName').value,
+            document.getElementById('amount').value,
+            document.getElementById('maam_id').value,  // Changed from 'vat' to 'maam_id'
+            document.getElementById('totalAmount').value,
+            document.getElementById('deliveryPlace').value,
+            document.getElementById('contactName').value,
+            document.getElementById('contactPhone').value,
+            document.getElementById('contactEmail').value,
+            document.getElementById('projectName').value,
+            document.getElementById('agentNumber').value,
+            document.getElementById('budgetItem').value
+        ]
+    ];
 
-            let csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
+    let csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "purchase_request.csv");
-            document.body.appendChild(link);
-            link.click(); // יוצר את ההורדה אוטומטית
-            document.body.removeChild(link); // מסיר את הלינק לאחר ההורדה
-        }
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "purchase_request.csv");
+    document.body.appendChild(link);
+    link.click(); // יוצר את ההורדה אוטומטית
+    document.body.removeChild(link); // מסיר את הלינק לאחר ההורדה
+}
+
 
 
 
@@ -778,10 +774,10 @@
         }
 
         // פונקציה לניהול הרשאות
-        // setTimeout(() => {
-        //     alert("אין פעילות בדף, תתבצע יציאה אוטומטית.");
-        //     exit();
-        // }, 600000); // 10 דקות
+        setTimeout(() => {
+            alert("אין פעילות בדף, תתבצע יציאה אוטומטית.");
+            exit();
+        }, 600000); // 10 דקות
 
         // פונקציה לטעינת רשומות
         async function getReshumot() {

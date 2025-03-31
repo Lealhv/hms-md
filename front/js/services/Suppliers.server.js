@@ -24,7 +24,7 @@ async function getAllSuppliers() {
 // פונקציה ליצירת ספק חדשa 
  async function createSupplier(supplier) {
     try {
-        const response = await fetch('/api/suppliers', {
+        const response = await fetch(`${apiUrl}/supplier`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -3,6 +3,7 @@
 // In reshumot.server.js, around line 22
 async function createReshumot(data) {
     try {
+        debugger
       const response = await fetch('http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/', {
         method: 'POST',
         headers: {

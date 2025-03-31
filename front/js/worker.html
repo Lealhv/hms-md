@@ -66,11 +66,82 @@
             cursor: pointer;
             font-size: 1em;
         }
+
+        /* Header styling */
+        #header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 25px;
+            border: none;
+            padding: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-container {
+            padding: 40px 30px;
+            position: relative;
+        }
+
+        .title-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-area h1 {
+            margin: 0;
+            font-size: 6rem;
+            /* Even larger h1 */
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            margin: 10px 0 0;
+            font-size: 1rem;
+            /* Smaller subtitle */
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* Add a decorative element */
+        .header-container:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2ecc71, #f1c40f, #e74c3c);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 25px;
+            }
+
+            .title-area h1 {
+                font-size: 6rem;
+            }
+
+            .subtitle {
+                font-size: 1.5rem;
+            }
+        }
     </style>
     <script src="services/reshumot.server.js" defer></script>
     <script src="services/maam.server.js" defer></script>
     <script src="services/mnilvim.server.js" defer></script>
     <script src="services/userLog.server.js" defer></script>
+    <script src="services/Suppliers.server.js" defer></script>
+
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
 
 
@@ -79,18 +150,21 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- הוספת קישור לספריית html2pdf -->
 </head>
 
 <body onload="getData()">
     <div class="container">
         <div class="section" id="header">
-
             <div class="header-container">
-                <h1>מערכת ניהול מסמכים</h1>
-                <!-- <button id="conditionalButton" class="admin-btn" onclick="goToAdmin()">לעמוד מנהל</button> -->
+                <div class="logo-area">
+                </div>
+                <div class="title-area">
+                    <h1>מערכת ניהול מסמכים</h1>
+                    <p class="subtitle">המערכת המתקדמת לניהול ומעקב אחר מסמכים</p>
+                </div>
             </div>
         </div>
+
 
         <div class="header-buttons">
             <button type="button" class="btn-danger" onclick="exit()">
@@ -115,12 +189,9 @@
                     <label for="supplierName">שם הספק:</label>
                     <select id="supplierName" name="supplierName">
                         <option value="" disabled selected>בחר ספק</option>
-                        <option value="ספק 1">ספק 1</option>
-                        <option value="ספק 2">ספק 2</option>
                     </select>
                     <div id="error-supplierName" class="error-message" style="color: red;"></div>
                 </div>
-
                 <div class="form-group checkbox-container">
                     <label for="exempt">עוסק פטור:</label>
                     <input type="checkbox" id="exempt" name="exempt">
@@ -273,8 +344,23 @@
             getReshumot();
             getMaam();
             checkFunctionCall();
+            loadSuppliers();
+
             //  loadDocuments();
 
+        }
+        async function loadSuppliers() {
+            const suppliers = await getAllSuppliers(); // הנחה שהפונקציה מחזירה את הספקים
+            console.log(suppliers); // הוסף לוג כאן כדי לבדוק מה מוחזר
+            const supplierSelect = document.getElementById('supplierName');
+            supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
+
+            suppliers.forEach(supplier => {
+                const option = document.createElement('option');
+                option.value = supplier.SP_name; // הנח כאן את השם של הספק
+                option.textContent = supplier.SP_name; // הנח כאן את השם של הספק
+                supplierSelect.appendChild(option);
+            });
         }
         function calculateVAT() {
             const amount = document.getElementById('amount').value;
@@ -634,11 +720,6 @@
             }, 5000);
         }
 
-
-        function deleteDocument() {
-            alert("המסמך נמחק.");
-        }
-
         async function getMaam() {
             try {
                 const maam = await listAllMaam();
@@ -674,25 +755,47 @@
 
         function exportToExcel() {
             const data = [
-                ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Amount', 'VAT', 'Total Amount', 'Delivery Location', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Agent Number', 'Budget Item'],
+                ['Record Number', 'Timestamp', 'Department', 'Supplier Name','Patoor', 'Amount', 'VAT','schmaam', 'Total Amount', 'Delivery Location','sochen', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Budget Item'],
                 [
+                    
                     document.getElementById('autoNumber').value,
                     document.getElementById('timestamp').value,
                     document.getElementById('department').value,
                     document.getElementById('supplierName').value,
+                    document.getElementById('patoor').value,  // Changed from 'vat' to 'patoor'
                     document.getElementById('amount').value,
-                    document.getElementById('vat').value,
+                    document.getElementById('maam_id').value, 
+                    document.getElementById('scmaan').value, 
+                     // Changed from 'vat' to 'maam_id'
                     document.getElementById('totalAmount').value,
                     document.getElementById('deliveryPlace').value,
+                    document.getElementById('agentNumber').value,
                     document.getElementById('contactName').value,
                     document.getElementById('contactPhone').value,
                     document.getElementById('contactEmail').value,
                     document.getElementById('projectName').value,
-                    document.getElementById('agentNumber').value,
                     document.getElementById('budgetItem').value
                 ]
             ];
 
+    //         public $Rsh_id;
+    // public $Rsh_date;
+    // public $Rsh_mchlaka;
+    // public $Rsh_sapak;
+    // public $Rsh_patoor;
+    // public $Rsh_schoom;
+    // public $Rsh_maam;
+    // public $Rsh_schmaam;
+    // public $Rsh_schtotal;
+    // public $Rsh_aspaka;
+    // public $Rsh_proyktnam;
+    // public $Rsh_sochen;
+    // public $Rsh_takziv;
+    // public $Rsh_cname;
+    // public $Rsh_cnametl;
+    // public $Rsh_cemail;
+    console.log(data);
+debugger
             let csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
 
             const encodedUri = encodeURI(csvContent);
@@ -703,6 +806,7 @@
             link.click(); // יוצר את ההורדה אוטומטית
             document.body.removeChild(link); // מסיר את הלינק לאחר ההורדה
         }
+
 
 
 
@@ -778,10 +882,10 @@
         }
 
         // פונקציה לניהול הרשאות
-        // setTimeout(() => {
-        //     alert("אין פעילות בדף, תתבצע יציאה אוטומטית.");
-        //     exit();
-        // }, 600000); // 10 דקות
+        setTimeout(() => {
+            alert("אין פעילות בדף, תתבצע יציאה אוטומטית.");
+            exit();
+        }, 600000); // 10 דקות
 
         // פונקציה לטעינת רשומות
         async function getReshumot() {
@@ -1099,50 +1203,50 @@
 
 
         async function loadDocuments(id) {
-    isFunctionCalled = true;
-    const documentsArea = document.getElementById('documents-area');
-    const tbody = document.getElementById('documents-body');
-    const table = document.getElementById('documentsTable');
-    const messageDiv = document.getElementById('message');
-    
-    // Clear previous content
-    tbody.innerHTML = '';
-    
-    // Handle undefined ID case
-    if (id === undefined) {
-        documentsArea.classList.add('empty');
-        messageDiv.innerHTML = '<i class="fas fa-info-circle"></i> יש לבחור רשומה על מנת להציג מסמכים';
-        messageDiv.style.display = 'block';
-        table.style.display = 'none';
-        isFunctionCalled = false;
-        checkFunctionCall();
-        return;
-    }
-    
-    // Fetch documents
-    const documents = await listMnilvim(id);
-    
-    if (documents.length === 0) {
-        documentsArea.classList.add('empty');
-        messageDiv.innerHTML = '<i class="fas fa-info-circle"></i> אין מסמכים נלווים';
-        messageDiv.style.display = 'block';
-        table.style.display = 'none';
-    } else {
-        documentsArea.classList.remove('empty');
-        messageDiv.style.display = 'none';
-        table.style.display = 'table';
-        documents.forEach(doc => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
+            isFunctionCalled = true;
+            const documentsArea = document.getElementById('documents-area');
+            const tbody = document.getElementById('documents-body');
+            const table = document.getElementById('documentsTable');
+            const messageDiv = document.getElementById('message');
+
+            // Clear previous content
+            tbody.innerHTML = '';
+
+            // Handle undefined ID case
+            if (id === undefined) {
+                documentsArea.classList.add('empty');
+                messageDiv.innerHTML = '<i class="fas fa-info-circle"></i> יש לבחור רשומה על מנת להציג מסמכים';
+                messageDiv.style.display = 'block';
+                table.style.display = 'none';
+                isFunctionCalled = false;
+                checkFunctionCall();
+                return;
+            }
+
+            // Fetch documents
+            const documents = await listMnilvim(id);
+
+            if (documents.length === 0) {
+                documentsArea.classList.add('empty');
+                messageDiv.innerHTML = '<i class="fas fa-info-circle"></i> אין מסמכים נלווים';
+                messageDiv.style.display = 'block';
+                table.style.display = 'none';
+            } else {
+                documentsArea.classList.remove('empty');
+                messageDiv.style.display = 'none';
+                table.style.display = 'table';
+                documents.forEach(doc => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
                 <td>${doc.MN_pratim}</td>
                 <td>${doc.MN_dateAdd}</td>
                 <td><button onclick="deleteDocument('${doc.MN_id}', event)"><i class="fas fa-trash"></i> מחק</button></td>
             `;
-            row.onclick = () => fetchDocument(doc.MN_location, doc.MN_pratim);
-            tbody.appendChild(row);
-        });
-    }
-}
+                    row.onclick = () => fetchDocument(doc.MN_location, doc.MN_pratim);
+                    tbody.appendChild(row);
+                });
+            }
+        }
 
         async function fetchDocument(url) {
             const httpUrl = url.replace(/^file:\/\//, 'http://localhost/');
@@ -1156,17 +1260,17 @@
 
 
         function checkFunctionCall() {
-    if (!isFunctionCalled) {
-        const documentsArea = document.getElementById('documents-area');
-        const messageDiv = document.getElementById('message');
-        const table = document.getElementById('documentsTable');
-        
-        documentsArea.classList.add('empty');
-        messageDiv.innerHTML = 'יש לבחור רשומה על מנת להציג מסמכים';
-        messageDiv.style.display = 'block';
-        table.style.display = 'none';
-    }
-}
+            if (!isFunctionCalled) {
+                const documentsArea = document.getElementById('documents-area');
+                const messageDiv = document.getElementById('message');
+                const table = document.getElementById('documentsTable');
+
+                documentsArea.classList.add('empty');
+                messageDiv.innerHTML = 'יש לבחור רשומה על מנת להציג מסמכים';
+                messageDiv.style.display = 'block';
+                table.style.display = 'none';
+            }
+        }
 
         async function deleteDocument(id) {
             event.stopPropagation(); // מונע מהאירוע להתפשט ולגרום להורדת המסמך

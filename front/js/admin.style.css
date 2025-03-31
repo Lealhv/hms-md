@@ -848,7 +848,7 @@ input[type="number"] {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(218, 14, 14, 0.9);
+    background-color: rgba(79, 120, 223, 0.434);
     display: flex;
     justify-content: center; /* Centering the overlay content */
     align-items: center;
@@ -856,29 +856,70 @@ input[type="number"] {
     z-index: 10;
 }
 
-.header-buttons {
+.header-actions {
+    display: flex;
+    float: left;
+    /* Force left alignment regardless of RTL */
+    margin-bottom: 20px;
+    gap: 10px;
+    /* Space between buttons */
+}
+
+.header-actions .btn {
+    min-width: 120px;
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Align items to the left */
-    margin: 20px; /* You can adjust margins as needed */
-    gap: 10px;
-    z-index: 100;
+    justify-content: center;
+    gap: 8px;
 }
 
+.header-actions .btn i {
+    font-size: 14px;
+}
 
-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+.header-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-actions .btn-danger {
+    background-color: #d9534f;
     color: white;
-    padding: 20px 0;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d43f3a;
 }
 
-header h1 {
-    text-align: center;
-    font-weight: 700;
-    font-size: 2rem;
+.header-actions .btn-danger:hover {
+    background-color: #c9302c;
+    border-color: #ac2925;
+}
+
+/* Clear the float to prevent layout issues */
+.container::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+
+/* Section Styling */
+.section {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background-color: white;
+}
+
+.section h2 {
+    color: var(--primary-color);
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1.1rem;
 }
 
 #header {
@@ -893,27 +934,87 @@ header h1 {
     font-size: 1.5rem;
 }
 
-#header p {
-    margin: 0.5rem 0 0 0;
-    opacity: 0.9;
-}
-section {
-    margin: 1rem 0;
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    background-color: white;
+
+/* Upload Section Styling */
+.upload-section {
+    background: linear-gradient(to left, #f8f9fa, #ffffff);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 25px 0;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    border-right: 4px solid #3498db;
 }
 
-.section h2 {
-    color: var(--primary-color);
-    margin: 0 0 1rem 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 1.1rem;
+.upload-title {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+
+.upload-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.upload-button-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.upload-button-wrapper:hover {
+    transform: translateY(-3px);
+}
+
+.upload-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid #3498db;
+    color: #3498db;
+    border-radius: 8px;
+    padding: 15px 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 150px;
+    height: 100px;
+}
+
+.upload-btn:hover {
+    background: #3498db;
+    color: white;
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.upload-btn i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    margin-top: 8px;
+    color: #7f8c8d;
+    font-size: 0.8rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .upload-buttons-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .upload-btn {
+        width: 130px;
+        height: 90px;
+    }
 }

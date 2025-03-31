@@ -274,7 +274,7 @@
         </div>
 
         <div class="card">
-            <h2><i class="fas fa-filter"></i> סינון מסמכים</h2>
+            <h2><i class="fas fa-filter"></i> סינון רשומות</h2>
             <div class="filter-area">
                 <input type="text" id="supplierFilter" placeholder="שם ספק">
                 <input type="text" id="agentFilter" placeholder="שם סוכן">
@@ -282,8 +282,22 @@
                 <button class="btn" onclick="filterRecords()"><i class="fas fa-search"></i> סנן</button>
             </div>
         </div>
-        <input type="file" id="fileInput" accept=".csv, .xls, .xlsx" />
-        <button onclick="loadFile()">טעון קובץ</button>
+        <!-- <label for="fileInput" class="btn">טעינת רשימת ספקים</label>
+        <input type="file" id="fileInput" accept=".csv, .xls, .xlsx" style="display: none;" /> -->
+
+        <!-- הוסף כפתור לטעינת רשומות -->
+        <button type="button" class="btn-secondary form-action-btn"
+            onclick="document.getElementById('recordsFile').click();">
+            <i class="fas fa-file-upload"></i> טעינת רשומות
+        </button>
+        <input type="file" id="recordsFile" style="display: none;" accept=".csv, .xls, .xlsx"
+            onchange="loadRecords(event)">
+        <input type="file" id="recordsFile" style="display: none;" accept=".xls,.xlsx" onchange="loadRecords(event)">
+        <button type="button" class="btn-secondary form-action-btn"
+            onclick="document.getElementById('Suppliers').click();">
+            <i class="fas fa-file-upload"></i> הוספת רשימת ספקים
+        </button>
+        <!-- <button onclick="loadFile()">טעון קובץ</button> -->
         <div id="supplierList"></div>
 
         <div class="card">
@@ -418,6 +432,8 @@
             </form>
         </div>
         <input type="file" id="document" style="display: none;" onchange="MnilvimUpload(event)">
+        <input type="file" id="Suppliers" style="display: none;" onchange="loadFile(event)">
+
     </div>
 
     <script>
@@ -974,10 +990,19 @@
         }
 
         function MnilvimUpload(event) {
+
             event.preventDefault(); // למנוע את שליחת הטופס הרגילה
 
             const fileInput = document.getElementById('document');
             const data = {};
+
+            // Get the selected record ID from the hidden input field
+            const recordId = document.getElementById('autoNumber').value;
+
+            if (!recordId) {
+                showNotification("אנא בחר רשומה לפני הוספת מסמך", "error");
+                return;
+            }
 
             // הוסף את המידע הנוסף
             if (fileInput.files.length > 0) {
@@ -986,31 +1011,54 @@
                 const fileNameWithoutExtension = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
                 data.MN_pratim = fileNameWithoutExtension;
                 data.MN_location = fileInput.value; // מיקום הקובץ במחשב
-                data.MN_shyooch = RSH_ID; // לדוגמה, RSH_ID
+                data.MN_shyooch = recordId; // Use the selected record ID instead of undefined RSH_ID
                 data.MN_status = 1; // סטטוס
                 data.MN_dateAdd = new Date().toISOString().split('T')[0]; // תאריך של היום
                 data.MN_type = file.type; // סוג הקובץ
             }
+
             addMnilvim(data)
                 .then(response => {
-                    if (response.message === "Mnilvim added successfully")
+                    debugger
+                    if (response.message === "Mnilvim created successfully") {
                         // הנח את ההודעה כאן אם ההוספה הצליחה
                         showNotification("הקובץ נוסף בהצלחה!");
-                    listMnilvim(RSH_ID);
+
+                        // עדכון מיידי של רשימת המסמכים הנלווים לרשומה הספציפית
+                        viewMnilvim(recordId).then(details => {
+                            debugger
+                            const detailsElement = document.getElementById(`details-${recordId}`);
+                            if (detailsElement) {
+                                detailsElement.innerHTML = details;
+
+                                // פתח את האקורדיון אם הוא סגור
+                                const accordionRow = document.getElementById(`accordion-${recordId}`);
+                                if (accordionRow && accordionRow.style.display === "none") {
+                                    accordionRow.style.display = "table-row";
+                                }
+                            }
+                        });
+
+                        // נקה את שדה הקובץ
+                        fileInput.value = '';
+                    }
                 })
                 .catch(error => {
                     // הנח את ההודעה כאן אם הייתה שגיאה
-                    showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
+                    showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message, "error");
                 });
         }
 
 
-        function loadFile() {
-            const fileInput = document.getElementById('fileInput');
+
+
+
+        function loadFile(event) {
+            const fileInput = event.target; // קבלת שדה הקלט מתוך האירוע
             const file = fileInput.files[0];
 
             if (!file) {
-                alert('אנא בחר קובץ.');
+                showNotification('אנא בחר קובץ.');
                 return;
             }
 
@@ -1021,26 +1069,26 @@
             } else if (fileExtension === 'xls' || fileExtension === 'xlsx') {
                 loadExcel(file);
             } else {
-                alert('פורמט קובץ לא נתמך. אנא בחר קובץ CSV או Excel.');
+                showNotification('פורמט קובץ לא נתמך. אנא בחר קובץ CSV או Excel.');
             }
         }
+
 
         function loadCSV(file) {
             Papa.parse(file, {
                 header: true,
                 complete: async function (results) {
-                    for (const supplier of results.data) {
-                        try {
-                            const response = await createSupplier(supplier); // שלח כל ספק ל-createSupplier
-                            if (response.status === 200) {
-                                // אם השרת החזיר סטטוס 200, הוסף את הספק לרשימה
-                                displaySuppliers([supplier.SP_name]); // הנח כאן את השם של הספק
-                            } else {
-                                console.error('Failed to create supplier:', response);
-                            }
-                        } catch (error) {
-                            console.error('Error creating supplier:', error);
+                    const suppliers = results.data.map(supplier => ({ SP_name: supplier.SP_name }));
+
+                    try {
+                        const response = await createSupplier(suppliers); // שלח את כל הספקים ל-createSuppliers
+                        if (response.status === 200) {
+                            loadSuppliers(); // עדכן את רשימת הספקים כאן
+                        } else {
+                            console.error('Failed to create suppliers:', response);
                         }
+                    } catch (error) {
+                        console.error('Error creating suppliers:', error);
                     }
                 },
                 error: function (error) {
@@ -1048,6 +1096,7 @@
                 }
             });
         }
+
         function loadExcel(file) {
             const reader = new FileReader();
             reader.onload = async function (e) {
@@ -1059,23 +1108,20 @@
                 // הנחה שהשמות נמצאים בעמודה הראשונה
                 const suppliers = jsonData.map(row => ({ SP_name: row[0] }));
 
-                for (const supplier of suppliers) {
-                    try {
-                        debugger
-                        const response = await createSupplier(supplier); // שלח כל ספק ל-createSupplier
-                        if (response.status === 200) {
-                            // אם השרת החזיר סטטוס 200, הוסף את הספק לרשימה
-                            displaySuppliers([supplier.SP_name]); // הנח כאן את השם של הספק
-                        } else {
-                            console.error('Failed to create supplier:', response);
-                        }
-                    } catch (error) {
-                        console.error('Error creating supplier:', error);
+                try {
+                    const response = await createSupplier(suppliers); // שלח את כל הספקים ל-createSuppliers
+                    if (response.status === 200) {
+                        loadSuppliers(); // עדכן את רשימת הספקים כאן
+                    } else {
+                        console.error('Failed to create suppliers:', response);
                     }
+                } catch (error) {
+                    console.error('Error creating suppliers:', error);
                 }
             };
             reader.readAsArrayBuffer(file);
         }
+
 
         function displaySuppliers(suppliers) {
             const supplierListDiv = document.getElementById('supplierList');
@@ -1092,6 +1138,110 @@
                 supplierSelect.appendChild(option);
             });
         }
+
+        function loadRecords(event) {
+            const fileInput = event.target;
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showNotification('אנא בחר קובץ.');
+                return;
+            }
+
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+
+            if (fileExtension === 'csv') {
+                loadCSVRecords(file);
+            } else if (fileExtension === 'xls' || fileExtension === 'xlsx') {
+                loadExcelRecords(file);
+            } else {
+                showNotification('פורמט קובץ לא נתמך. אנא בחר קובץ CSV או Excel.');
+            }
+        }
+
+        function loadCSVRecords(file) {
+            Papa.parse(file, {
+                header: true,
+                complete: async function (results) {
+                    const records = results.data.map(row => ({
+                      
+//      $Rsh_id ,
+//      $Rsh_date,
+//      $Rsh_mchlaka,
+//  $Rsh_sapak,
+//      $Rsh_patoor,
+//      $Rsh_schoom,
+//      $Rsh_maam
+//      $Rsh_schmaam;
+//      $Rsh_schtotal;
+//      $Rsh_aspaka;
+//      $Rsh_proyktnam;
+//      $Rsh_sochen;
+//      $Rsh_takziv;
+//      $Rsh_cname;
+//      $Rsh_cnametl;
+//      $Rsh_cemail = ;
+
+
+                        // הנח כאן את מיפוי השדות שלך
+                        field1: row.field1, // לדוגמה
+                        field2: row.field2, // לדוגמה
+                        // הוסף שדות נוספים לפי הצורך
+                    }));
+                    console.log(records);
+                    debugger
+                    try {
+                        const response = await createReshumot(records); // שלח את כל הרשומות ל-createRecords
+                        if (response.status === 200) {
+                            showNotification('הרשומות נוספו בהצלחה!');
+                        } else {
+                            console.error('Failed to create records:', response);
+                            showNotification('שגיאה בהוספת הרשומות');
+                        }
+                    } catch (error) {
+                        console.error('Error creating records:', error);
+                        showNotification('שגיאה בהוספת הרשומות: ' + error.message);
+                    }
+                },
+                error: function (error) {
+                    console.error('Error loading CSV:', error);
+                    showNotification('שגיאה בטעינת קובץ CSV: ' + error.message);
+                }
+            });
+        }
+
+        function loadExcelRecords(file) {
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                // הנחה שהשמות נמצאים בעמודות
+                const records = jsonData.map(row => ({
+                    // הנח כאן את מיפוי השדות שלך
+                    field1: row[0], // לדוגמה
+                    field2: row[1], // לדוגמה
+                    // הוסף שדות נוספים לפי הצורך
+                }));
+
+                try {
+                    const response = await createReshumot(records); // שלח את כל הרשומות ל-createRecords
+                    if (response.status === 200) {
+                        showNotification('הרשומות נוספו בהצלחה!');
+                    } else {
+                        console.error('Failed to create records:', response);
+                        showNotification('שגיאה בהוספת הרשומות');
+                    }
+                } catch (error) {
+                    console.error('Error creating records:', error);
+                    showNotification('שגיאה בהוספת הרשומות: ' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
 
         // Make sure the document is ready before calling getReshumot
         document.addEventListener('DOMContentLoaded', function () {

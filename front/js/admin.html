@@ -270,7 +270,7 @@
         <button class="btn" onclick="goToEmployeePage(2)">לעמוד עובד</button>
 
         <div class="footer-actions">
-            <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> התנתק</button>
+            <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> יציאה</button>
         </div>
 
         <div class="card">
@@ -332,15 +332,6 @@
                     </select>
                     <div id="error-supplierName" class="error-message" style="color: red;"></div>
                 </div>
-                <!-- 
-                <div class="form-group">
-                    <label for="supplierName">שם הספק:</label>
-                    <select id="supplierName" name="supplierName">
-                        <option value="" disabled selected>בחר ספק</option>
-                    </select>
-                    <div id="error-supplierName" class="error-message" style="color: red;"></div>
-                </div> -->
-
                 <div class="form-group checkbox-container">
                     <label for="exempt">עוסק פטור:</label>
                     <input type="checkbox" id="exempt" name="exempt">
@@ -590,6 +581,14 @@
             showNotification('הסינון נוקה', 'info', 2000);
         }
 
+        function calculateVAT() {
+            const amount = document.getElementById('amount').value;
+            let maam = document.getElementById('maam_id').value;
+            maam = maam / 100;
+            const vat = amount * maam; // לדוגמה, מע"מ 17%
+            document.getElementById('scmaan').value = vat;
+            document.getElementById('totalAmount').value = parseFloat(amount) + vat;
+        }
 
         function goToEmployeePage(variable) {
             localStorage.setItem('PR', variable);
@@ -1050,9 +1049,6 @@
         }
 
 
-
-
-
         function loadFile(event) {
             const fileInput = event.target; // קבלת שדה הקלט מתוך האירוע
             const file = fileInput.files[0];
@@ -1073,7 +1069,6 @@
             }
         }
 
-
         function loadCSV(file) {
             Papa.parse(file, {
                 header: true,
@@ -1085,14 +1080,14 @@
                         if (response.status === 200) {
                             loadSuppliers(); // עדכן את רשימת הספקים כאן
                         } else {
-                            console.error('Failed to create suppliers:', response);
+                            showNotification('נכשלה יצירת הספקים: ' + response.statusText);
                         }
                     } catch (error) {
-                        console.error('Error creating suppliers:', error);
+                        showNotification('שגיאה ביצירת ספקים: ' + error.message);
                     }
                 },
                 error: function (error) {
-                    console.error('Error loading CSV:', error);
+                    showNotification('שגיאה בטעינת CSV: ' + error.message);
                 }
             });
         }
@@ -1112,11 +1107,12 @@
                     const response = await createSupplier(suppliers); // שלח את כל הספקים ל-createSuppliers
                     if (response.status === 200) {
                         loadSuppliers(); // עדכן את רשימת הספקים כאן
+                        showNotification('הספקים נוספו בהצלחה!');
                     } else {
-                        console.error('Failed to create suppliers:', response);
+                        showNotification('נכשלה יצירת הספקים: ' + response.statusText);
                     }
                 } catch (error) {
-                    console.error('Error creating suppliers:', error);
+                    showNotification('שגיאה ביצירת ספקים: ' + error.message);
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1163,31 +1159,28 @@
             Papa.parse(file, {
                 header: true,
                 complete: async function (results) {
-                    const records = results.data.map(row => ({
-                      
-//      $Rsh_id ,
-//      $Rsh_date,
-//      $Rsh_mchlaka,
-//  $Rsh_sapak,
-//      $Rsh_patoor,
-//      $Rsh_schoom,
-//      $Rsh_maam
-//      $Rsh_schmaam;
-//      $Rsh_schtotal;
-//      $Rsh_aspaka;
-//      $Rsh_proyktnam;
-//      $Rsh_sochen;
-//      $Rsh_takziv;
-//      $Rsh_cname;
-//      $Rsh_cnametl;
-//      $Rsh_cemail = ;
+                    const records = results.data.map(row => {
+                        console.log(row);
+                        debugger; // עצור כאן כדי לבדוק את הערכים של row
+                        return {
+                            Rsh_id: row["Record Number"], // מיפוי ל-Rsh_id
+                            Rsh_date: row["Timestamp"], // מיפוי ל-Rsh_date
+                            Rsh_mchlaka: row["Department"], // מיפוי ל-Rsh_mchlaka
+                            Rsh_sapak: row["Supplier Name"], // מיפוי ל-Rsh_sapak
+                            Rsh_patoor: row["Contact Phone"], // מיפוי ל-Rsh_patoor
+                            Rsh_schoom: row["Amount"], // מיפוי ל-Rsh_schoom
+                            Rsh_maam: row["VAT"], // מיפוי ל-Rsh_maam
+                            Rsh_schmaam: row["Total Amount"], // מיפוי ל-Rsh_schmaam
+                            Rsh_aspaka: row["Delivery Location"], // מיפוי ל-Rsh_aspaka
+                            Rsh_proyktnam: row["Project Name"], // מיפוי ל-Rsh_proyktnam
+                            Rsh_sochen: row["Contact Name"], // מיפוי ל-Rsh_sochen
+                            Rsh_takziv: row["Contact Email"], // מיפוי ל-Rsh_takziv
+                            Rsh_cname: row["Delivery Location"], // מיפוי ל-Rsh_cname
+                            Rsh_cnametl: row["Delivery Location"], // אם יש צורך בשדה נוסף
+                        };
+                    });
 
 
-                        // הנח כאן את מיפוי השדות שלך
-                        field1: row.field1, // לדוגמה
-                        field2: row.field2, // לדוגמה
-                        // הוסף שדות נוספים לפי הצורך
-                    }));
                     console.log(records);
                     debugger
                     try {

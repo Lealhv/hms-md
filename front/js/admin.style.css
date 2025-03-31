@@ -22,17 +22,17 @@ body {
 }
 
 /* Header */
-header {
+/* header {
     background-color: #2c3e50;
     color: white;
     padding: 1rem 0;
     margin-bottom: 2rem;
-}
+} */
 
-header h1 {
+/* header h1 {
     font-size: 1.8rem;
     font-weight: 500;
-}
+} */
 
 /* Cards */
 .card {
@@ -922,17 +922,17 @@ input[type="number"] {
     font-size: 1.1rem;
 }
 
-#header {
+/* #header {
     background-color: var(--primary-color);
     color: white;
     border-radius: 8px 8px 0 0;
     padding: 1rem;
-}
+} */
 
-#header h1 {
+/* #header h1 {
     margin: 0;
     font-size: 1.5rem;
-}
+} */
 
 
 /* Upload Section Styling */

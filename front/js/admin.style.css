@@ -848,7 +848,7 @@ input[type="number"] {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(79, 120, 223, 0.434);
+    background-color: rgba(79, 159, 217, 0.677);
     display: flex;
     justify-content: center; /* Centering the overlay content */
     align-items: center;

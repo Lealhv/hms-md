@@ -280,6 +280,7 @@
             overflow: hidden;
             text-align: center;
         }
+
         /* .header-container {
             width: 90%;
             max-width: 1200px;
@@ -457,21 +458,6 @@
             }
         }
 
-        /* Header actions styling */
-        /* .header-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding: 10px 20px;
-            margin-bottom: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            position: relative;
-            z-index: 1;
-            clear: both;
-        } */
-
         .header-actions .btn {
             padding: 8px 15px;
             border-radius: 5px;
@@ -505,28 +491,31 @@
         .header-actions .btn:not(.btn-danger):hover {
             background-color: #2980b9;
         }
+
         .header-buttons {
-    display: flex;
-    justify-content: flex-start;
-    /* Align to the left */
-    gap: 10px;
-    /* Space between buttons */
-    margin: 15px 0;
-    width: 100%;
-    direction: ltr;
-    /* For RTL layout since the page is in Hebrew */
-}.header-buttons button {
-    padding: 8px 16px;
-    border-radius: 5px;
-    border: none;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 120px;
-}
+            display: flex;
+            justify-content: flex-start;
+            /* Align to the left */
+            gap: 10px;
+            /* Space between buttons */
+            margin: 15px 0;
+            width: 100%;
+            direction: ltr;
+            /* For RTL layout since the page is in Hebrew */
+        }
+
+        .header-buttons button {
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
     </style>
 
     <link rel="stylesheet" href="admin.style.css">
@@ -540,8 +529,8 @@
                 <div class="logo-area">
                 </div>
                 <div class="title-area">
-                    <h1>מערכת ניהול רשומות</h1>
-                    <p class="subtitle">המערכת המתקדמת לניהול ומעקב אחר רשומות</p>
+                    <h1>מערכת ניהול הזמנות</h1>
+                    <p class="subtitle">המערכת המתקדמת לניהול ומעקב אחר הזמנות</p>
                 </div>
             </div>
         </div>
@@ -552,13 +541,15 @@
             <button id="conditionalButton" class="admin-btn" onclick="goToAdmin()">לעמוד מנהל</button>
         </div> -->
         <div class="header-buttons">
-            <button class="btn" onclick="goToEmployeePage(2)"><i class="fas fa-user"></i> לעמוד עובד</button>
             <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> יציאה</button>
+
+            <button class="btn" onclick="goToEmployeePage(2)"><i class="fas fa-user"></i> לעמוד עובד</button>
         </div>
 
 
+
         <div class="upload-section">
-            <h2><i class="fas fa-filter"></i> סינון רשומות</h2>
+            <h2><i class="fas fa-filter"></i> סינון הזמנות</h2>
             <div class="filter-area">
                 <input type="text" id="supplierFilter" placeholder="שם ספק">
                 <input type="text" id="agentFilter" placeholder="שם סוכן">
@@ -566,29 +557,14 @@
                 <button class="btn" onclick="filterRecords()"><i class="fas fa-search"></i> סנן</button>
             </div>
         </div>
-        <!-- <label for="fileInput" class="btn">טעינת רשימת ספקים</label>
-        <input type="file" id="fileInput" accept=".csv, .xls, .xlsx" style="display: none;" /> -->
-        <!-- <div class="btn-upload">
-        <button type="button" class="btn-secondary form-action-btn"
-            onclick="document.getElementById('recordsFile').click();">
-            <i class="fas fa-file-upload"></i> טעינת רשומות
-        </button>
-        <input type="file" id="recordsFile" style="display: none;" accept=".csv, .xls, .xlsx"
-            onchange="loadRecords(event)">
-        <input type="file" id="recordsFile" style="display: none;" accept=".xls,.xlsx" onchange="loadRecords(event)">
-        <button type="button" class="btn-secondary form-action-btn"
-            onclick="document.getElementById('Suppliers').click();">
-            <i class="fas fa-file-upload"></i> טעינת  ספקים
-        </button>
 
-        </div> -->
 
         <div class="upload-section">
             <div class="upload-buttons-container">
                 <div class="upload-button-wrapper">
                     <button type="button" class="upload-btn" onclick="document.getElementById('recordsFile').click();">
                         <i class="fas fa-file-upload"></i>
-                        <span>טעינת רשומות</span>
+                        <span>טעינת הזמנות</span>
                     </button>
                     <input type="file" id="recordsFile" style="display: none;" accept=".csv, .xls, .xlsx"
                         onchange="loadRecords(event)">
@@ -610,7 +586,7 @@
         <div id="supplierList"></div>
 
         <div class="card">
-            <h2><i class="fas fa-file-alt"></i> רשומות</h2>
+            <h2><i class="fas fa-file-alt"></i> הזמנות</h2>
             <div id="listAllReshumot"></div>
         </div>
     </div>
@@ -618,7 +594,7 @@
     <div id="editDialog" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title"> עריכת רשומה </h2>
+                <h2 class="modal-title"> עריכת הזמנה </h2>
                 <button type="button" class="close" onclick="closeEditDialog()" aria-label="סגור">&times;</button>
             </div>
             <form id="documentForm">
@@ -706,8 +682,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="budgetItem">תקציב:</label>
-                    <input type="number" id="budgetItem" name="budgetItem" placeholder="הזן תקציב">
+                    <label for="budgetItem">מספר סעיף תקציבי:</label>
+                    <input type="number" id="budgetItem" name="budgetItem" placeholder="הזן מספר סעיף">
                     <div id="error-budgetItem" class="error-message" style="color: red;"></div>
                 </div>
 
@@ -801,7 +777,6 @@
         async function loadSuppliers() {
             const suppliers = await getAllSuppliers(); // הנחה שהפונקציה מחזירה את הספקים
             console.log(suppliers); // הוסף לוג כאן כדי לבדוק מה מוחזר
-            debugger
             const supplierSelect = document.getElementById('supplierName');
             supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
 
@@ -981,7 +956,7 @@
                 'Rsh_cname': 'שם סוכן',
                 'Rsh_cnametl': 'טלפון סוכן',
                 'Rsh_cemail': 'מייל סוכן',
-                'Rsh_takziv': 'תקציב'
+                'Rsh_takziv': 'מספר סעיף תקציבי'
             };
 
             const hiddenColumns = ['Rsh_id', 'Rsh_status'];
@@ -1020,7 +995,7 @@
                 tableHTML += '</tbody></table></div>';
                 reshumotListDiv.innerHTML = tableHTML;
 
-                // טען את הפרטים עבור כל רשומה
+                // טען את הפרטים עבור כל הזמנה
                 reshumot.forEach(record => {
                     viewMnilvim(record.Rsh_id).then(details => {
                         document.getElementById(`details-${record.Rsh_id}`).innerHTML = details; // עדכן את תוכן האקורדיון
@@ -1055,7 +1030,6 @@
 
         // Replace toggleActions with selectRow
         function selectRow(row) {
-            debugger
             const recordId = row.getAttribute('data-id');
             // Update the ID of the selected record
             document.getElementById('autoNumber').value = recordId;
@@ -1070,10 +1044,14 @@
         function editRecord(recordId) {
             // Retrieve the selected record data
             const selectedRow = document.querySelector(`tr[data-id="${recordId}"]`);
+            console.log('innerText of td:', selectedRow.querySelector('td:nth-child(4)').innerText);
+            const innerTextValue = selectedRow.querySelector('td:nth-child(4)').innerText.trim();
+            console.log('Trimmed innerText value:', innerTextValue);
+
             const record = {
                 Rsh_mchlaka: selectedRow.querySelector('td:nth-child(2)').innerText, // מחלקה
                 Rsh_sapak: selectedRow.querySelector('td:nth-child(3)').innerText, // ספק
-                Rsh_patoor: selectedRow.querySelector('td:nth-child(4)').innerText === 'עוסק פטור' ? '1' : '0', // פטור
+                Rsh_patoor: innerTextValue === 'עוסק פטור' ? '1' : '0', // פטור
                 Rsh_schoom: selectedRow.querySelector('td:nth-child(5)').innerText, // סכום
                 Rsh_maam: selectedRow.querySelector('td:nth-child(6)').innerText, // מע"מ
                 Rsh_schmaam: selectedRow.querySelector('td:nth-child(7)').innerText, // סכום מע"מ
@@ -1086,12 +1064,20 @@
                 Rsh_cemail: selectedRow.querySelector('td:nth-child(14)').innerText, // מייל סוכן
                 Rsh_takziv: selectedRow.querySelector('td:nth-child(15)').innerText // תקציב
             };
+
+            console.log('Rsh_patoor:', record.Rsh_patoor); // לבדוק מה הערך של Rsh_patoor
+
             if (document.getElementById('editDepartment')) {
                 document.getElementById('editDepartment').value = record.Rsh_mchlaka || '';
             }
 
-            if (document.getElementById('supplierName')) document.getElementById('supplierName').value = record.Rsh_sapak || '';
-            if (document.getElementById('exempt')) document.getElementById('exempt').checked = record.Rsh_patoor === '1';
+            if (document.getElementById('supplierName')) {
+                document.getElementById('supplierName').value = record.Rsh_sapak || '';
+            }
+
+            if (document.getElementById('exempt')) {
+                document.getElementById('exempt').checked = innerTextValue === '1'; // אם הערך הוא '1', סמן את ה-checkbox
+            }
             if (document.getElementById('amount')) document.getElementById('amount').value = record.Rsh_schoom || '';
             if (document.getElementById('maam_id')) document.getElementById('maam_id').value = record.Rsh_maam || '';
             if (document.getElementById('scmaan')) document.getElementById('scmaan').value = record.Rsh_schmaam || '';
@@ -1117,7 +1103,7 @@
         async function deleteRecord(recordId) {
             const result = await Swal.fire({
                 title: 'אישור מחיקה',
-                text: 'האם אתה בטוח שברצונך למחוק רשומה זו?',
+                text: 'האם אתה בטוח שברצונך למחוק הזמנה זו?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -1129,23 +1115,20 @@
             if (result.isConfirmed) {
                 const res = await deleteReshumot(recordId);
                 if (res.message === "Reshumot deleted successfully") {
-                    showNotification('הרשומה נמחקה בהצלחה');
+                    showNotification('ההזמנה נמחקה בהצלחה');
                     getReshumot()
                 } else {
-                    showNotification('שגיאה במחיקת הרשומה');
+                    showNotification('שגיאה במחיקת ההזמנה');
                 }
             }
         }
         async function saveData() {
-            debugger
-
             const recordId = document.getElementById('autoNumber').value;
 
             if (!recordId) {
                 console.error("recordId is not found or is empty");
                 return; // טיפול בשגיאה אם ה-ID לא נמצא
             }
-            debugger
             console.log("recordId =")
             console.log(recordId);
             // Fetch all records to check if the record already exists
@@ -1179,30 +1162,29 @@
             };
             console.log("data:")
             console.log(data)
-            debugger
             try {
                 data.Rsh_date = new Date().toLocaleString('sv-SE')
                 // Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
                 // If record exists, update it
                 const response = await updateReshumot(data);
                 if (response.message === "Reshumot updated successfully") {
-                    showNotification('רשומה עודכנה בהצלחה!', 'success');
+                    showNotification('הזמנה עודכנה בהצלחה!', 'success');
                     getReshumot()
                     // location.reload();
                 }
                 else {
-                    showNotification('שגיאה בעדכון הרשומה', 'error');
+                    showNotification('שגיאה בעדכון ההזמנה', 'error');
 
                 }
                 // If record does not exist, create it
                 closeEditDialog();
 
-                // showNotification('רשומה נשמרה בהצלחה!');
+                // showNotification('הזמנה נשמרה בהצלחה!');
             }
             // clearFields(); // Clear fields after saving
             catch (error) {
                 console.error('Error updating record:', error);
-                showNotification('שגיאה בעדכון הרשומה: ' + error.message, 'error');
+                showNotification('שגיאה בעדכון ההזמנה: ' + error.message, 'error');
             }
         }
 
@@ -1306,7 +1288,7 @@
             const recordId = document.getElementById('autoNumber').value;
 
             if (!recordId) {
-                showNotification("אנא בחר רשומה לפני הוספת מסמך", "error");
+                showNotification("אנא בחר הזמנה לפני הוספת מסמך", "error");
                 return;
             }
 
@@ -1325,14 +1307,12 @@
 
             addMnilvim(data)
                 .then(response => {
-                    debugger
                     if (response.message === "Mnilvim created successfully") {
                         // הנח את ההודעה כאן אם ההוספה הצליחה
                         showNotification("הקובץ נוסף בהצלחה!");
 
-                        // עדכון מיידי של רשימת המסמכים הנלווים לרשומה הספציפית
+                        // עדכון מיידי של רשימת המסמכים הנלווים להזמנה הספציפית
                         viewMnilvim(recordId).then(details => {
-                            debugger
                             const detailsElement = document.getElementById(`details-${recordId}`);
                             if (detailsElement) {
                                 detailsElement.innerHTML = details;
@@ -1442,105 +1422,198 @@
             });
         }
 
-        function loadRecords(event) {
-            const fileInput = event.target;
-            const file = fileInput.files[0];
 
+
+        // טעינת הזמנות:
+        async function loadRecords(event) {
+            const file = event.target.files[0];
             if (!file) {
-                showNotification('אנא בחר קובץ.');
+                console.error('No file selected');
                 return;
             }
 
-            const fileExtension = file.name.split('.').pop().toLowerCase();
+            console.log('File selected:', file.name);
 
-            if (fileExtension === 'csv') {
-                loadCSVRecords(file);
-            } else if (fileExtension === 'xls' || fileExtension === 'xlsx') {
-                loadExcelRecords(file);
-            } else {
-                showNotification('פורמט קובץ לא נתמך. אנא בחר קובץ CSV או Excel.');
-            }
-        }
-
-        function loadCSVRecords(file) {
-            Papa.parse(file, {
-                header: true,
-                complete: async function (results) {
-                    const records = results.data.map(row => {
-                        console.log(row);
-                        debugger; // עצור כאן כדי לבדוק את הערכים של row
-                        return {
-                            Rsh_id: row["Record Number"], // מיפוי ל-Rsh_id
-                            Rsh_date: row["Timestamp"], // מיפוי ל-Rsh_date
-                            Rsh_mchlaka: row["Department"], // מיפוי ל-Rsh_mchlaka
-                            Rsh_sapak: row["Supplier Name"], // מיפוי ל-Rsh_sapak
-                            Rsh_patoor: row["Contact Phone"], // מיפוי ל-Rsh_patoor
-                            Rsh_schoom: row["Amount"], // מיפוי ל-Rsh_schoom
-                            Rsh_maam: row["VAT"], // מיפוי ל-Rsh_maam
-                            Rsh_schmaam: row["Total Amount"], // מיפוי ל-Rsh_schmaam
-                            Rsh_aspaka: row["Delivery Location"], // מיפוי ל-Rsh_aspaka
-                            Rsh_proyktnam: row["Project Name"], // מיפוי ל-Rsh_proyktnam
-                            Rsh_sochen: row["Contact Name"], // מיפוי ל-Rsh_sochen
-                            Rsh_takziv: row["Contact Email"], // מיפוי ל-Rsh_takziv
-                            Rsh_cname: row["Delivery Location"], // מיפוי ל-Rsh_cname
-                            Rsh_cnametl: row["Delivery Location"], // אם יש צורך בשדה נוסף
-                        };
-                    });
-
-
-                    console.log(records);
-                    debugger
-                    try {
-                        const response = await createReshumot(records); // שלח את כל הרשומות ל-createRecords
-                        if (response.status === 200) {
-                            showNotification('הרשומות נוספו בהצלחה!');
-                        } else {
-                            console.error('Failed to create records:', response);
-                            showNotification('שגיאה בהוספת הרשומות');
-                        }
-                    } catch (error) {
-                        console.error('Error creating records:', error);
-                        showNotification('שגיאה בהוספת הרשומות: ' + error.message);
-                    }
-                },
-                error: function (error) {
-                    console.error('Error loading CSV:', error);
-                    showNotification('שגיאה בטעינת קובץ CSV: ' + error.message);
-                }
-            });
-        }
-
-        function loadExcelRecords(file) {
             const reader = new FileReader();
             reader.onload = async function (e) {
+                console.log('File read successfully');
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-                // הנחה שהשמות נמצאים בעמודות
-                const records = jsonData.map(row => ({
-                    // הנח כאן את מיפוי השדות שלך
-                    field1: row[0], // לדוגמה
-                    field2: row[1], // לדוגמה
-                    // הוסף שדות נוספים לפי הצורך
-                }));
+                console.log('Data extracted from Excel:', jsonData);
+                debugger
+                const records = jsonData.slice(1).map(row => {
+                    const record = {
+                        Rsh_id: "AUTO-2943", // שינוי ל-ID ייחודי
+                        Rsh_date: new Date().toLocaleString('sv-SE'),
+                        Rsh_mchlaka: row[2],
+                        Rsh_sapak: row[3],
+                        Rsh_patoor: "1", // שינוי לערך "1"
+                        Rsh_schoom: parseFloat(row[5]),
+                        Rsh_maam: row[6], // שינוי לערך 18
+                        Rsh_schmaam: row[7],
+                        Rsh_schtotal: parseInt(row[8]),
+                        Rsh_aspaka: row[9],
+                        Rsh_proyktnam: row[14],
+                        Rsh_sochen: row[10],
+                        Rsh_takziv: row[15],
+                        Rsh_cname: row[11],
+                        Rsh_cnametl: row[12],
+                        Rsh_cemail: row[13]
+                    };
 
-                try {
-                    const response = await createReshumot(records); // שלח את כל הרשומות ל-createRecords
-                    if (response.status === 200) {
-                        showNotification('הרשומות נוספו בהצלחה!');
-                    } else {
-                        console.error('Failed to create records:', response);
-                        showNotification('שגיאה בהוספת הרשומות');
+                    console.log('אוביקט לשליחה::', record);
+                    console.log('Record created:', record);
+                    return record;
+                });
+
+                console.log('All records:', records);
+
+                // שלח את כל ההזמנות לשרת אחת אחת
+                for (const record of records) {
+                    try {
+                        const response = await createReshumot(record); // שלח את האובייקט לשרת
+                        if (response.message === "Reshumot created successfully") {
+                            showNotification('ההזמנות נוספו בהצלחה!');
+                            getReshumot()
+                        } else {
+                            console.error('Failed to create record:', response);
+                            showNotification('שגיאה בהוספת ההזמנות');
+                        }
+                    } catch (error) {
+                        console.error('Error creating record:', error);
+                        showNotification('שגיאה בהוספת ההזמנות: ' + error.message);
                     }
-                } catch (error) {
-                    console.error('Error creating records:', error);
-                    showNotification('שגיאה בהוספת הרשומות: ' + error.message);
                 }
             };
             reader.readAsArrayBuffer(file);
         }
+
+
+        // function formatDate(dateString) {
+        //     const parts = dateString.split('.');
+        //     const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`; // המרה לפורמט YYYY-MM-DD
+        //     console.log('Formatted date:', formattedDate);
+        //     return formattedDate;
+        // }
+
+        // async function sendRecordsToServer(records) {
+        //     console.log('Sending records to server...');
+        //     const response = await fetch('YOUR_SERVER_ENDPOINT', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(records)
+        //     });
+        //     return response;
+        // }
+
+
+        // function loadRecords(event) {
+        //     const fileInput = event.target;
+        //     const file = fileInput.files[0];
+
+        //     if (!file) {
+        //         showNotification('אנא בחר קובץ.');
+        //         return;
+        //     }
+
+        //     const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        //     if (fileExtension === 'csv') {
+        //         loadCSVRecords(file);
+        //     } else if (fileExtension === 'xls' || fileExtension === 'xlsx') {
+        //         loadExcelRecords(file);
+        //     } else {
+        //         showNotification('פורמט קובץ לא נתמך. אנא בחר קובץ CSV או Excel.');
+        //     }
+        // }
+
+
+        // function loadExcelRecords(file) {
+        //     const reader = new FileReader();
+        //     reader.onload = async function (e) {
+        //         const data = new Uint8Array(e.target.result);
+        //         const workbook = XLSX.read(data, { type: 'array' });
+        //         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        //         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+        //         // הנחה שהשמות נמצאים בעמודות
+        //         const records = jsonData.slice(1).map(row => ({
+        //             Rsh_date: new Date().toLocaleString('sv-SE'), // Timestamp
+        //             Rsh_mchlaka: row[7], // Department
+        //             Rsh_sapak: row[10], // Supplier Name
+        //             Rsh_patoor: row[5], // Contact Phone
+        //             Rsh_schoom: parseFloat(row[1]), // Amount
+        //             Rsh_maam: parseFloat(row[11]), // VAT
+        //             Rsh_schmaam: parseFloat(row[12]), // Total Amount
+        //             Rsh_schtotal: 0, // אם יש צורך בשדה זה
+        //             Rsh_aspaka: "0", // אם יש צורך בשדה זה
+        //             Rsh_proyktnam: row[8], // Project Name
+        //             Rsh_sochen: row[4], // Contact Name
+        //             Rsh_takziv: row[3], // Contact Email
+        //             Rsh_cname: "0", // אם יש צורך בשדה זה
+        //             Rsh_cnametl: "0", // אם יש צורך בשדה זה
+        //             Rsh_cemail: row[3] // Contact Email
+        //         }));
+        //         console.log(records);
+        //         debugger;
+        //         try {
+        //             const response = await createReshumot(records); // שלח את כל ההזמנות ל-createRecords
+        //             if (response.status === 200) {
+        //                 showNotification('ההזמנות נוספו בהצלחה!');
+        //             } else {
+        //                 console.error('Failed to create records:', response);
+        //                 showNotification('שגיאה בהוספת ההזמנות');
+        //             }
+        //         } catch (error) {
+        //             console.error('Error creating records:', error);
+        //             showNotification('שגיאה בהוספת ההזמנות: ' + error.message);
+        //         }
+        //     };
+        //     reader.readAsArrayBuffer(file);
+        // }
+
+
+
+
+
+        // function loadExcelRecords(file) {
+        //     const reader = new FileReader();
+        //     reader.onload = async function (e) {
+        //         const data = new Uint8Array(e.target.result);
+        //         const workbook = XLSX.read(data, { type: 'array' });
+        //         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        //         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+        //         // הנחה שהשמות נמצאים בעמודות
+        //         const records = jsonData.map(row => ({
+
+        //             // הנח כאן את מיפוי השדות שלך
+
+        //             field1: row[0], // לדוגמה
+        //             field2: row[1], // לדוגמה
+        //             // הוסף שדות נוספים לפי הצורך
+        //         }));
+
+        //         try {
+        //             const response = await createReshumot(records); // שלח את כל ההזמנות ל-createRecords
+        //             if (response.status === 200) {
+        //                 showNotification('ההזמנות נוספו בהצלחה!');
+        //             } else {
+        //                 console.error('Failed to create records:', response);
+        //                 showNotification('שגיאה בהוספת ההזמנות');
+        //             }
+        //         } catch (error) {
+        //             console.error('Error creating records:', error);
+        //             showNotification('שגיאה בהוספת ההזמנות: ' + error.message);
+        //         }
+        //     };
+        //     reader.readAsArrayBuffer(file);
+        // }
 
 
         // Make sure the document is ready before calling getReshumot

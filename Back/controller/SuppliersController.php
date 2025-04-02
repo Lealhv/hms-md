@@ -95,7 +95,7 @@
 
             $stmt = $this->conn->prepare($query);
 
-            $stmt->bind_param("i", $id); // ה-ID של הרשומה למחיקה
+            $stmt->bind_param("i", $id); // ה-ID של ההזמנה למחיקה
 
             if ($stmt->execute()) {
                 echo json_encode(["message" => "Supplier deleted successfully"]);

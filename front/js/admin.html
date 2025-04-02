@@ -615,11 +615,11 @@
                     </select>
                     <div id="error-supplierName" class="error-message" style="color: red;"></div>
                 </div>
-                <div class="form-group checkbox-container">
+                <!-- <div class="form-group checkbox-container">
                     <label for="exempt">עוסק פטור:</label>
                     <input type="checkbox" id="exempt" name="exempt">
                     <div id="error-exempt" class="error-message" style="color: red;"></div>
-                </div>
+                </div> -->
 
                 <div class="form-group">
                     <label for="amount">סכום:</label>
@@ -627,7 +627,7 @@
                     <div id="error-amount" class="error-message" style="color: red;"></div>
                 </div>
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="maam_id">מע"מ:</label>
                     <input type="number" id="maam_id" name="vat" readonly>
                     <div id="error-maam_id" class="error-message" style="color: red;"></div>
@@ -643,7 +643,7 @@
                     <label for="totalAmount">סכום כולל:</label>
                     <input type="number" id="totalAmount" name="totalAmount" readonly>
                     <div id="error-totalAmount" class="error-message" style="color: red;"></div>
-                </div>
+                </div> -->
 
                 <div class="form-group">
                     <label for="deliveryPlace">מקום אספקה:</label>
@@ -863,14 +863,14 @@
             showNotification('הסינון נוקה', 'info', 2000);
         }
 
-        function calculateVAT() {
-            const amount = document.getElementById('amount').value;
-            let maam = document.getElementById('maam_id').value;
-            maam = maam / 100;
-            const vat = amount * maam; // לדוגמה, מע"מ 17%
-            document.getElementById('scmaan').value = vat;
-            document.getElementById('totalAmount').value = parseFloat(amount) + vat;
-        }
+        // function calculateVAT() {
+        //     const amount = document.getElementById('amount').value;
+        //     let maam = document.getElementById('maam_id').value;
+        //     maam = maam / 100;
+        //     const vat = amount * maam; // לדוגמה, מע"מ 17%
+        //     document.getElementById('scmaan').value = vat;
+        //     document.getElementById('totalAmount').value = parseFloat(amount) + vat;
+        // }
 
         function goToEmployeePage(variable) {
             localStorage.setItem('PR', variable);
@@ -945,11 +945,8 @@
                 'Rsh_date': 'תאריך',
                 'Rsh_mchlaka': 'מחלקה',
                 'Rsh_sapak': 'ספק',
-                'Rsh_patoor': 'פטור',
+                // 'Rsh_patoor': 'פטור',
                 'Rsh_schoom': 'סכום',
-                'Rsh_maam': 'מע"מ',
-                'Rsh_schmaam': 'סכום מע"מ',
-                'Rsh_schtotal': 'סכום כולל',
                 'Rsh_aspaka': 'מקום אספקה',
                 'Rsh_proyktnam': 'שם פרויקט',
                 'Rsh_sochen': 'סוכן',
@@ -1051,11 +1048,8 @@
             const record = {
                 Rsh_mchlaka: selectedRow.querySelector('td:nth-child(2)').innerText, // מחלקה
                 Rsh_sapak: selectedRow.querySelector('td:nth-child(3)').innerText, // ספק
-                Rsh_patoor: innerTextValue === 'עוסק פטור' ? '1' : '0', // פטור
+                // Rsh_patoor: innerTextValue === 'עוסק פטור' ? '1' : '0', // פטור
                 Rsh_schoom: selectedRow.querySelector('td:nth-child(5)').innerText, // סכום
-                Rsh_maam: selectedRow.querySelector('td:nth-child(6)').innerText, // מע"מ
-                Rsh_schmaam: selectedRow.querySelector('td:nth-child(7)').innerText, // סכום מע"מ
-                Rsh_schtotal: selectedRow.querySelector('td:nth-child(8)').innerText, // סכום כולל
                 Rsh_aspaka: selectedRow.querySelector('td:nth-child(9)').innerText, // מקום אספקה
                 Rsh_proyktnam: selectedRow.querySelector('td:nth-child(10)').innerText, // שם פרויקט
                 Rsh_sochen: selectedRow.querySelector('td:nth-child(11)').innerText, // מס סוכן
@@ -1065,7 +1059,6 @@
                 Rsh_takziv: selectedRow.querySelector('td:nth-child(15)').innerText // תקציב
             };
 
-            console.log('Rsh_patoor:', record.Rsh_patoor); // לבדוק מה הערך של Rsh_patoor
 
             if (document.getElementById('editDepartment')) {
                 document.getElementById('editDepartment').value = record.Rsh_mchlaka || '';
@@ -1075,13 +1068,8 @@
                 document.getElementById('supplierName').value = record.Rsh_sapak || '';
             }
 
-            if (document.getElementById('exempt')) {
-                document.getElementById('exempt').checked = innerTextValue === '1'; // אם הערך הוא '1', סמן את ה-checkbox
-            }
+           
             if (document.getElementById('amount')) document.getElementById('amount').value = record.Rsh_schoom || '';
-            if (document.getElementById('maam_id')) document.getElementById('maam_id').value = record.Rsh_maam || '';
-            if (document.getElementById('scmaan')) document.getElementById('scmaan').value = record.Rsh_schmaam || '';
-            if (document.getElementById('totalAmount')) document.getElementById('totalAmount').value = record.Rsh_schtotal || '';
             if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = record.Rsh_aspaka || '';
             if (document.getElementById('projectName')) document.getElementById('projectName').value = record.Rsh_proyktnam || '';
             if (document.getElementById('agentNumber')) document.getElementById('agentNumber').value = record.Rsh_sochen || '';
@@ -1142,11 +1130,10 @@
                 Rsh_date: document.getElementById('timestamp').value,
                 Rsh_mchlaka: document.getElementById('editDepartment').value,
                 Rsh_sapak: document.getElementById('supplierName').value,
-                Rsh_patoor: document.getElementById('exempt').checked ? '1' : '0', // Use the checkbox value
                 Rsh_schoom: document.getElementById('amount').value,
-                Rsh_maam: document.getElementById('maam_id').value, // Changed from 'vat' to 'maam_id'
-                Rsh_schmaam: document.getElementById('scmaan').value, // Changed from 'totalAmount' to 'scmaan'
-                Rsh_schtotal: document.getElementById('totalAmount').value,
+                // Rsh_maam: document.getElementById('maam_id').value, // Changed from 'vat' to 'maam_id'
+                // Rsh_schmaam: document.getElementById('scmaan').value, // Changed from 'totalAmount' to 'scmaan'
+                // Rsh_schtotal: document.getElementById('totalAmount').value,
                 Rsh_aspaka: document.getElementById('deliveryPlace').value, // Changed from 'contactName' to 'deliveryPlace'
                 Rsh_proyktnam: document.getElementById('projectName').value,
                 Rsh_email: document.getElementById('contactEmail').value,
@@ -1450,18 +1437,17 @@
                         Rsh_date: new Date().toLocaleString('sv-SE'),
                         Rsh_mchlaka: row[2],
                         Rsh_sapak: row[3],
-                        Rsh_patoor: "1", // שינוי לערך "1"
-                        Rsh_schoom: parseFloat(row[5]),
-                        Rsh_maam: row[6], // שינוי לערך 18
-                        Rsh_schmaam: row[7],
-                        Rsh_schtotal: parseInt(row[8]),
-                        Rsh_aspaka: row[9],
-                        Rsh_proyktnam: row[14],
-                        Rsh_sochen: row[10],
-                        Rsh_takziv: row[15],
-                        Rsh_cname: row[11],
-                        Rsh_cnametl: row[12],
-                        Rsh_cemail: row[13]
+                        Rsh_schoom: parseFloat(row[4]),
+                        // Rsh_maam: row[6], // שינוי לערך 18
+                        // Rsh_schmaam: row[7],
+                        // Rsh_schtotal: parseInt(row[8]),
+                        Rsh_aspaka: row[5],
+                        Rsh_proyktnam: row[10],
+                        Rsh_sochen: row[6],
+                        Rsh_takziv: row[11],
+                        Rsh_cname: row[7],
+                        Rsh_cnametl: row[8],
+                        Rsh_cemail: row[9]
                     };
 
                     console.log('אוביקט לשליחה::', record);

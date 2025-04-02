@@ -40,13 +40,13 @@ async function createReshumot(data) {
 // }
 
 // Update
-async function updateReshumot(data) {
+async function updateReshumot(data, id) {
     debugger
     console.log(data);
 
     // ודא ש-Rsh_id קיים ב-data
-    const apiUrl = `http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/${data.Rsh_id}`;
-
+    const apiUrl = `http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/${id}`;
+    console.log(id);
     try {
         const response = await fetch(apiUrl, {
             method: 'PUT',

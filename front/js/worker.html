@@ -191,35 +191,17 @@
                     </select>
                     <div id="error-supplierName" class="error-message" style="color: red;"></div>
                 </div>
-                <div class="form-group checkbox-container">
+                <!-- <div class="form-group checkbox-container">
                     <label for="exempt">עוסק פטור:</label>
                     <input type="checkbox" id="exempt" name="exempt">
                     <div id="error-exempt" class="error-message" style="color: red;"></div>
-                </div>
+                </div> -->
 
                 <div class="form-group">
                     <label for="amount">סכום:</label>
                     <input type="number" id="amount" name="amount" onchange="calculateVAT()" placeholder="הזן סכום">
                     <div id="error-amount" class="error-message" style="color: red;"></div>
                 </div>
-                <!-- 
-                <div class="form-group">
-                    <label for="maam_id">מע"מ:</label>
-                    <input type="number" id="maam_id" name="vat" readonly>
-                    <div id="error-maam_id" class="error-message" style="color: red;"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="scmaan">סכום מע"מ:</label>
-                    <input type="number" id="scmaan" name="scmaan" readonly>
-                    <div id="error-scmaan" class="error-message" style="color: red;"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="totalAmount">סכום כולל:</label>
-                    <input type="number" id="totalAmount" name="totalAmount" readonly>
-                    <div id="error-totalAmount" class="error-message" style="color: red;"></div>
-                </div> -->
 
                 <div class="form-group">
                     <label for="deliveryPlace">מקום אספקה:</label>
@@ -359,14 +341,7 @@
                 supplierSelect.appendChild(option);
             });
         }
-        // function calculateVAT() {
-        //     const amount = document.getElementById('amount').value;
-        //     let maam = document.getElementById('maam_id').value;
-        //     maam = maam / 100;
-        //     const vat = amount * maam; // לדוגמה, מע"מ 17%
-        //     document.getElementById('scmaan').value = vat;
-        //     document.getElementById('totalAmount').value = parseFloat(amount) + vat;
-        // }
+
         // Function to check if all required fields are filled
         function checkFormCompletion() {
             const requiredFields = [
@@ -581,8 +556,6 @@
             // Remove or replace this line since requiredDate doesn't exist
             // if (document.getElementById('requiredDate')) document.getElementById('requiredDate').value = '';
             if (document.getElementById('amount')) document.getElementById('amount').value = '';
-            // Change 'vat' to 'maam_id' since that's what's in your HTML
-            // if (document.getElementById('maam_id')) document.getElementById('maam_id').value = '';
             if (document.getElementById('scmaan')) document.getElementById('scmaan').value = '';
             if (document.getElementById('totalAmount')) document.getElementById('totalAmount').value = '';
             if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = '';
@@ -593,8 +566,6 @@
             if (document.getElementById('agentNumber')) document.getElementById('agentNumber').value = '';
             if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = '';
 
-            // If you have a checkbox for exempt, you might want to uncheck it
-            if (document.getElementById('exempt')) document.getElementById('exempt').checked = false;
             checkFormCompletion();
             loadDocuments();
         }
@@ -730,13 +701,12 @@
         }
         function exportToExcel() {
             const data = [
-                ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Patoor', 'Amount', 'Delivery Location', 'sochen', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Budget Item'],
+                ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Amount', 'Delivery Location', 'sochen', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Budget Item'],
                 [
                     document.getElementById('autoNumber').value,
                     document.getElementById('timestamp').value,
                     document.getElementById('department').value,
                     document.getElementById('supplierName').value,
-                    document.getElementById('exempt') ? (document.getElementById('exempt').checked ? "1" : "0") : "0",
                     document.getElementById('amount').value,
                     document.getElementById('deliveryPlace').value,
                     document.getElementById('agentNumber').value,
@@ -774,11 +744,10 @@
                     const existingRecord = records.find(record => record.Rsh_id === recordId);
 
                     const data = {
-                        Rsh_id: recordId,
+                        // Rsh_id: recordId,
                         Rsh_date: new Date().toLocaleString('sv-SE'),
                         Rsh_mchlaka: document.getElementById('department').value,
                         Rsh_sapak: document.getElementById('supplierName').value,
-                        Rsh_patoor: document.getElementById('exempt').checked ? '1' : '0',
                         Rsh_schoom: document.getElementById('amount').value,
                         Rsh_aspaka: document.getElementById('deliveryPlace').value,
                         Rsh_proyktnam: document.getElementById('projectName').value,
@@ -790,7 +759,7 @@
                     };
 
                     console.log("Data object:", data);
-debugger
+                    debugger
                     let response;
                     if (existingRecord) {
                         // If record exists, update it
@@ -900,7 +869,6 @@ debugger
                 'Rsh_date': 'תאריך',
                 'Rsh_mchlaka': 'מחלקה',
                 'Rsh_sapak': 'ספק',
-                'Rsh_patoor': 'פטור',
                 'Rsh_schoom': 'סכום',
                 'Rsh_aspaka': 'מקום אספקה', // שדה זה הוחלף
                 'Rsh_proyktnam': 'שם פרויקט', // שדה זה הוחלף
@@ -1113,10 +1081,6 @@ debugger
         function loadRecordToForm(item) {
             document.getElementById('department').value = item.Rsh_mchlaka || '';
             document.getElementById('supplierName').value = item.Rsh_sapak || '';
-            console.log(item.Rsh_patoor); // בדוק מה הערך של Rsh_patoor
-            if (document.getElementById('exempt')) {
-                document.getElementById('exempt').checked = item.Rsh_patoor === '1'; // אם הערך הוא '1', סמן את ה-checkbox
-            }
             document.getElementById('amount').value = item.Rsh_schoom || '';
             document.getElementById('deliveryPlace').value = item.Rsh_aspaka || '';
             document.getElementById('agentNumber').value = item.Rsh_sochen || '';

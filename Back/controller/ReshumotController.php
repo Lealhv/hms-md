@@ -22,7 +22,7 @@ class ReshumotController
         // בדוק אם הנתונים הושגו כראוי
         if (
             !isset($data->Rsh_date) || !isset($data->Rsh_mchlaka) || !isset($data->Rsh_sapak) ||
-            !isset($data->Rsh_schoom) || !isset($data->Rsh_patoor) || !isset($data->Rsh_aspaka) ||
+            !isset($data->Rsh_schoom) || !isset($data->Rsh_aspaka) ||
             !isset($data->Rsh_proyktnam) || !isset($data->Rsh_sochen) || !isset($data->Rsh_takziv) ||
             !isset($data->Rsh_cname) || !isset($data->Rsh_cnametl) || !isset($data->Rsh_cemail)
         ) {
@@ -30,7 +30,7 @@ class ReshumotController
             return;
         }
 
-        $query = "INSERT INTO reshumot (Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_patoor, Rsh_schoom, Rsh_aspaka, Rsh_proyktnam, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO reshumot (Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_schoom, Rsh_aspaka, Rsh_proyktnam, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
         if ($stmt === false) {
@@ -39,19 +39,16 @@ class ReshumotController
         }
 
         // Convert values to ensure proper types
-        $patoor = intval($data->Rsh_patoor);
         $schoom = floatval($data->Rsh_schoom);
         $aspaka = strval($data->Rsh_aspaka);
         $proyktnam = strval($data->Rsh_proyktnam);
         $sochen = strval($data->Rsh_sochen);
         $takziv = strval($data->Rsh_takziv);
-
         $stmt->bind_param(
-            "ssiisssssssi", // ודא שהמחרוזת מתאימה ל-12 משתנים
+            "sssisssssss", // 11 תווים - הוספת s נוספת עבור ה-ID
             $data->Rsh_date,
             $data->Rsh_mchlaka,
             $data->Rsh_sapak,
-            $patoor,
             $schoom,
             $aspaka,
             $proyktnam,
@@ -86,6 +83,7 @@ class ReshumotController
             echo json_encode(["error" => "Reshumot not found"]);
         }
     }
+
     public function upDate($id)
     {
         // קבלת הנתונים מה-BODY של הבקשה
@@ -94,7 +92,7 @@ class ReshumotController
         // ודא שכל הנתונים הנדרשים קיימים
         if (
             !isset($data->Rsh_date) || !isset($data->Rsh_mchlaka) || !isset($data->Rsh_sapak) ||
-            !isset($data->Rsh_patoor) || !isset($data->Rsh_schoom) || !isset($data->Rsh_aspaka) ||
+            !isset($data->Rsh_schoom) || !isset($data->Rsh_aspaka) ||
             !isset($data->Rsh_proyktnam) || !isset($data->Rsh_sochen) || !isset($data->Rsh_takziv) ||
             !isset($data->Rsh_cname) || !isset($data->Rsh_cnametl) || !isset($data->Rsh_cemail)
         ) {
@@ -106,7 +104,6 @@ class ReshumotController
                         Rsh_date = ?, 
                         Rsh_mchlaka = ?, 
                         Rsh_sapak = ?, 
-                        Rsh_patoor = ?, 
                         Rsh_schoom = ?, 
                         Rsh_aspaka = ?, 
                         Rsh_proyktnam = ?, 
@@ -124,7 +121,6 @@ class ReshumotController
         }
 
         // המרת סוגים
-        $patoor = (int)$data->Rsh_patoor; // המרה ל-integer
         $schoom = (int)$data->Rsh_schoom; // המרה ל-integer
         $takziv = (int)$data->Rsh_takziv; // המרה ל-integer
         $id_param = (int)$id; // המרת ה-ID למספר שלם
@@ -134,12 +130,12 @@ class ReshumotController
         $proyktnam = isset($data->Rsh_proyktnam) ? strval($data->Rsh_proyktnam) : null;
         $sochen = isset($data->Rsh_sochen) ? strval($data->Rsh_sochen) : null;
 
+
         $stmt->bind_param(
-            "sssisssssssis", // 13 תווים - הוספת s נוספת עבור ה-ID
+            "sssissssssis", // 12 תווים, כולל i ל-Rsh_id
             $data->Rsh_date,
             $data->Rsh_mchlaka,
             $data->Rsh_sapak,
-            $patoor,
             $schoom,
             $aspaka,
             $proyktnam,
@@ -148,20 +144,14 @@ class ReshumotController
             $data->Rsh_cname,
             $data->Rsh_cnametl,
             $data->Rsh_cemail,
-            $id_param // ה-ID כאן
+            $id_param // ה-ID צריך להיות האחרון
         );
-
         if ($stmt->execute()) {
             echo json_encode(["message" => "Reshumot updated successfully"]);
         } else {
             echo json_encode(["error" => "Failed to update reshumot: " . $stmt->error]);
         }
     }
-
-
-
-
-
 
     public function delete($id)
     {

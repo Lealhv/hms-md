@@ -882,7 +882,7 @@
                 Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
                 Lg_status: 0
             });
-            alert("מתנתק מהמערכת...");
+            showNotification("מתנתק מהמערכת...");
             window.location.href = 'login.html'; // הפניה לדף התחברות
         }
 
@@ -1039,48 +1039,77 @@
 
         // Add the editRecord function
         function editRecord(recordId) {
-            // Retrieve the selected record data
-            const selectedRow = document.querySelector(`tr[data-id="${recordId}"]`);
-            console.log('innerText of td:', selectedRow.querySelector('td:nth-child(4)').innerText);
-            const innerTextValue = selectedRow.querySelector('td:nth-child(4)').innerText.trim();
-            console.log('Trimmed innerText value:', innerTextValue);
+            try {
+                // Retrieve the selected record data
+                const selectedRow = document.querySelector(`tr[data-id="${recordId}"]`);
 
-            const record = {
-                Rsh_mchlaka: selectedRow.querySelector('td:nth-child(2)').innerText, // מחלקה
-                Rsh_sapak: selectedRow.querySelector('td:nth-child(3)').innerText, // ספק
-                // Rsh_patoor: innerTextValue === 'עוסק פטור' ? '1' : '0', // פטור
-                Rsh_schoom: selectedRow.querySelector('td:nth-child(5)').innerText, // סכום
-                Rsh_aspaka: selectedRow.querySelector('td:nth-child(9)').innerText, // מקום אספקה
-                Rsh_proyktnam: selectedRow.querySelector('td:nth-child(10)').innerText, // שם פרויקט
-                Rsh_sochen: selectedRow.querySelector('td:nth-child(11)').innerText, // מס סוכן
-                Rsh_cname: selectedRow.querySelector('td:nth-child(12)').innerText, // שם סוכן
-                Rsh_cnametl: selectedRow.querySelector('td:nth-child(13)').innerText, // טלפון סוכן
-                Rsh_cemail: selectedRow.querySelector('td:nth-child(14)').innerText, // מייל סוכן
-                Rsh_takziv: selectedRow.querySelector('td:nth-child(15)').innerText // תקציב
-            };
+                if (!selectedRow) {
+                    console.error('Selected row not found for ID:', recordId);
+                    showNotification('שגיאה: לא ניתן למצוא את השורה הנבחרת', 'error');
+                    return;
+                }
+
+                // Get all data cells in the row
+                const cells = selectedRow.querySelectorAll('td.data-cell');
+
+                // Check if we have enough cells
+                if (cells.length < 5) {
+                    console.error('Not enough cells in the selected row:', cells.length);
+                    showNotification('שגיאה: מבנה הטבלה אינו תקין', 'error');
+                    return;
+                }
+
+                // Create record object safely by checking each cell before accessing
+                // Create record object safely by checking each cell before accessing
+                const record = {
+                    Rsh_mchlaka: (cells[1] ? cells[1].innerText.trim() : '') // מחלקה
+                };
+
+                record.Rsh_sapak = (cells[2] ? cells[2].innerText.trim() : ''); // ספק
+
+                record.Rsh_schoom = (cells[3] ? cells[3].innerText.trim() : ''); // סכום
+
+                record.Rsh_aspaka = (cells[4] ? cells[4].innerText.trim() : ''); // מקום אספקה
+
+                record.Rsh_proyktnam = (cells[5] ? cells[5].innerText.trim() : ''); // שם פרויקט
+
+                record.Rsh_sochen = (cells[6] ? cells[6].innerText.trim() : ''); // מס סוכן
+
+                record.Rsh_cname = (cells[7] ? cells[7].innerText.trim() : ''); // שם סוכן
+
+                record.Rsh_cnametl = (cells[8] ? cells[8].innerText.trim() : ''); // טלפון סוכן
+
+                record.Rsh_cemail = (cells[9] ? cells[9].innerText.trim() : ''); // מייל סוכן
+
+                record.Rsh_takziv = (cells[10] ? cells[10].innerText.trim() : ''); // תקציב
+
+                // Set form values safely with null checks
+                if (document.getElementById('editDepartment')) {
+                    document.getElementById('editDepartment').value = record.Rsh_mchlaka || '';
+                }
+
+                if (document.getElementById('supplierName')) {
+                    document.getElementById('supplierName').value = record.Rsh_sapak || '';
+                }
+
+                if (document.getElementById('amount')) document.getElementById('amount').value = record.Rsh_schoom || '';
+                if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = record.Rsh_aspaka || '';
+                if (document.getElementById('projectName')) document.getElementById('projectName').value = record.Rsh_proyktnam || '';
+                if (document.getElementById('agentNumber')) document.getElementById('agentNumber').value = record.Rsh_sochen || '';
+                if (document.getElementById('contactEmail')) document.getElementById('contactEmail').value = record.Rsh_cemail || '';
+                if (document.getElementById('contactName')) document.getElementById('contactName').value = record.Rsh_cname || '';
+                if (document.getElementById('contactPhone')) document.getElementById('contactPhone').value = record.Rsh_cnametl || '';
+                if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = record.Rsh_takziv || '';
 
 
-            if (document.getElementById('editDepartment')) {
-                document.getElementById('editDepartment').value = record.Rsh_mchlaka || '';
+
+                // Show the edit dialog
+                const modal = document.getElementById("editDialog");
+                modal.style.display = "block";
+            } catch (error) {
+                console.error('Error in editRecord:', error);
+                showNotification('שגיאה בעריכת הרשומה: ' + error.message, 'error');
             }
-
-            if (document.getElementById('supplierName')) {
-                document.getElementById('supplierName').value = record.Rsh_sapak || '';
-            }
-
-           
-            if (document.getElementById('amount')) document.getElementById('amount').value = record.Rsh_schoom || '';
-            if (document.getElementById('deliveryPlace')) document.getElementById('deliveryPlace').value = record.Rsh_aspaka || '';
-            if (document.getElementById('projectName')) document.getElementById('projectName').value = record.Rsh_proyktnam || '';
-            if (document.getElementById('agentNumber')) document.getElementById('agentNumber').value = record.Rsh_sochen || '';
-            if (document.getElementById('contactEmail')) document.getElementById('contactEmail').value = record.Rsh_cemail || '';
-            if (document.getElementById('contactName')) document.getElementById('contactName').value = record.Rsh_cname || '';
-            if (document.getElementById('contactPhone')) document.getElementById('contactPhone').value = record.Rsh_cnametl || '';
-            if (document.getElementById('budgetItem')) document.getElementById('budgetItem').value = record.Rsh_takziv || '';
-
-            // Show the edit dialog
-            const modal = document.getElementById("editDialog");
-            modal.style.display = "block";
         }
 
         // Function to close the edit dialog

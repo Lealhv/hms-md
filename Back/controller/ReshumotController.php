@@ -14,6 +14,18 @@ class ReshumotController
         $this->conn = $conn;
     }
 
+    private function supplierExists($supplierId)
+    {
+        $query = "SELECT COUNT(*) FROM suppliers WHERE SP_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $supplierId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $count = $result->fetch_row()[0];
+
+        return $count > 0;
+    }
+
     public function create()
     {
         // קבלת הנתונים מה-BODY של הבקשה
@@ -30,6 +42,18 @@ class ReshumotController
             return;
         }
 
+        // בדוק אם ה-Supplier קיים
+        if (!$this->supplierExists($data->Rsh_sapak)) {
+            echo json_encode(["error" => "Supplier does not exist."]);
+            return;
+        }
+
+        // הסר את הבדיקה אם ה-SP_id קיים כבר במערכת
+        // if ($this->spIdExists($data->Rsh_sapak)) {
+        //     echo json_encode(["error" => "Error: Value already exists."]);
+        //     return;
+        // }
+
         $query = "INSERT INTO reshumot (Rsh_date, Rsh_mchlaka, Rsh_sapak, Rsh_schoom, Rsh_aspaka, Rsh_proyktnam, Rsh_sochen, Rsh_takziv, Rsh_cname, Rsh_cnametl, Rsh_cemail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($query);
@@ -45,7 +69,7 @@ class ReshumotController
         $sochen = strval($data->Rsh_sochen);
         $takziv = strval($data->Rsh_takziv);
         $stmt->bind_param(
-            "sssisssssss", // 11 תווים - הוספת s נוספת עבור ה-ID
+            "sssisssssss", // 11 תווים
             $data->Rsh_date,
             $data->Rsh_mchlaka,
             $data->Rsh_sapak,
@@ -59,7 +83,6 @@ class ReshumotController
             $data->Rsh_cemail
         );
 
-
         if ($stmt->execute()) {
             $new_id = $stmt->insert_id; // קבלת ה-ID החדש שנוצר
             echo json_encode(["message" => "Reshumot created successfully", "Rsh_id" => $new_id]);
@@ -68,20 +91,11 @@ class ReshumotController
         }
     }
 
-    public function read($Rsh_id)
+    // פונקציה לבדוק אם ה-SP_id קיים במערכת
+    private function spIdExists($sp_id)
     {
-        $query = "SELECT * FROM reshumot WHERE Rsh_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $Rsh_id); // שים לב שה-ID הוא מספרי
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $reshumot = $result->fetch_assoc();
-            echo json_encode($reshumot);
-        } else {
-            echo json_encode(["error" => "Reshumot not found"]);
-        }
+        // הפונקציה הזו לא נדרשת יותר, אז אפשר להשאיר אותה ריקה או למחוק
+        return false; // מחזיר false תמיד
     }
 
     public function upDate($id)
@@ -97,6 +111,12 @@ class ReshumotController
             !isset($data->Rsh_cname) || !isset($data->Rsh_cnametl) || !isset($data->Rsh_cemail)
         ) {
             echo json_encode(["error" => "All fields are required."]);
+            return;
+        }
+
+        // בדוק אם ה-Supplier קיים
+        if (!$this->supplierExists($data->Rsh_sapak)) {
+            echo json_encode(["error" => "Supplier does not exist."]);
             return;
         }
 
@@ -121,15 +141,14 @@ class ReshumotController
         }
 
         // המרת סוגים
-        $schoom = (int)$data->Rsh_schoom; // המרה ל-integer
-        $takziv = (int)$data->Rsh_takziv; // המרה ל-integer
-        $id_param = (int)$id; // המרת ה-ID למספר שלם
+        $schoom = floatval($data->Rsh_schoom); // המרה ל-float
+        $takziv = intval($data->Rsh_takziv); // המרה ל-integer
+        $id_param = intval($id); // המרת ה-ID למספר שלם
 
         // טיפול בערכים שיכולים להיות NULL
         $aspaka = isset($data->Rsh_aspaka) ? strval($data->Rsh_aspaka) : null;
         $proyktnam = isset($data->Rsh_proyktnam) ? strval($data->Rsh_proyktnam) : null;
         $sochen = isset($data->Rsh_sochen) ? strval($data->Rsh_sochen) : null;
-
 
         $stmt->bind_param(
             "sssissssssis", // 12 תווים, כולל i ל-Rsh_id
@@ -146,6 +165,7 @@ class ReshumotController
             $data->Rsh_cemail,
             $id_param // ה-ID צריך להיות האחרון
         );
+
         if ($stmt->execute()) {
             echo json_encode(["message" => "Reshumot updated successfully"]);
         } else {
@@ -178,6 +198,22 @@ class ReshumotController
         }
 
         echo json_encode($reshumotList);
+    }
+
+    public function read($Rsh_id)
+    {
+        $query = "SELECT * FROM reshumot WHERE Rsh_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $Rsh_id); // שים לב שה-ID הוא מספרי
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $reshumot = $result->fetch_assoc();
+            echo json_encode($reshumot);
+        } else {
+            echo json_encode(["error" => "Reshumot not found"]);
+        }
     }
 }
 

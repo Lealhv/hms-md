@@ -22,7 +22,7 @@ async function getAllSuppliers() {
 }
 
 // פונקציה ליצירת ספק חדשa 
- async function createSupplier(supplier) {
+async function createSupplier(supplier) {
     try {
         const response = await fetch(`${apiUrl}/supplier`, {
             method: 'POST',
@@ -31,13 +31,20 @@ async function getAllSuppliers() {
             },
             body: JSON.stringify(supplier)
         });
-        
+
         // Check if the response is OK before trying to parse JSON
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
+        // Check if data contains an array of errors
+        if (Array.isArray(data) && data.length > 0 && data.every(item => item.error)) {
+            const errors = data.map(item => item.error);
+            console.error('Error in createSupplier:', errors);
+            return { status: response.status, errors, message: 'error' }; // Returning 'error' here
+        }
+
         return { status: response.status, data };
     } catch (error) {
         console.error('Error in createSupplier:', error);
@@ -47,5 +54,30 @@ async function getAllSuppliers() {
 }
 
 
+
+// פונקציה לקבלת כל הספקים
+async function getSupplierById(id) {
+    debugger
+    try {
+        const response = await fetch(`${apiUrl}/supplier/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+        debugger;
+        const supplier = await response.json();
+        return supplier;
+    } catch (error) {
+        console.error("Error fetching supplier:", error);
+    }
+}
+
+
+window.getSupplierById = getSupplierById;
 window.getAllSuppliers = getAllSuppliers;
 window.createSupplier = createSupplier;

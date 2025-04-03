@@ -41,12 +41,10 @@ async function createReshumot(data) {
 
 // Update
 async function updateReshumot(data, id) {
-    debugger
-    console.log(data);
+    console.log("Updating reshumot with ID:", id);
+    console.log("Data to be sent:", data);
 
-    // ודא ש-Rsh_id קיים ב-data
     const apiUrl = `http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/${id}`;
-    console.log(id);
     try {
         const response = await fetch(apiUrl, {
             method: 'PUT',
@@ -56,12 +54,15 @@ async function updateReshumot(data, id) {
             body: JSON.stringify(data)
         });
 
-        // Check content type before trying to parse JSON
+        console.log("Response status:", response.status);
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
-            return await response.json();
+            const jsonResponse = await response.json();
+            debugger
+            console.log("Response from server:", jsonResponse);
+            debugger
+            return jsonResponse;
         } else {
-            // Handle non-JSON response
             const text = await response.text();
             console.error("Server returned non-JSON response:", text);
             throw new Error("Server returned HTML instead of JSON. Check server logs for PHP errors.");

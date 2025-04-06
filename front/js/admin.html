@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="services/reshumot.server.js" defer></script>
 
-    <title>מערכת ניהול מסמכים מאובטחת</title>
+    <title>מערכת ניהול מסמכים </title>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -516,6 +516,80 @@
             justify-content: center;
             min-width: 120px;
         }
+
+        /* Modify the upload-section styling */
+        .upload-section {
+            background: linear-gradient(to left, #f8f9fa, #ffffff);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-right: 4px solid #3498db;
+            width: 100%;
+            /* Ensure the section takes full width */
+        }
+
+        /* Modify the upload-buttons-container to use flex with full width */
+        .upload-buttons-container {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            /* Distribute space between items */
+            gap: 20px;
+            /* Keep some gap between buttons */
+        }
+
+        /* Modify the upload-button-wrapper to take equal width */
+        .upload-button-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s;
+            flex: 1;
+            /* Make each wrapper take equal space */
+            width: 100%;
+            /* Ensure full width within its container */
+        }
+
+        /* Modify the upload-btn to take full width of its wrapper */
+        .upload-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid #3498db;
+            color: #3498db;
+            border-radius: 8px;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            /* Make button take full width of wrapper */
+            height: 100px;
+        }
+
+        /* Adjust responsive behavior */
+        @media (max-width: 768px) {
+            .upload-buttons-container {
+                flex-direction: column;
+                /* Stack buttons on small screens */
+            }
+
+            .upload-button-wrapper {
+                width: 100%;
+                /* Full width on small screens */
+                margin-bottom: 15px;
+                /* Add space between stacked buttons */
+            }
+
+            .upload-btn {
+                width: 100%;
+                /* Full width button on small screens */
+            }
+        }
     </style>
 
     <link rel="stylesheet" href="admin.style.css">
@@ -754,26 +828,6 @@
             }
         }
 
-        // async function loadSuppliers(id) {
-        //     debugger
-        //     const suppliers = await getSupplierById(id); // הנחה שהפונקציה מחזירה את הספקים
-        //     // console.log(suppliers); // הוסף לוג כאן כדי לבדוק מה מוחזר
-        //     const supplierSelect = document.getElementById('supplierName');
-        //     supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
-
-        //     // suppliers.forEach(supplier => {
-        //     //     const option = document.createElement('option');
-        //     //     option.value = supplier.SP_name; // הנח כאן את השם של הספק
-        //     //     option.textContent = supplier.SP_name; // הנח כאן את השם של הספק
-        //     //     supplierSelect.appendChild(option);
-        //     // });
-        // }
-
-
-        // קרא לפונקציה בעת טעינת הדף
-        // document.addEventListener('DOMContentLoaded', loadSuppliers);
-
-
         // Separate function for filtering data
         function filterRecords() {
             // Check if we have data to filter
@@ -841,17 +895,7 @@
                 getReshumot();
             }
 
-            // Provide user feedback
         }
-
-        // function calculateVAT() {
-        //     const amount = document.getElementById('amount').value;
-        //     let maam = document.getElementById('maam_id').value;
-        //     maam = maam / 100;
-        //     const vat = amount * maam; // לדוגמה, מע"מ 17%
-        //     document.getElementById('scmaan').value = vat;
-        //     document.getElementById('totalAmount').value = parseFloat(amount) + vat;
-        // }
 
         function goToEmployeePage(variable) {
             localStorage.setItem('PR', variable);
@@ -982,6 +1026,15 @@
                         }
                     }
                     tableHTML += '</tr>';
+
+                    // Add accordion row for each record
+                    tableHTML += `<tr id="accordion-${recordId}" class="accordion-row" style="display: none;">
+                <td colspan="${Object.keys(titleMapping).length - hiddenColumns.length}">
+                    <div id="details-${recordId}" class="accordion-content">
+                        <p>טוען מסמכים נילווים...</p>
+                    </div>
+                </td>
+            </tr>`;
                 }
 
                 tableHTML += '</tbody></table></div>';
@@ -993,25 +1046,58 @@
             }
         }
 
-        // Modified toggleAccordion function to support forced open/close
+        // Modified toggleAccordion function to support forced open/close and load accompanying documents
         function toggleAccordion(row, forceState) {
-
             const recordId = row.getAttribute('data-id');
             document.getElementById('autoNumber').value = recordId;
 
             const accordionRow = document.getElementById(`accordion-${recordId}`);
 
-            if (!accordionRow) return;
+            if (!accordionRow) {
+                console.error(`Accordion row not found for record ID: ${recordId}`);
+                return;
+            }
 
             if (forceState === 'open') {
                 accordionRow.style.display = "table-row";
+                // Load the accompanying documents
+                viewMnilvim(recordId).then(details => {
+                    const detailsElement = document.getElementById(`details-${recordId}`);
+                    if (detailsElement) {
+                        detailsElement.innerHTML = details;
+                    }
+                }).catch(error => {
+                    console.error(`Error loading documents for record ${recordId}:`, error);
+                    const detailsElement = document.getElementById(`details-${recordId}`);
+                    if (detailsElement) {
+                        detailsElement.innerHTML = '<p>שגיאה בטעינת מסמכים נילווים</p>';
+                    }
+                });
             } else if (forceState === 'close') {
                 accordionRow.style.display = "none";
             } else {
                 // Toggle as before
-                accordionRow.style.display = accordionRow.style.display === "none" ? "table-row" : "none";
+                const newDisplay = accordionRow.style.display === "none" ? "table-row" : "none";
+                accordionRow.style.display = newDisplay;
+
+                // If opening, load the documents
+                if (newDisplay === "table-row") {
+                    viewMnilvim(recordId).then(details => {
+                        const detailsElement = document.getElementById(`details-${recordId}`);
+                        if (detailsElement) {
+                            detailsElement.innerHTML = details;
+                        }
+                    }).catch(error => {
+                        console.error(`Error loading documents for record ${recordId}:`, error);
+                        const detailsElement = document.getElementById(`details-${recordId}`);
+                        if (detailsElement) {
+                            detailsElement.innerHTML = '<p>שגיאה בטעינת מסמכים נילווים</p>';
+                        }
+                    });
+                }
             }
         }
+
 
         // Replace toggleActions with selectRow
         function selectRow(row) {
@@ -1160,7 +1246,7 @@
                     showNotification('ההזמנה נמחקה בהצלחה');
                     getReshumot()
                 } else {
-                    showNotification('שגיאה במחיקת ההזמנה',  'error');
+                    showNotification('שגיאה במחיקת ההזמנה', 'error');
                 }
             }
         }
@@ -1184,28 +1270,20 @@
                 Rsh_mchlaka: document.getElementById('editDepartment').value,
                 Rsh_sapak: document.getElementById('supplierId').value,
                 Rsh_schoom: document.getElementById('amount').value,
-                // Rsh_maam: document.getElementById('maam_id').value, // Changed from 'vat' to 'maam_id'
-                // Rsh_schmaam: document.getElementById('scmaan').value, // Changed from 'totalAmount' to 'scmaan'
-                // Rsh_schtotal: document.getElementById('totalAmount').value,
                 Rsh_aspaka: document.getElementById('deliveryPlace').value, // Changed from 'contactName' to 'deliveryPlace'
                 Rsh_proyktnam: document.getElementById('projectName').value,
                 Rsh_email: document.getElementById('contactEmail').value,
                 Rsh_sochen: document.getElementById('agentNumber').value, // Changed from 'contactPhone' to 'contactName'
                 Rsh_takziv: document.getElementById('budgetItem').value, // Changed from 'agentNumber' to 'budgetItem'
                 Rsh_cname: document.getElementById('contactName').value, // Changed from 'budgetItem' to 'contactName'
-                // Rsh_cnametl: document.getElementById('contactPhone').value, // Added this field
 
-                // שדות אחרים
                 Rsh_cnametl: document.getElementById('contactPhone').value ? '0' + document.getElementById('contactPhone').value : '', // הוספת 0 בהתחלה
-                // שדות אחרים
                 Rsh_cemail: document.getElementById('contactEmail').value
             };
             console.log("data:")
             console.log(data)
             try {
-                data.Rsh_date = new Date().toLocaleString('sv-SE')
-                // Lg_timestmpiout: new Date().toLocaleString('sv-SE'),
-                // If record exists, update it
+                data.Rsh_date = new Date().toLocaleString('sv-SE');
                 const response = await updateReshumot(data, recordId);
                 if (response.message === "Reshumot updated successfully") {
                     showNotification('הזמנה עודכנה בהצלחה!', 'success');
@@ -1218,8 +1296,6 @@
                 }
                 // If record does not exist, create it
                 closeEditDialog();
-
-                // showNotification('הזמנה נשמרה בהצלחה!');
             }
             // clearFields(); // Clear fields after saving
             catch (error) {
@@ -1391,7 +1467,7 @@
             if (fileExtension === 'xls' || fileExtension === 'xlsx') {
                 loadExcel(file);
             } else {
-                showNotification('פורמט קובץ לא נתמך. אנא בחר קובץ   Excel.',  'error');
+                showNotification('פורמט קובץ לא נתמך. אנא בחר קובץ   Excel.', 'error');
             }
         }
 
@@ -1422,29 +1498,10 @@
                         showNotification('נכשלה יצירת הספקים: ' + "קוד קיים במערכת", 'error');
                     }
                 } catch (error) {
-                    showNotification('שגיאה ביצירת ספקים: '  , 'error');
+                    showNotification('שגיאה ביצירת ספקים: ', 'error');
                 }
             };
             reader.readAsArrayBuffer(file);
-        }
-
-
-
-
-        function displaySuppliers(suppliers) {
-            const supplierListDiv = document.getElementById('supplierList');
-            const supplierSelect = document.getElementById('supplierName');
-
-            suppliers.forEach(supplier => {
-                const supplierElement = document.createElement('div');
-                supplierElement.textContent = supplier;
-                supplierListDiv.appendChild(supplierElement);
-
-                const option = document.createElement('option');
-                option.value = supplier;
-                option.textContent = supplier;
-                supplierSelect.appendChild(option);
-            });
         }
 
         document.getElementById('supplierId').addEventListener('change', async function () {

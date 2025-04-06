@@ -134,6 +134,45 @@
             .subtitle {
                 font-size: 1.5rem;
             }
+
+            /* Styling for the row and button overlay */
+            .record-row {
+                position: relative;
+                transition: all 0.3s ease;
+            }
+
+            .blurred {
+                filter: blur(3px);
+            }
+
+            /* Action buttons */
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+                background-color: rgba(240, 248, 255, 0.9);
+                padding: 8px;
+                border-radius: 4px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                z-index: 100;
+            }
+
+            /* Selected Row and Action Buttons */
+            .action-buttons-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(79, 159, 217, 0.677);
+                display: flex;
+                justify-content: center;
+                /* Centering the overlay content */
+                align-items: center;
+                gap: 10px;
+                z-index: 10;
+            }
+
+
         }
     </style>
     <script src="services/reshumot.server.js" defer></script>
@@ -185,21 +224,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="supplierName">שם הספק:</label>
-                    <select id="supplierName" name="supplierName">
+                    <label for="supplierId">מספר הספק:</label>
+                    <select id="supplierId" name="supplierId">
                         <option value="" disabled selected>בחר ספק</option>
                     </select>
+                    <div id="error-supplierId" class="error-message" style="color: red;"></div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="supplierName">שם ספק:</label>
+                    <input type="text" id="supplierName" name="supplierName" placeholder="בחר ספק" readonly>
                     <div id="error-supplierName" class="error-message" style="color: red;"></div>
                 </div>
-                <!-- <div class="form-group checkbox-container">
-                    <label for="exempt">עוסק פטור:</label>
-                    <input type="checkbox" id="exempt" name="exempt">
-                    <div id="error-exempt" class="error-message" style="color: red;"></div>
-                </div> -->
 
                 <div class="form-group">
                     <label for="amount">סכום:</label>
-                    <input type="number" id="amount" name="amount" onchange="calculateVAT()" placeholder="הזן סכום">
+                    <input type="number" id="amount" name="amount" placeholder="הזן סכום">
                     <div id="error-amount" class="error-message" style="color: red;"></div>
                 </div>
 
@@ -301,16 +342,10 @@
             </table>
         </div>
 
-        <div id="reshumotList">
+        <div id="listAllReshumot">
         </div>
 
-        <div id="formContainer"></div> <!-- הוספת אלמנט זה -->
-
-
-        <!-- להעביר למנהל -->
-        <!-- <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)"> -->
-
-
+        <div id="formContainer"></div>
 
         <input type="file" id="document" style="display: none;" onchange="MnilvimUpload(event)">
 
@@ -323,21 +358,22 @@
         function getData() {
             getReshumot();
             checkFunctionCall();
-            loadSuppliers();
+            loadListSuppliers();
 
             //  loadDocuments();
 
         }
-        async function loadSuppliers() {
+        async function loadListSuppliers() {
+            debugger
             const suppliers = await getAllSuppliers(); // הנחה שהפונקציה מחזירה את הספקים
             console.log(suppliers); // הוסף לוג כאן כדי לבדוק מה מוחזר
-            const supplierSelect = document.getElementById('supplierName');
+            const supplierSelect = document.getElementById('supplierId');
             supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
 
             suppliers.forEach(supplier => {
                 const option = document.createElement('option');
-                option.value = supplier.SP_name; // הנח כאן את השם של הספק
-                option.textContent = supplier.SP_name; // הנח כאן את השם של הספק
+                option.value = supplier.SP_id; // הנח כאן את השם של הספק
+                option.textContent = supplier.SP_id; // הנח כאן את השם של הספק
                 supplierSelect.appendChild(option);
             });
         }
@@ -346,7 +382,7 @@
         function checkFormCompletion() {
             const requiredFields = [
                 'department',
-                'supplierName',
+                'supplierId',
                 'amount',
                 'deliveryPlace',
                 'agentNumber',
@@ -402,7 +438,7 @@
 
         function validateForm() {
             const department = document.getElementById("department").value;
-            const supplierName = document.getElementById("supplierName").value;
+            const supplierId = document.getElementById("supplierId").value;
             const amount = document.getElementById("amount").value;
             const deliveryPlace = document.getElementById("deliveryPlace").value;
             const agentNumber = document.getElementById("agentNumber").value;
@@ -422,8 +458,8 @@
                 isValid = false;
             }
 
-            if (!supplierName) {
-                document.getElementById("error-supplierName").innerText = "יש לבחור ספק.";
+            if (!supplierId) {
+                document.getElementById("error-supplierId").innerText = "יש לבחור ספק.";
                 isValid = false;
             }
 
@@ -483,7 +519,7 @@
         function clearErrorMessages() {
             const errorIds = [
                 "error-department",
-                "error-supplierName",
+                "error-supplierId",
                 "error-amount",
                 "error-deliveryPlace",
                 "error-agentNumber",
@@ -516,7 +552,7 @@
         function clearErrorMessages() {
             const errorIds = [
                 "error-department",
-                "error-supplierName",
+                "error-supplierId",
                 "error-amount",
                 "error-deliveryPlace",
                 "error-agentNumber",
@@ -552,7 +588,9 @@
             if (document.getElementById('autoNumber')) document.getElementById('autoNumber').value = '';
             if (document.getElementById('timestamp')) document.getElementById('timestamp').value = '';
             if (document.getElementById('department')) document.getElementById('department').value = '';
-            if (document.getElementById('supplierName')) document.getElementById('supplierName').value = 'ספק 1';
+            if (document.getElementById('supplierId')) document.getElementById('supplierId').value = '';
+
+            if (document.getElementById('supplierName')) document.getElementById('supplierName').value = '';
             // Remove or replace this line since requiredDate doesn't exist
             // if (document.getElementById('requiredDate')) document.getElementById('requiredDate').value = '';
             if (document.getElementById('amount')) document.getElementById('amount').value = '';
@@ -585,6 +623,7 @@
 
 
         function MnilvimUpload(event) {
+            debugger
             event.preventDefault(); // למנוע את שליחת הטופס הרגילה
 
             const fileInput = document.getElementById('document');
@@ -602,6 +641,7 @@
                 data.MN_dateAdd = new Date().toISOString().split('T')[0]; // תאריך של היום
                 data.MN_type = file.type; // סוג הקובץ
             }
+            debugger
             addMnilvim(data)
                 .then(response => {
                     if (response.message === "Mnilvim added successfully")
@@ -614,39 +654,6 @@
                     // הנח את ההודעה כאן אם הייתה שגיאה
                     showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
                 });
-        }
-
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const content = e.target.result;
-                    const rows = content.split('\n').map(row => row.split(','));
-                    const headers = rows[0].map(header => header.trim());
-                    const data = rows[1].map(value => value.trim());
-                    const expectedFields = [
-                        "Record Number", "Timestamp", "Department", "Supplier Name", "Amount",
-                        "VAT", "Total Amount", "Delivery Location", "Contact Name",
-                        "Contact Phone", "Contact Email", "Project Name", "Agent Number", "Budget Item"
-                    ];
-                    if (headers.length !== expectedFields.length) {
-                        showNotification("הקובץ שהועלה אינו תואם לשדות הדרושים");
-                        return;
-                    }
-
-                    for (let i = 0; i < headers.length; i++) {
-                        const fieldId = headers[i].toLowerCase().replace(/ /g, '-');
-                        if (document.getElementById(fieldId)) {
-                            document.getElementById(fieldId).value = data[i];
-                        }
-                    }
-                    showNotification("הקובץ הועלה ויובאו נתונים בהצלחה!");
-                };
-                reader.readAsText(file);
-            }
-            event.target.value = '';
         }
 
         function showNotification(message, type = 'info') {
@@ -688,8 +695,6 @@
             }, 5000);
         }
 
-
-
         function exportToPDF() {
             const element = document.querySelector('.container');
             html2pdf()
@@ -699,6 +704,7 @@
                     showNotification('הקובץ PDF יוצא בהצלחה!');
                 });
         }
+
         function exportToExcel() {
             const data = [
                 ['Record Number', 'Timestamp', 'Department', 'Supplier Name', 'Amount', 'Delivery Location', 'sochen', 'Contact Name', 'Contact Phone', 'Contact Email', 'Project Name', 'Budget Item'],
@@ -717,9 +723,6 @@
                     document.getElementById('budgetItem').value
                 ]
             ];
-
-            console.log(data);
-
             const workbook = XLSX.utils.book_new();
 
             // המרת המערך לאובייקט מתאים ל-XLSX
@@ -747,19 +750,16 @@
                         // Rsh_id: recordId,
                         Rsh_date: new Date().toLocaleString('sv-SE'),
                         Rsh_mchlaka: document.getElementById('department').value,
-                        Rsh_sapak: document.getElementById('supplierName').value,
+                        Rsh_sapak: document.getElementById('supplierId').value,
                         Rsh_schoom: document.getElementById('amount').value,
                         Rsh_aspaka: document.getElementById('deliveryPlace').value,
                         Rsh_proyktnam: document.getElementById('projectName').value,
                         Rsh_sochen: document.getElementById('agentNumber').value,
                         Rsh_takziv: document.getElementById('budgetItem').value,
                         Rsh_cname: document.getElementById('contactName').value,
-                        Rsh_cnametl: document.getElementById('contactPhone').value || '',
+                        Rsh_cnametl: document.getElementById('contactPhone').value,
                         Rsh_cemail: document.getElementById('contactEmail').value
                     };
-
-                    console.log("Data object:", data);
-                    debugger
                     let response;
                     if (existingRecord) {
                         // If record exists, update it
@@ -794,11 +794,9 @@
             }
         }
 
-
-
         // פונקציה לניהול הרשאות
         setTimeout(() => {
-            alert("אין פעילות בדף, תתבצע יציאה אוטומטית.");
+            showNotification("מתנתק מהמערכת...");
             exit();
         }, 600000); // 10 דקות
 
@@ -860,227 +858,275 @@
                 }
             });
         }
-        function fillForm(data) {
-            debugger
-            const formContainer = document.getElementById('formContainer');
-            formContainer.innerHTML = ''; // Clear previous content
+
+        async function fillForm(reshumot) {
+            const reshumotListDiv = document.getElementById('listAllReshumot');
+
+            if (!reshumot || reshumot.length === 0) {
+                console.warn('No records to display in fillForm');
+                reshumotListDiv.innerHTML = '<p>אין נתונים להצגה</p>';
+                return;
+            }
 
             const titleMapping = {
                 'Rsh_date': 'תאריך',
                 'Rsh_mchlaka': 'מחלקה',
-                'Rsh_sapak': 'ספק',
+                'Rsh_sapak': 'מספר ספק',
+                'SP_name': 'פרטי ספק',
                 'Rsh_schoom': 'סכום',
-                'Rsh_aspaka': 'מקום אספקה', // שדה זה הוחלף
-                'Rsh_proyktnam': 'שם פרויקט', // שדה זה הוחלף
+                'Rsh_aspaka': 'מקום אספקה',
+                'Rsh_proyktnam': 'שם פרויקט',
                 'Rsh_sochen': 'סוכן',
-                'Rsh_takziv': 'מספר סעיף תקציבי',
                 'Rsh_cname': 'שם סוכן',
                 'Rsh_cnametl': 'טלפון סוכן',
-                'Rsh_cemail': 'מייל סוכן'
+                'Rsh_cemail': 'מייל סוכן',
+                'Rsh_takziv': 'מספר סעיף תקציבי',
             };
 
-            const tableContainer = document.createElement('div');
-            tableContainer.style.backgroundColor = '#fff';
-            tableContainer.style.borderRadius = '8px';
-            tableContainer.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
-            tableContainer.style.overflow = 'hidden';
-            tableContainer.style.marginBottom = '30px';
-            tableContainer.style.fontSize = '0.85rem';
+            const hiddenColumns = ['Rsh_id', 'Rsh_status'];
 
-            const tableHeader = document.createElement('div');
-            tableHeader.style.padding = '15px 20px';
-            tableHeader.style.backgroundColor = '#3498db';
-            tableHeader.style.color = 'white';
-            tableHeader.style.borderBottom = '1px solid #e0e0e0';
-            tableHeader.innerHTML = '<h3 style="margin: 0; font-size: 1.2rem;"><i class="fas fa-list-alt" style="margin-right: 10px;"></i>רשימת הזמנות</h3>';
-            tableContainer.appendChild(tableHeader);
-
-            const table = document.createElement('table');
-            table.className = 'records-table';
-            table.style.width = '100%';
-            table.style.borderCollapse = 'collapse';
-            table.style.fontSize = '0.8rem';
-
-            const headerRow = document.createElement('tr');
-
-            for (const title in titleMapping) {
-                const th = document.createElement('th');
-                th.textContent = titleMapping[title];
-                th.style.padding = '10px 8px';
-                th.style.textAlign = 'center';
-                th.style.backgroundColor = '#f8f9fa';
-                th.style.color = '#495057';
-                th.style.fontWeight = '600';
-                th.style.borderBottom = '2px solid #dee2e6';
-                th.style.fontSize = '0.8rem';
-                headerRow.appendChild(th);
-            }
-
-            const thead = document.createElement('thead');
-            thead.appendChild(headerRow);
-            table.appendChild(thead);
-
-            const tbody = document.createElement('tbody');
-
-            let activeRow = null;
-
-            data.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.style.position = 'relative';
-                row.style.cursor = 'pointer';
-
-                row.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#f8f9fa';
-
+            try {
+                let tableHTML = '<div class="table-responsive"><table class="records-table">';
+                tableHTML += '<thead><tr>';
                 for (const key in titleMapping) {
-                    const td = document.createElement('td');
-                    td.textContent = item[key] || 'לא צוין';
-                    td.style.padding = '8px 10px';
-                    td.style.textAlign = 'center';
-                    td.style.borderBottom = '1px solid #e9ecef';
-                    td.style.fontSize = '0.75rem';
-                    row.appendChild(td);
+                    if (!hiddenColumns.includes(key)) {
+                        tableHTML += `<th>${titleMapping[key]}</th>`;
+                    }
+                }
+                tableHTML += '</tr></thead>';
+
+                tableHTML += '<tbody>';
+                for (const record of reshumot) {
+                    const recordId = record.Rsh_id;
+
+                    tableHTML += `<tr class="record-row" data-id="${recordId}" onclick="toggleButtons(this)">`;
+                    for (const key in titleMapping) {
+                        if (!hiddenColumns.includes(key)) {
+                            if (key === 'Rsh_sapak') {
+                                const supplierDetails = await loadSuppliers(record.Rsh_sapak);
+                                tableHTML += `<td class="data-cell"><span class="cell-content">${supplierDetails.SP_id || ''}</span></td>`;
+                            } else if (key === 'SP_name') {
+                                const supplierDetails = await loadSuppliers(record.Rsh_sapak);
+                                tableHTML += `<td class="data-cell"><span class="cell-content">${supplierDetails.SP_name || ''}</span></td>`;
+                            } else {
+                                tableHTML += `<td class="data-cell"><span class="cell-content">${record[key] || ''}</span></td>`;
+                            }
+                        }
+                    }
+                    tableHTML += '</tr>';
                 }
 
-                const overlay = document.createElement('div');
-                overlay.className = 'row-action-overlay';
-                overlay.style.position = 'absolute';
-                overlay.style.top = '0';
-                overlay.style.left = '0';
-                overlay.style.width = '100%';
-                overlay.style.height = '100%';
-                overlay.style.backgroundColor = 'rgba(52, 152, 219, 0.3)';
-                overlay.style.display = 'none';
-                overlay.style.justifyContent = 'center';
-                overlay.style.alignItems = 'center';
-                overlay.style.zIndex = '10';
-                overlay.style.transition = 'all 0.3s ease';
+                tableHTML += '</tbody></table></div>';
+                reshumotListDiv.innerHTML = tableHTML;
 
-                const buttonContainer = document.createElement('div');
-                buttonContainer.style.display = 'flex';
-                buttonContainer.style.gap = '15px';
-
-                const editButton = document.createElement('button');
-                editButton.innerHTML = '<i class="fas fa-edit"></i> עריכה';
-                editButton.style.padding = '8px 15px';
-                editButton.style.borderRadius = '4px';
-                editButton.style.border = 'none';
-                editButton.style.backgroundColor = 'white';
-                editButton.style.color = '#3498db';
-                editButton.style.cursor = 'pointer';
-                editButton.style.fontWeight = 'bold';
-                editButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-
-                editButton.onclick = function (e) {
-                    e.stopPropagation();
-                    loadRecordToForm(item);
-                    loadDocuments(item.Rsh_id);
-                    overlay.style.display = 'none';
-                    activeRow = null;
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth' // הוספת אפקט גלילה חלקה
-                    });
-                };
-
-                const deleteButton = document.createElement('button');
-                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> מחיקה';
-                deleteButton.style.padding = '8px 15px';
-                deleteButton.style.borderRadius = '4px';
-                deleteButton.style.border = 'none';
-                deleteButton.style.backgroundColor = 'white';
-                deleteButton.style.color = '#e74c3c';
-                deleteButton.style.cursor = 'pointer';
-                deleteButton.style.fontWeight = 'bold';
-                deleteButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-
-                deleteButton.onclick = async function (e) {
-                    e.stopPropagation();
-
-                    const result = await Swal.fire({
-                        title: 'אישור מחיקה',
-                        text: 'האם אתה בטוח שברצונך למחוק הזמנה זו?',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'כן, מחק את זה!',
-                        cancelButtonText: 'לא, ביטול'
-                    });
-
-                    if (result.isConfirmed) {
-                        const res = await deleteReshumot(item.Rsh_id);
-                        if (res.message === "Reshumot deleted successfully") {
-                            row.remove();
-                            showNotification('ההזמנה נמחקה בהצלחה');
-                        } else {
-                            showNotification('שגיאה במחיקת ההזמנה');
-                        }
+                // Add click event to document to close any open button overlays when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('.record-row') && !e.target.closest('.button-overlay')) {
+                        document.querySelectorAll('.record-row').forEach(row => {
+                            row.classList.remove('blurred', 'active-row');
+                            const existingOverlay = row.querySelector('.button-overlay');
+                            if (existingOverlay) {
+                                existingOverlay.remove();
+                            }
+                        });
                     }
+                });
 
-                    overlay.style.display = 'none';
-                    activeRow = null;
-                };
-
-                buttonContainer.appendChild(editButton);
-                buttonContainer.appendChild(deleteButton);
-                overlay.appendChild(buttonContainer);
-                row.appendChild(overlay);
-
-                row.onclick = function () {
-                    if (this === activeRow) {
-                        overlay.style.display = 'none';
-                        activeRow = null;
-                        return;
-                    }
-
-                    if (activeRow) {
-                        const activeOverlay = activeRow.querySelector('.row-action-overlay');
-                        if (activeOverlay) {
-                            activeOverlay.style.display = 'none';
-                        }
-                    }
-
-                    overlay.style.display = 'flex';
-                    activeRow = this;
-
-                    this.style.backgroundColor = '#e9f7fe';
-                };
-
-                tbody.appendChild(row);
-            });
-
-            table.appendChild(tbody);
-            tableContainer.appendChild(table);
-            formContainer.appendChild(tableContainer);
-
-            if (data.length === 0) {
-                const noDataMsg = document.createElement('div');
-                noDataMsg.style.textAlign = 'center';
-                noDataMsg.style.padding = '30px 20px';
-                noDataMsg.style.color = '#7f8c8d';
-                noDataMsg.style.backgroundColor = '#f9f9f9';
-                noDataMsg.style.borderRadius = '8px';
-                noDataMsg.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)';
-                noDataMsg.style.margin = '20px 0';
-                noDataMsg.style.fontSize = '0.85rem';
-                noDataMsg.innerHTML = '<i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px; color: #95a5a6;"></i><br>אין הזמנות להצגה';
-                formContainer.appendChild(noDataMsg);
+            } catch (error) {
+                console.error("Error in fillForm:", error);
+                reshumotListDiv.innerHTML = '<p>שגיאה בעיבוד הנתונים: ' + error.message + '</p>';
             }
-
-            document.addEventListener('click', function (e) {
-                if (activeRow && !tableContainer.contains(e.target)) {
-                    const activeOverlay = activeRow.querySelector('.row-action-overlay');
-                    if (activeOverlay) {
-                        activeOverlay.style.display = 'none';
-                    }
-                    activeRow = null;
-                }
-            });
         }
 
-        function loadRecordToForm(item) {
+
+        function toggleButtons(row) {
+            // Check if this row already has buttons displayed
+            const isActive = row.classList.contains('active-row');
+
+            // Reset all rows first
+            document.querySelectorAll('.record-row').forEach(r => {
+                r.classList.remove('active-row', 'blurred');
+                const existingOverlay = r.querySelector('.action-buttons-overlay');
+                if (existingOverlay) {
+                    existingOverlay.remove();
+                }
+            });
+
+            // If the row wasn't active, make it active and show buttons
+            if (!isActive) {
+                // Add active class to the row
+                row.classList.add('active-row', 'blurred');
+
+                // Create button overlay
+                const recordId = row.getAttribute('data-id');
+                const buttonOverlay = document.createElement('div');
+                buttonOverlay.className = 'action-buttons-overlay';
+                buttonOverlay.style.position = 'absolute';
+                buttonOverlay.style.top = '0';
+                buttonOverlay.style.left = '0';
+                buttonOverlay.style.width = '100%';
+                buttonOverlay.style.height = '50%';
+                buttonOverlay.style.backgroundColor = 'rgba(135, 206, 250, 0.7)'; // Lighter cyan/blue tint
+                buttonOverlay.style.display = 'flex';
+                buttonOverlay.style.justifyContent = 'center';
+                buttonOverlay.style.alignItems = 'center';
+                buttonOverlay.style.gap = '15px'; // Space between buttons
+                buttonOverlay.style.zIndex = '10';
+
+                // Create edit button with enhanced styling
+                const editButton = document.createElement('button');
+                editButton.innerHTML = '<i class="fas fa-edit"></i> עריכה';
+                editButton.className = 'edit-btn';
+                editButton.style.padding = '8px 16px';
+                editButton.style.backgroundColor = 'white';
+                editButton.style.color = '#3498db';
+                editButton.style.border = '2px solid #3498db';
+                editButton.style.borderRadius = '5px';
+                editButton.style.fontSize = '14px';
+                editButton.style.fontWeight = 'bold';
+                editButton.style.cursor = 'pointer';
+                editButton.style.transition = 'all 0.3s ease';
+                editButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+
+                // Hover effect for edit button
+                editButton.onmouseover = function () {
+                    this.style.backgroundColor = '#3498db';
+                    this.style.color = 'white';
+                };
+                editButton.onmouseout = function () {
+                    this.style.backgroundColor = 'white';
+                    this.style.color = '#3498db';
+                };
+
+                // Add click event for edit button
+                editButton.onclick = function (e) {
+                    e.stopPropagation();
+                    editRecord(recordId);
+                };
+
+                // Create delete button with enhanced styling
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> מחיקה';
+                deleteButton.className = 'delete-btn';
+                deleteButton.style.padding = '8px 16px';
+                deleteButton.style.backgroundColor = 'white';
+                deleteButton.style.color = '#e74c3c';
+                deleteButton.style.border = '2px solid #e74c3c';
+                deleteButton.style.borderRadius = '5px';
+                deleteButton.style.fontSize = '14px';
+                deleteButton.style.fontWeight = 'bold';
+                deleteButton.style.cursor = 'pointer';
+                deleteButton.style.transition = 'all 0.3s ease';
+                deleteButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+
+                // Hover effect for delete button
+                deleteButton.onmouseover = function () {
+                    this.style.backgroundColor = '#e74c3c';
+                    this.style.color = 'white';
+                };
+                deleteButton.onmouseout = function () {
+                    this.style.backgroundColor = 'white';
+                    this.style.color = '#e74c3c';
+                };
+
+                // Add click event for delete button
+                deleteButton.onclick = function (e) {
+                    e.stopPropagation();
+                    deleteRecord(recordId);
+                };
+
+                // Add buttons to overlay
+                buttonOverlay.appendChild(editButton);
+                buttonOverlay.appendChild(deleteButton);
+
+                // Add the overlay to the row
+                row.style.position = 'relative'; // Ensure the row has position relative for absolute positioning
+                row.appendChild(buttonOverlay);
+            }
+        }
+
+        function editRecord(recordId) {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' // הוספת אפקט גלילה חלקה
+            });
+            const recordRow = document.querySelector(`tr[data-id="${recordId}"]`);
+
+            // שלוף את כל התאים בשורה
+            const cells = recordRow.querySelectorAll('.data-cell .cell-content');
+
+            // צור אובייקט record עם המידע מהתאים
+            const record = {
+                Rsh_id: recordId, // הוסף את ה-ID של ההזמנה
+                Rsh_date: cells[0].innerText,
+                Rsh_mchlaka: cells[1].innerText,
+                Rsh_sapak: cells[2].innerText,
+                SP_name: cells[3].innerText,
+                Rsh_schoom: cells[4].innerText,
+                Rsh_aspaka: cells[5].innerText,
+                Rsh_proyktnam: cells[6].innerText,
+                Rsh_sochen: cells[7].innerText,
+                Rsh_cname: cells[8].innerText,
+                Rsh_cnametl: cells[9].innerText,
+                Rsh_cemail: cells[10].innerText,
+                Rsh_takziv: cells[11].innerText,
+            };
+
+            // כאן תוכל להוסיף לוגיקה כדי למלא את הטופס עם המידע שנשלף
+            loadRecordToForm(record);
+        }
+
+
+        async function deleteRecord(recordId) {
+            const result = await Swal.fire({
+                title: 'אישור מחיקה',
+                text: 'האם אתה בטוח שברצונך למחוק הזמנה זו?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'כן, מחק את זה!',
+                cancelButtonText: 'לא, ביטול'
+            });
+
+            if (result.isConfirmed) {
+                const res = await deleteReshumot(recordId);
+                if (res.message === "Reshumot deleted successfully") {
+                    showNotification('ההזמנה נמחקה בהצלחה');
+                    getReshumot()
+                    // fillForm(await fetchReshumot()); // עדכן את הטבלה לאחר מחיקה
+                } else {
+                    showNotification('שגיאה במחיקת ההזמנה');
+                }
+            }
+        }
+
+        async function loadSuppliers(id) {
+            const supplier = await getSupplierById(id); // הנחה שהפונקציה מחזירה את הספק
+            const supplierSelect = document.getElementById('supplierName');
+            supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
+
+            // אם יש צורך להוסיף את הספק לרשימה
+            if (supplier) {
+                const option = document.createElement('option');
+                option.value = supplier.SP_name; // הנח כאן את השם של הספק
+                option.textContent = supplier.SP_name; // הנח כאן את השם של הספק
+                supplierSelect.appendChild(option);
+            }
+
+            return supplier; // החזר את האובייקט של הספק
+        }
+        async function loadRecordToForm(item) {
+
+            debugger
             document.getElementById('department').value = item.Rsh_mchlaka || '';
-            document.getElementById('supplierName').value = item.Rsh_sapak || '';
+            // Fetch suppliers from server
+            const supplierIdField = document.getElementById('supplierId');
+            await loadAllSuppliers(supplierIdField, item.Rsh_sapak); // קריאה לשרת להביא את הספקים
+
+            if (document.getElementById('supplierName')) {
+                document.getElementById('supplierName').value = item.SP_name || '';
+            }
             document.getElementById('amount').value = item.Rsh_schoom || '';
             document.getElementById('deliveryPlace').value = item.Rsh_aspaka || '';
             document.getElementById('agentNumber').value = item.Rsh_sochen || '';
@@ -1094,37 +1140,47 @@
             document.getElementById('autoNumber').value = item.Rsh_id || ''; // Assuming Rsh_id is the identifier
             document.getElementById('timestamp').value = item.Rsh_date || ''; // Assuming Rsh_date is the timestamp
             checkFormCompletion();
+            RSH_ID = item.Rsh_id;
+            loadDocuments(RSH_ID);
         }
 
+        document.getElementById('supplierId').addEventListener('change', async function () {
+            const selectedSupplierId = this.value; // קבלת ה-ID של הספק הנבחר
+            const supplierData = await getSupplierById(selectedSupplierId); // קריאה לפונקציה לקבלת פרטי הספק
 
-        function showActionButtons(item, row) {
-            const existingActionContainer = document.getElementById('actionContainer');
-            if (existingActionContainer) {
-                existingActionContainer.remove();
+            if (supplierData && supplierData.SP_name) {
+                document.getElementById('supplierName').value = supplierData.SP_name; // עדכון השם בשדה
+            } else {
+                showNotification('לא נמצאו פרטי ספק עבור ID:' + selectedSupplierId, error);
             }
+        });
 
-            const buttonContainer = row.querySelector('div');
-            buttonContainer.style.display = 'flex'; // Show buttons
+        async function loadAllSuppliers(supplierIdField, selectedSupplierId) {
+            debugger
+            try {
+                const suppliers = await getAllSuppliers(); // שנה את ה-URL לפי הצורך
+                debugger
+                // const suppliers = await response.json();
 
-            const newActionContainer = document.createElement('div');
-            newActionContainer.id = 'actionContainer';
-            newActionContainer.style.position = 'absolute';
-            newActionContainer.style.zIndex = '10';
-            newActionContainer.style.backgroundColor = '#ffffff';
-            newActionContainer.style.border = '1px solid #ddd';
-            newActionContainer.style.borderRadius = '5px';
-            newActionContainer.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
-            newActionContainer.style.padding = '10px';
-            newActionContainer.style.marginTop = '-50px'; // Adjust as needed
-            newActionContainer.style.left = row.getBoundingClientRect().left + 'px';
-            newActionContainer.style.top = row.getBoundingClientRect().top + 'px';
+                // ניקוי הסלקטור לפני הוספת ספקים חדשים
+                supplierIdField.innerHTML = '<option value="" disabled selected>בחר ספק</option>';
 
-            document.body.appendChild(newActionContainer);
+                suppliers.forEach(supplier => {
+                    const option = document.createElement('option');
+                    option.value = supplier.SP_id; // שימוש ב-SP_id כערך
+                    option.text = supplier.SP_id; // הצגת שם הספק
+                    supplierIdField.add(option);
+                });
+
+                // הגדרת הספק הנבחר
+                if (selectedSupplierId) {
+                    supplierIdField.value = selectedSupplierId;
+                }
+            } catch (error) {
+                console.error('Error loading suppliers:', error);
+                showNotification('שגיאה בטעינת ספקים: ' + error.message, 'error');
+            }
         }
-
-
-
-
 
         window.addEventListener('beforeunload', function () {
             updateUser(localStorage.getItem('userId'),
@@ -1159,6 +1215,7 @@
 
 
         async function loadDocuments(id) {
+            debugger
             isFunctionCalled = true;
             const documentsArea = document.getElementById('documents-area');
             const tbody = document.getElementById('documents-body');
@@ -1178,7 +1235,7 @@
                 checkFunctionCall();
                 return;
             }
-
+            debugger
             try {
                 // Fetch documents
                 const response = await listMnilvim(id);
@@ -1198,7 +1255,7 @@
                     documentsArea.classList.remove('empty');
                     messageDiv.style.display = 'none';
                     table.style.display = 'table';
-
+                    debugger
                     documents.forEach(doc => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
@@ -1264,7 +1321,6 @@
                 loadDocuments(RSH_ID); // טען מחדש את המסמכים
             }
         }
-
 
     </script>
 </body>

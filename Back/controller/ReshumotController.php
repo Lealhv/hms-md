@@ -151,7 +151,7 @@ class ReshumotController
         $sochen = isset($data->Rsh_sochen) ? strval($data->Rsh_sochen) : null;
 
         $stmt->bind_param(
-            "sssissssssis", // 12 תווים, כולל i ל-Rsh_id
+            "sssissssssss", // 12 תווים, כולל i ל-Rsh_id
             $data->Rsh_date,
             $data->Rsh_mchlaka,
             $data->Rsh_sapak,

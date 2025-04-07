@@ -4,30 +4,31 @@
 async function createReshumot(data) {
     try {
         debugger
-      const response = await fetch('http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      // Get the raw text response for debugging
-      const rawText = await response.text();      
-      // Try to parse it as JSON
-      try {
-        const result = JSON.parse(rawText);
-        return result;
-      } catch (parseError) {
-        console.error('Failed to parse response as JSON:', parseError);
-        throw new Error(`Server returned invalid JSON. First 100 chars: ${rawText.substring(0, 100)}...`);
-      }
+        const response = await fetch('http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        // Get the raw text response for debugging
+        const rawText = await response.text();
+        // Try to parse it as JSON
+        try {
+            const result = JSON.parse(rawText);
+            console.log(result.message);
+            return result;
+        } catch (parseError) {
+            console.error('Failed to parse response as JSON:', parseError);
+            throw new Error(`Server returned invalid JSON. First 100 chars: ${rawText.substring(0, 100)}...`);
+        }
     } catch (error) {
-      console.error('Error in createReshumot:', error);
-      throw error;
+        console.error('Error in createReshumot:', error);
+        throw error;
     }
-  }
-  
+}
+
 
 
 
@@ -39,32 +40,40 @@ async function createReshumot(data) {
 // }
 
 // Update
-async function updateReshumot(data) {
-    const apiUrl = `http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/${data.Rsh_id}`;
+async function updateReshumot(data, id) {
+    console.log("Updating reshumot with ID:", id);
+    console.log("Data to be sent:", data);
 
-
+    const apiUrl = `http://localhost/project/hms-md/Back/controller/ReshumotController.php/reshumot/${id}`;
     try {
         const response = await fetch(apiUrl, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data) // ודא ש-data מכיל את כל השדות הנדרשים
+            body: JSON.stringify(data)
         });
 
-
-        if (!response.ok) {
-            throw new Error(`Network response was not ok: ${response.statusText}`);
+        console.log("Response status:", response.status);
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            const jsonResponse = await response.json();
+            debugger
+            console.log("Response from server:", jsonResponse);
+            debugger
+            return jsonResponse;
+        } else {
+            const text = await response.text();
+            console.error("Server returned non-JSON response:", text);
+            throw new Error("Server returned HTML instead of JSON. Check server logs for PHP errors.");
         }
-
-        const result = await response.json();
-        return result;
-
     } catch (error) {
-        console.error('Error updating reshumot:', error);
-        throw error; // לזרוק את השגיאה כדי שניתן יהיה לטפל בה מחוץ לפונקציה
+        console.error("Error updating reshumot:", error);
+        throw error;
     }
 }
+
+
 
 // Delete
 async function deleteReshumot(id) {

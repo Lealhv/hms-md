@@ -1,0 +1,172 @@
+:root {
+    --primary-color: #3f51b5;
+    --primary-light: #e8eaf6;
+    --secondary-color: #78909c;
+    --success-color: #4caf50;
+    --danger-color: #f44336;
+    --text-color: #37474f;
+    --border-radius: 4px;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Rubik', 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f9fafc;
+    direction: rtl;
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+}
+
+.header-buttons {
+    display: flex;
+    justify-content: flex-start;
+    /* Align to the left */
+    gap: 10px;
+    /* Space between buttons */
+    margin: 15px 0;
+    width: 100%;
+    direction: ltr;
+    /* For RTL layout since the page is in Hebrew */
+}
+
+/* Base button styles */
+.header-buttons button {
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+}
+
+/* Exit button style */
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-danger i {
+    margin-left: 8px;
+}
+
+/* Admin button style */
+.admin-btn {
+    background-color: #2980b9;
+    color: white;
+    box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+}
+
+.admin-btn:hover {
+    background-color: #138496;
+    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Disabled button style */
+.disabled-btn {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Notification styling */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out forwards;
+    max-width: 350px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.notification.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-right: 4px solid #28a745;
+}
+
+.notification.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-right: 4px solid #dc3545;
+}
+
+.notification.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-right: 4px solid #17a2b8;
+}
+
+.notification.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-right: 4px solid #ffc107;
+}
+
+.notification i {
+    font-size: 1.2rem;
+}
+
+.notification .message {
+    flex: 1;
+}
+
+.close-notification {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.close-notification:hover {
+    opacity: 1;
+} 

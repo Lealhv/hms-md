@@ -79,22 +79,26 @@ class UserDepartmentsController
         echo json_encode($responses);
     }
 
-    public function read($department_id, $user_id)
+    public function readByUserId($user_id)
     {
-        $query = "SELECT * FROM user_departments WHERE department_id = ? AND user_id = ?";
+        $query = "SELECT department_id FROM user_departments WHERE user_id = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("ii", $department_id, $user_id);
+        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $userDepartment = $result->fetch_assoc();
-            echo json_encode($userDepartment);
+    
+        $departmentIds = [];
+        while ($row = $result->fetch_assoc()) {
+            $departmentIds[] = $row['department_id'];
+        }
+    
+        if (count($departmentIds) > 0) {
+            echo json_encode($departmentIds);
         } else {
-            echo json_encode(["error" => "User department not found"]);
+            echo json_encode(["error" => "No departments found for user_id: " . $user_id]);
         }
     }
-
+    
     public function delete($department_id, $user_id)
     {
         $query = "DELETE FROM user_departments WHERE department_id = ? AND user_id = ?";
@@ -134,8 +138,8 @@ $requestUri = explode("/", trim($requestUri, "/"));
 $controller = new UserDepartmentsController();
 
 if (count($requestUri) >= 1) {
-    if ($requestUri[0] === "user_department" && $_SERVER['REQUEST_METHOD'] === "GET" && isset($requestUri[1]) && isset($requestUri[2])) {
-        $controller->read($requestUri[1], $requestUri[2]); // GET /user_department/{department_id}/{user_id}
+    if ($requestUri[0] === "user_department" && $_SERVER['REQUEST_METHOD'] === "GET" && isset($requestUri[1])) {
+        $controller->readByUserId($requestUri[1]); // GET /user_department/{user_id}
     } elseif ($requestUri[0] === "user_departments" && $_SERVER['REQUEST_METHOD'] === "GET") {
         $controller->listAll(); // GET /user_departments
     } elseif ($requestUri[0] === "user_department" && $_SERVER['REQUEST_METHOD'] === "POST") {

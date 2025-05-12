@@ -150,3 +150,31 @@ const updateUserLog = async (id, userData) => {
 };
 
 window.updateUserLog = updateUserLog;
+
+
+const getdepofuser = async (id) => {
+    try {
+        const scriptText = await (await fetch('https://hms-md.co.il/wp-content/themes/twentytwentyfour-child/hms-md/js/department_users.server.js')).text();
+        eval(scriptText);
+        return typeof getDepartmentsByUserId  === 'function' ? getDepartmentsByUserId (id) : (console.error('getDepartmentsByUserId  לא זמינה'), null);
+    } catch (error) {
+        console.error('שגיאה בטעינת הסקריפט:', error);
+        return null;
+    }
+};
+
+window.getdepofuser = getdepofuser;
+
+
+const getreshumotByDep = async (id) => {
+    try {
+        const scriptText = await (await fetch('https://hms-md.co.il/wp-content/themes/twentytwentyfour-child/hms-md/js/reshumot.server.js')).text();
+        eval(scriptText);
+        return typeof readReshumot  === 'function' ? readReshumot (id) : (console.error('readReshumot  לא זמינה'), null);
+    } catch (error) {
+        console.error('שגיאה בטעינת הסקריפט:', error);
+        return null;
+    }
+};
+
+window.getreshumotByDep = getreshumotByDep;

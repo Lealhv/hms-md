@@ -79,29 +79,26 @@ class AgentDepartmentsController
         echo json_encode($responses);
     }
 
-    public function readAgentsByDepartmentIds($departmentIds)
+    public function getAgentsByDepartments($departmentIds)
     {
-        // המרת רשימת department_id למחרוזת עבור השאילתה
         $ids = implode(',', array_map('intval', $departmentIds));
-        
-        $query = "SELECT agent_id FROM agents WHERE department_id IN ($ids)";
+        $query = "SELECT agent_id, AG_name FROM agents WHERE department_id IN ($ids)";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
     
-        $agentIds = [];
+        $agents = [];
         while ($row = $result->fetch_assoc()) {
-            $agentIds[] = $row['agent_id'];
+            $agents[] = [
+                'AG_id' => $row['agent_id'],
+                'AG_name' => $row['AG_name']
+            ];
         }
     
-        if (count($agentIds) > 0) {
-            echo json_encode($agentIds);
-        } else {
-            echo json_encode(["error" => "No agents found for the provided department_ids."]);
-        }
+        return $agents; // החזרת המידע
     }
-    
-    
+
+        
     public function delete($department_id, $agent_id)
     {
         $query = "DELETE FROM department_agents WHERE department_id = ? AND agent_id = ?";
@@ -142,7 +139,7 @@ $controller = new AgentDepartmentsController();
 
 if (count($requestUri) >= 1) {
     if ($requestUri[0] === "agent_department" && $_SERVER['REQUEST_METHOD'] === "GET" && isset($requestUri[1])) {
-        $controller->readAgentsByDepartmentIds($requestUri[1]); // GET /agent_department/{agent_id}
+        $controller->getAgentsByDepartments($requestUri[1]); // GET /agent_department/{agent_id}
     } elseif ($requestUri[0] === "agent_departments" && $_SERVER['REQUEST_METHOD'] === "GET") {
         $controller->listAll(); // GET /agent_departments
     } elseif ($requestUri[0] === "agent_department" && $_SERVER['REQUEST_METHOD'] === "POST") {

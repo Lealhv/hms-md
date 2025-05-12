@@ -72,21 +72,30 @@ class DepartmentsController
         echo json_encode($responses);
     }
 
-    public function read($DP_id)
+    public function read($DP_ids)
     {
-        $query = "SELECT * FROM departments WHERE DP_id = ?";
+        $ids = explode(',', $DP_ids);
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    
+        $query = "SELECT DP_id, DP_name FROM departments WHERE DP_id IN ($placeholders)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $DP_id);
+    
+        $stmt->bind_param(str_repeat('i', count($ids)), ...$ids);
         $stmt->execute();
         $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $department = $result->fetch_assoc();
-            echo json_encode($department);
-        } else {
-            echo json_encode(["error" => "Department not found"]);
+    
+        $departments = [];
+    
+        while ($row = $result->fetch_assoc()) {
+            $departments[] = [
+                'DP_id' => $row['DP_id'],
+                'DP_name' => $row['DP_name']
+            ];
         }
+    
+        return json_encode($departments); // החזרת התוצאה
     }
+    
 
     public function upDate($id)
     {

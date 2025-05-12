@@ -84,21 +84,52 @@ class UserDepartmentsController
         $query = "SELECT department_id FROM user_departments WHERE user_id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $user_id);
+        
         $stmt->execute();
         $result = $stmt->get_result();
-    
+        
         $departmentIds = [];
         while ($row = $result->fetch_assoc()) {
             $departmentIds[] = $row['department_id'];
         }
-    
+        
         if (count($departmentIds) > 0) {
-            echo json_encode($departmentIds);
+            $idsString = implode(',', $departmentIds);
+    
+            // יצירת מופע של הקונטרולר DepartmentsController
+            $departmentController = new DepartmentsController($this->conn);
+            $departmentsJson = $departmentController->read($idsString); // קריאה לפונקציה read
+    
+            // בדיקה אם התוצאה היא לא null
+            if ($departmentsJson !== null) {
+                $departments = json_decode($departmentsJson, true); // המרה ל-array
+    
+                // יצירת מופע של הקונטרולר ReshumotController
+                $reshumotController = new ReshumotController($this->conn);
+                $reshumotJson = $reshumotController->readByDepartments(['departments' => implode(',', $departmentIds)]); // קריאה לפונקציה readByDepartments
+    
+                // בדיקה אם התוצאה היא לא null
+                if ($reshumotJson !== null) {
+                    $reshumotData = json_decode($reshumotJson, true); // המרה ל-array
+                } else {
+                    $reshumotData = []; // טיפול במקרה של null
+                }
+    
+                // החזרת מערך עם שתי התוצאות
+                return json_encode([
+                    'departments' => $departments,
+                    'reshumot' => $reshumotData, // החזרת נתוני הרשומות לפי מחלקות
+                ]);
+            } else {
+                return json_encode(["error" => "Department data is null."]);
+            }
         } else {
-            echo json_encode(["error" => "No departments found for user_id: " . $user_id]);
+            return json_encode(["error" => "No departments found for user_id: " . $user_id]);
         }
     }
     
+    
+
     public function delete($department_id, $user_id)
     {
         $query = "DELETE FROM user_departments WHERE department_id = ? AND user_id = ?";

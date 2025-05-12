@@ -49,6 +49,7 @@ class AgentsController
         }
     }
 
+
     public function read($AG_id)
     {
         $query = "SELECT * FROM agent WHERE AG_id = ?";
@@ -56,14 +57,14 @@ class AgentsController
         $stmt->bind_param("i", $AG_id);
         $stmt->execute();
         $result = $stmt->get_result();
-
+    
         if ($result->num_rows > 0) {
-            $agent = $result->fetch_assoc();
-            echo json_encode($agent);
+            return $result->fetch_assoc(); // החזרת האובייקט
         } else {
-            echo json_encode(["error" => "agent not found"]);
+            return ["error" => "agent not found"];
         }
     }
+    
 
     public function update($AG_id)
     {

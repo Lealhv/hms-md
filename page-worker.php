@@ -32,9 +32,12 @@ get_header();
             <!-- Row 1 -->
             <div class="form-group">
                 <label for="department">מחלקה:</label>
-                <input type="text" id="department" name="department" placeholder="הזן שם מחלקה">
+                <select id="department" name="department">
+                    <option value="" disabled selected>בחר מחלקה</option>
+                </select>
                 <div id="error-department" class="error-message" style="color: red;"></div>
             </div>
+
 
             <div class="form-group">
                 <label for="supplierId">מספר הספק:</label>
@@ -164,52 +167,55 @@ get_header();
 
     var RSH_ID = 0;
 
-    function getData() {
-        getReshumot();
+    async function getData() {
+        const userId = localStorage.getItem('userId');
+        const userDepartments = await getdepofuser(userId); // המתנה לתוצאה
+
+        await getReshumot(userDepartments); // העבר את userDepartments לפונקציה
         checkFunctionCall();
         loadListSuppliers();
     }
-document.addEventListener('DOMContentLoaded', function() {
-    const formFields = document.querySelectorAll('#documentForm input, #documentForm select');
-    formFields.forEach(field => {
-        field.addEventListener('input', checkFormCompletion);
+    document.addEventListener('DOMContentLoaded', function() {
+        const formFields = document.querySelectorAll('#documentForm input, #documentForm select');
+        formFields.forEach(field => {
+            field.addEventListener('input', checkFormCompletion);
+        });
+
+        // הוסף מאזין לאירוע blur לשדה מספר סעיף תקציבי
+        document.getElementById('budgetItem').addEventListener('blur', function() {
+            const budgetItemValue = this.value;
+            const errorMessageElement = document.getElementById("error-budgetItem");
+            errorMessageElement.innerText = ""; // נקה הודעת שגיאה קודמת
+
+            // בדוק אם הערך הוא בדיוק 7 ספרות
+            if (!/^\d{7}$/.test(budgetItemValue)) {
+                errorMessageElement.innerText = "מספר סעיף תקציבי חייב להיות 7 ספרות.";
+            }
+        });
+
+        // Initial check
+        checkFormCompletion();
     });
 
-    // הוסף מאזין לאירוע blur לשדה מספר סעיף תקציבי
-    document.getElementById('budgetItem').addEventListener('blur', function() {
-        const budgetItemValue = this.value;
-        const errorMessageElement = document.getElementById("error-budgetItem");
-        errorMessageElement.innerText = ""; // נקה הודעת שגיאה קודמת
 
-        // בדוק אם הערך הוא בדיוק 7 ספרות
-        if (!/^\d{7}$/.test(budgetItemValue)) {
-            errorMessageElement.innerText = "מספר סעיף תקציבי חייב להיות 7 ספרות.";
+    async function loadListSuppliers() {
+        const suppliers = await listSuppliers(); // הנחה שהפונקציה מחזירה מערך של ספקים
+
+        if (!Array.isArray(suppliers)) {
+            console.error("החזרה אינה מערך");
+            return;
         }
-    });
 
-    // Initial check
-    checkFormCompletion();
-});
+        const supplierSelect = document.getElementById('supplierId');
+        supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
 
-	
-async function loadListSuppliers() {
-    const suppliers = await listSuppliers(); // הנחה שהפונקציה מחזירה מערך של ספקים
-
-    if (!Array.isArray(suppliers)) {
-        console.error("החזרה אינה מערך");
-        return;
+        suppliers.forEach(supplier => {
+            const option = document.createElement('option');
+            option.value = supplier.SP_id; // הנח כאן את ה-SP_id
+            option.textContent = `${supplier.SP_id} - ${supplier.SP_name}`; // הצגת SP_id ו-SP_name
+            supplierSelect.appendChild(option);
+        });
     }
-
-    const supplierSelect = document.getElementById('supplierId');
-    supplierSelect.innerHTML = '<option value="" disabled selected>בחר ספק</option>'; // ניקוי אפשרויות קודמות
-
-    suppliers.forEach(supplier => {
-        const option = document.createElement('option');
-        option.value = supplier.SP_id; // הנח כאן את ה-SP_id
-        option.textContent = `${supplier.SP_id} - ${supplier.SP_name}`; // הצגת SP_id ו-SP_name
-        supplierSelect.appendChild(option);
-    });
-}
 
     // Function to check if all required fields are filled
     function checkFormCompletion() {
@@ -268,76 +274,76 @@ async function loadListSuppliers() {
         checkFormCompletion();
     });
 
-function validateForm() {
-    const department = document.getElementById("department").value;
-    const supplierId = document.getElementById("supplierId").value;
-    const amount = document.getElementById("amount").value;
-    const deliveryPlace = document.getElementById("deliveryPlace").value;
-    const agentNumber = document.getElementById("agentNumber").value;
-    const contactName = document.getElementById("contactName").value;
-    const contactPhone = document.getElementById("contactPhone").value;
-    const contactEmail = document.getElementById("contactEmail").value;
-    const projectName = document.getElementById("projectName").value;
-    const budgetItem = document.getElementById("budgetItem").value;
+    function validateForm() {
+        const department = document.getElementById("department").value;
+        const supplierId = document.getElementById("supplierId").value;
+        const amount = document.getElementById("amount").value;
+        const deliveryPlace = document.getElementById("deliveryPlace").value;
+        const agentNumber = document.getElementById("agentNumber").value;
+        const contactName = document.getElementById("contactName").value;
+        const contactPhone = document.getElementById("contactPhone").value;
+        const contactEmail = document.getElementById("contactEmail").value;
+        const projectName = document.getElementById("projectName").value;
+        const budgetItem = document.getElementById("budgetItem").value;
 
-    // נקה הודעות שגיאה קודמות
-    clearErrorMessages();
+        // נקה הודעות שגיאה קודמות
+        clearErrorMessages();
 
-    let isValid = true;
+        let isValid = true;
 
-    if (!department) {
-        document.getElementById("error-department").innerText = "מחלקה היא שדה חובה.";
-        isValid = false;
+        if (!department) {
+            document.getElementById("error-department").innerText = "מחלקה היא שדה חובה.";
+            isValid = false;
+        }
+
+        if (!supplierId) {
+            document.getElementById("error-supplierId").innerText = "יש לבחור ספק.";
+            isValid = false;
+        }
+
+        if (!amount || amount <= 0) {
+            document.getElementById("error-amount").innerText = "סכום חייב להיות חיובי.";
+            isValid = false;
+        }
+
+        if (!deliveryPlace) {
+            document.getElementById("error-deliveryPlace").innerText = "מקום אספקה הוא שדה חובה.";
+            isValid = false;
+        }
+
+        if (!agentNumber) {
+            document.getElementById("error-agentNumber").innerText = "מס סוכן הוא שדה חובה.";
+            isValid = false;
+        }
+
+        if (!contactName) {
+            document.getElementById("error-contactName").innerText = "שם סוכן הוא שדה חובה.";
+            isValid = false;
+        }
+
+        if (!validatePhone(contactPhone)) {
+            document.getElementById("error-contactPhone").innerText = "טלפון סוכן לא תקין.";
+            isValid = false;
+        }
+
+        if (!validateEmail(contactEmail)) {
+            document.getElementById("error-contactEmail").innerText = "מייל סוכן לא תקין.";
+            isValid = false;
+        }
+
+        if (!projectName) {
+            document.getElementById("error-projectName").innerText = "שם פרויקט הוא שדה חובה.";
+            isValid = false;
+        }
+
+        // בדיקה עבור מספר סעיף תקציבי
+        if (!/^\d{7}$/.test(budgetItem)) {
+            document.getElementById("error-budgetItem").innerText = "מספר סעיף תקציבי חייב להיות 7 ספרות.";
+            isValid = false;
+        }
+
+        return isValid; // מחזיר true אם כל הבדיקות עברו
     }
-
-    if (!supplierId) {
-        document.getElementById("error-supplierId").innerText = "יש לבחור ספק.";
-        isValid = false;
-    }
-
-    if (!amount || amount <= 0) {
-        document.getElementById("error-amount").innerText = "סכום חייב להיות חיובי.";
-        isValid = false;
-    }
-
-    if (!deliveryPlace) {
-        document.getElementById("error-deliveryPlace").innerText = "מקום אספקה הוא שדה חובה.";
-        isValid = false;
-    }
-
-    if (!agentNumber) {
-        document.getElementById("error-agentNumber").innerText = "מס סוכן הוא שדה חובה.";
-        isValid = false;
-    }
-
-    if (!contactName) {
-        document.getElementById("error-contactName").innerText = "שם סוכן הוא שדה חובה.";
-        isValid = false;
-    }
-
-    if (!validatePhone(contactPhone)) {
-        document.getElementById("error-contactPhone").innerText = "טלפון סוכן לא תקין.";
-        isValid = false;
-    }
-
-    if (!validateEmail(contactEmail)) {
-        document.getElementById("error-contactEmail").innerText = "מייל סוכן לא תקין.";
-        isValid = false;
-    }
-
-    if (!projectName) {
-        document.getElementById("error-projectName").innerText = "שם פרויקט הוא שדה חובה.";
-        isValid = false;
-    }
-
-    // בדיקה עבור מספר סעיף תקציבי
-    if (!/^\d{7}$/.test(budgetItem)) {
-        document.getElementById("error-budgetItem").innerText = "מספר סעיף תקציבי חייב להיות 7 ספרות.";
-        isValid = false;
-    }
-
-    return isValid; // מחזיר true אם כל הבדיקות עברו
-}
 
 
     function validateEmail(email) {
@@ -440,42 +446,42 @@ function validateForm() {
         window.location.href = '/login'; // דף הלוגאין
     }
 
-function MnilvimUpload(event) {
-    event.preventDefault(); // למנוע את שליחת הטופס הרגילה
+    function MnilvimUpload(event) {
+        event.preventDefault(); // למנוע את שליחת הטופס הרגילה
 
-    const fileInput = document.getElementById('document');
-    const formData = new FormData();
+        const fileInput = document.getElementById('document');
+        const formData = new FormData();
 
-    // הוסף את המידע הנוסף
-    if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        const lastDotIndex = file.name.lastIndexOf('.');
-        const fileNameWithoutExtension = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
-        
-        formData.append('MN_pratim', fileNameWithoutExtension);
-        formData.append('MN_shyooch', RSH_ID); // לדוגמה, RSH_ID
-        formData.append('MN_status', 1); // סטטוס
-        formData.append('MN_dateAdd', new Date().toISOString().split('T')[0]); // תאריך של היום
-        formData.append('MN_type', file.type); // סוג הקובץ
-        formData.append('document', file); // הוספת הקובץ עצמו
+        // הוסף את המידע הנוסף
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const lastDotIndex = file.name.lastIndexOf('.');
+            const fileNameWithoutExtension = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
+
+            formData.append('MN_pratim', fileNameWithoutExtension);
+            formData.append('MN_shyooch', RSH_ID); // לדוגמה, RSH_ID
+            formData.append('MN_status', 1); // סטטוס
+            formData.append('MN_dateAdd', new Date().toISOString().split('T')[0]); // תאריך של היום
+            formData.append('MN_type', file.type); // סוג הקובץ
+            formData.append('document', file); // הוספת הקובץ עצמו
+        }
+        console.log("formData", formData)
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ', ' + pair[1]);
+        }
+
+        loadMnilvim(formData)
+            .then(response => {
+                if (response.message === "Mnilvim created successfully")
+                    showNotification("הקובץ נוסף בהצלחה!");
+                loadDocuments(RSH_ID);
+
+
+            })
+            .catch(error => {
+                showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
+            });
     }
-	console.log("formData" , formData)
-	for (var pair of formData.entries()) {
-    console.log(pair[0] + ', ' + pair[1]);
-}
-
-    loadMnilvim(formData)
-        .then(response => {
-            if (response.message === "Mnilvim created successfully")
-                showNotification("הקובץ נוסף בהצלחה!");
-            loadDocuments(RSH_ID);
-	
-
-        })
-        .catch(error => {
-            showNotification("אירעה שגיאה בהוספת הקובץ: " + error.message);
-        });
-}
 
 
     function showNotification(message, type = 'info') {
@@ -563,13 +569,12 @@ function MnilvimUpload(event) {
             const recordId = document.getElementById('autoNumber').value;
 
             try {
-                // Fetch all records to check if the record already exists
                 const records = await listReshumot();
                 const existingRecord = records.find(record => record.Rsh_id === recordId);
-				const orderer = localStorage.getItem('EU_Name');
+                const orderer = localStorage.getItem('EU_Name');
                 const data = {
                     Rsh_date: new Date().toLocaleString('sv-SE'),
-                    Rsh_mchlaka: document.getElementById('department').value,
+                    Rsh_mchlaka: document.getElementById('department').value, // כאן נשאר כפי שהיה
                     Rsh_sapak: document.getElementById('supplierId').value,
                     Rsh_schoom: document.getElementById('amount').value,
                     Rsh_aspaka: document.getElementById('deliveryPlace').value,
@@ -579,12 +584,11 @@ function MnilvimUpload(event) {
                     Rsh_cname: document.getElementById('contactName').value,
                     Rsh_cnametl: document.getElementById('contactPhone').value,
                     Rsh_cemail: document.getElementById('contactEmail').value,
-					Rsh_orderer : orderer
+                    Rsh_orderer: orderer
                 };
-			
+
                 let response;
                 if (existingRecord) {
-                    // If record exists, update it
                     response = await saveReshumot(data, recordId);
                     if (response && response.message === "Reshumot updated successfully") {
                         showNotification('הזמנה עודכנה בהצלחה!');
@@ -593,7 +597,6 @@ function MnilvimUpload(event) {
                         showNotification('שגיאה בעדכון ההזמנה', 'error');
                     }
                 } else {
-                    // If record does not exist, create it
                     response = await createReshumot(data);
                     if (response && response.message === "Reshumot created successfully") {
                         showNotification('הזמנה נשמרה בהצלחה!');
@@ -606,15 +609,11 @@ function MnilvimUpload(event) {
                 clearFields(); // Clear fields after saving
             } catch (error) {
                 console.error('Error saving Reshuma:', error);
-                console.error('Error details:', error.message);
-
-                // Show a more user-friendly error message
-                showNotification('שגיאה בשמירת ההזמנה: ' +
-                    (error.message.includes("invalid response") ?
-                        "בעיה בתקשורת עם השרת" : error.message), 'error');
+                showNotification('שגיאה בשמירת ההזמנה: ' + error.message, 'error');
             }
         }
     }
+
 
     // פונקציה לניהול הרשאות
     setTimeout(() => {
@@ -623,38 +622,55 @@ function MnilvimUpload(event) {
     }, 600000); // 10 דקות
 
     // פונקציה לטעינת הזמנות
-    async function getReshumot() {
-        try {
-            let reshumot;
-            try {
-                reshumot = await listReshumot();
-				console.log("reshumot" , reshumot)
-                fillForm(reshumot);
-            } catch (e) {
-                console.error('Error calling listAllReshumot:', e);
-                reshumotListDiv.innerHTML = '<p>Error fetching data: ' + e.message + '</p>';
-                return;
-            }
+    async function getReshumot(userDepartments) {
+    try {
+        const departmentSelect = document.getElementById('department');
+        departmentSelect.innerHTML = ''; // נקה את הסלקטור לפני הוספת מחלקות חדשות
 
-            if (!reshumot) {
-                console.warn('Reshumot data is null or undefined');
-                reshumotListDiv.innerHTML = '<p>No data available</p>';
-                return;
-            }
+        // הוסף אפשרות ברירת מחדל
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר מחלקה';
+        departmentSelect.appendChild(defaultOption);
 
-        } catch (error) {
-            console.error('Error in getReshumot function:', error);
-            const reshumotListDiv = document.getElementById('reshumotList');
-            if (reshumotListDiv) {
-                reshumotListDiv.innerHTML = '<p>Error loading data: ' + error.message + '</p>';
-            }
+        if (checkPR() === 2) {
+            const reshumot = await listReshumot();
+            fillForm(reshumot);
+
+            // הוסף את המחלקות לסלקטור
+            userDepartments[0].forEach(department => {
+                const option = document.createElement('option');
+                option.value = department.DP_id; // הנח כאן את ה-ID של המחלקה
+                option.textContent = department.DP_name; // הצגת DP_name
+                departmentSelect.appendChild(option);
+            });
+        } else {
+            // הוסף את המחלקות לסלקטור
+            userDepartments[0].forEach(department => {
+                const option = document.createElement('option');
+                option.value = department.DP_id; // הנח כאן את ה-ID של המחלקה
+                option.textContent = department.DP_name; // הצגת DP_name
+                departmentSelect.appendChild(option);
+                fillForm(userDepartments[1]);
+            });
+        }
+    } catch (error) {
+        console.error('Error in getReshumot function:', error);
+        const reshumotListDiv = document.getElementById('reshumotList');
+        if (reshumotListDiv) {
+            reshumotListDiv.innerHTML = '<p>Error loading data: ' + error.message + '</p>';
         }
     }
+}
+
+
+
+
 
     window.onload = function() {
         initializeForm();
         try {
-            getData();
+            getData(); // זה כבר מבצע את כל מה שצריך
         } catch (error) {
             console.error('Error in getData:', error);
             const reshumotListDiv = document.getElementById('reshumotList');
@@ -682,84 +698,84 @@ function MnilvimUpload(event) {
         });
     }
 
-async function fillForm(reshumot) {
-    const reshumotListDiv = document.getElementById('listAllReshumot');
+    async function fillForm(reshumot) {
+        const reshumotListDiv = document.getElementById('listAllReshumot');
 
-    if (!reshumot || reshumot.length === 0) {
-        console.warn('No records to display in fillForm');
-        reshumotListDiv.innerHTML = '<p>אין נתונים להצגה</p>';
-        return;
-    }
-
-    const titleMapping = {
-        'Rsh_date': 'תאריך',
-        'Rsh_mchlaka': 'מחלקה',
-        'Rsh_sapak': 'מספר ספק',
-        'SP_name': 'פרטי ספק',
-        'Rsh_schoom': 'סכום',
-        'Rsh_aspaka': 'מקום אספקה',
-        'Rsh_proyktnam': 'שם פרויקט',
-        'Rsh_sochen': 'סוכן',
-        'Rsh_cname': 'שם סוכן',
-        'Rsh_cnametl': 'טלפון סוכן',
-        'Rsh_cemail': 'מייל סוכן',
-        'Rsh_takziv': 'מספר סעיף תקציבי',
-        'Rsh_orderer': 'שם המזמין' // הוספת השדה החדש
-    };
-
-    const hiddenColumns = ['Rsh_id', 'Rsh_status'];
-
-    try {
-        let tableHTML = '<div class="table-responsive"><table class="records-table">';
-        tableHTML += '<thead><tr>';
-        for (const key in titleMapping) {
-            if (!hiddenColumns.includes(key)) {
-                tableHTML += `<th>${titleMapping[key]}</th>`;
-            }
+        if (!reshumot || reshumot.length === 0) {
+            console.warn('No records to display in fillForm');
+            reshumotListDiv.innerHTML = '<p>אין נתונים להצגה</p>';
+            return;
         }
-        tableHTML += '</tr></thead>';
 
-        tableHTML += '<tbody>';
-        for (const record of reshumot) {
-            const recordId = record.Rsh_id;
-            tableHTML += `<tr class="record-row" data-id="${recordId}" onclick="toggleButtons(this)">`;
+        const titleMapping = {
+            'Rsh_date': 'תאריך',
+            'Rsh_mchlaka': 'מחלקה',
+            'Rsh_sapak': 'מספר ספק',
+            'SP_name': 'פרטי ספק',
+            'Rsh_schoom': 'סכום',
+            'Rsh_aspaka': 'מקום אספקה',
+            'Rsh_proyktnam': 'שם פרויקט',
+            'Rsh_sochen': 'סוכן',
+            'Rsh_cname': 'שם סוכן',
+            'Rsh_cnametl': 'טלפון סוכן',
+            'Rsh_cemail': 'מייל סוכן',
+            'Rsh_takziv': 'מספר סעיף תקציבי',
+            'Rsh_orderer': 'שם המזמין' // הוספת השדה החדש
+        };
+
+        const hiddenColumns = ['Rsh_id', 'Rsh_status'];
+
+        try {
+            let tableHTML = '<div class="table-responsive"><table class="records-table">';
+            tableHTML += '<thead><tr>';
             for (const key in titleMapping) {
                 if (!hiddenColumns.includes(key)) {
-                    if (key === 'Rsh_sapak') {
-                        const supplierDetails = await loadSuppliers(record.Rsh_sapak);
-                        tableHTML += `<td class="data-cell"><span class="cell-content">${supplierDetails.SP_id || ''}</span></td>`;
-                    } else if (key === 'SP_name') {
-                        const supplierDetails = await loadSuppliers(record.Rsh_sapak);
-                        tableHTML += `<td class="data-cell"><span class="cell-content">${supplierDetails.SP_name || ''}</span></td>`;
-                    } else {
-                        tableHTML += `<td class="data-cell"><span class="cell-content">${record[key] || ''}</span></td>`;
-                    }
+                    tableHTML += `<th>${titleMapping[key]}</th>`;
                 }
             }
-            tableHTML += '</tr>';
-        }
+            tableHTML += '</tr></thead>';
 
-        tableHTML += '</tbody></table></div>';
-        reshumotListDiv.innerHTML = tableHTML;
-
-        // Add click event to document to close any open button overlays when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.record-row') && !e.target.closest('.button-overlay')) {
-                document.querySelectorAll('.record-row').forEach(row => {
-                    row.classList.remove('blurred', 'active-row');
-                    const existingOverlay = row.querySelector('.button-overlay');
-                    if (existingOverlay) {
-                        existingOverlay.remove();
+            tableHTML += '<tbody>';
+            for (const record of reshumot) {
+                const recordId = record.Rsh_id;
+                tableHTML += `<tr class="record-row" data-id="${recordId}" onclick="toggleButtons(this)">`;
+                for (const key in titleMapping) {
+                    if (!hiddenColumns.includes(key)) {
+                        if (key === 'Rsh_sapak') {
+                            const supplierDetails = await loadSuppliers(record.Rsh_sapak);
+                            tableHTML += `<td class="data-cell"><span class="cell-content">${supplierDetails.SP_id || ''}</span></td>`;
+                        } else if (key === 'SP_name') {
+                            const supplierDetails = await loadSuppliers(record.Rsh_sapak);
+                            tableHTML += `<td class="data-cell"><span class="cell-content">${supplierDetails.SP_name || ''}</span></td>`;
+                        } else {
+                            tableHTML += `<td class="data-cell"><span class="cell-content">${record[key] || ''}</span></td>`;
+                        }
                     }
-                });
+                }
+                tableHTML += '</tr>';
             }
-        });
 
-    } catch (error) {
-        console.error("Error in fillForm:", error);
-        reshumotListDiv.innerHTML = '<p>שגיאה בעיבוד הנתונים: ' + error.message + '</p>';
+            tableHTML += '</tbody></table></div>';
+            reshumotListDiv.innerHTML = tableHTML;
+
+            // Add click event to document to close any open button overlays when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.record-row') && !e.target.closest('.button-overlay')) {
+                    document.querySelectorAll('.record-row').forEach(row => {
+                        row.classList.remove('blurred', 'active-row');
+                        const existingOverlay = row.querySelector('.button-overlay');
+                        if (existingOverlay) {
+                            existingOverlay.remove();
+                        }
+                    });
+                }
+            });
+
+        } catch (error) {
+            console.error("Error in fillForm:", error);
+            reshumotListDiv.innerHTML = '<p>שגיאה בעיבוד הנתונים: ' + error.message + '</p>';
+        }
     }
-}
 
 
     function toggleButtons(row) {
@@ -875,12 +891,10 @@ async function fillForm(reshumot) {
         });
         const recordRow = document.querySelector(`tr[data-id="${recordId}"]`);
 
-        // שלוף את כל התאים בשורה
         const cells = recordRow.querySelectorAll('.data-cell .cell-content');
 
-        // צור אובייקט record עם המידע מהתאים
         const record = {
-            Rsh_id: recordId, // הוסף את ה-ID של ההזמנה
+            Rsh_id: recordId,
             Rsh_date: cells[0].innerText,
             Rsh_mchlaka: cells[1].innerText,
             Rsh_sapak: cells[2].innerText,
@@ -895,7 +909,6 @@ async function fillForm(reshumot) {
             Rsh_takziv: cells[11].innerText,
         };
 
-        // כאן תוכל להוסיף לוגיקה כדי למלא את הטופס עם המידע שנשלף
         loadRecordToForm(record);
     }
 
@@ -939,6 +952,7 @@ async function fillForm(reshumot) {
     }
     async function loadRecordToForm(item) {
         document.getElementById('department').value = item.Rsh_mchlaka || '';
+
         // Fetch suppliers from server
         const supplierIdField = document.getElementById('supplierId');
         await loadAllSuppliers(supplierIdField, item.Rsh_sapak); // קריאה לשרת להביא את הספקים
@@ -955,9 +969,8 @@ async function fillForm(reshumot) {
         document.getElementById('projectName').value = item.Rsh_proyktnam || '';
         document.getElementById('budgetItem').value = item.Rsh_takziv || '';
 
-        // Set hidden fields if necessary
-        document.getElementById('autoNumber').value = item.Rsh_id || ''; // Assuming Rsh_id is the identifier
-        document.getElementById('timestamp').value = item.Rsh_date || ''; // Assuming Rsh_date is the timestamp
+        document.getElementById('autoNumber').value = item.Rsh_id || '';
+        document.getElementById('timestamp').value = item.Rsh_date || '';
         checkFormCompletion();
         RSH_ID = item.Rsh_id;
         loadDocuments(RSH_ID);
@@ -979,38 +992,46 @@ async function fillForm(reshumot) {
             Lg_status: 0
         });
     });
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
         checkPR();
         if (document.referrer.includes("login")) {
             updateUserLog(localStorage.getItem('userId'), {
                 Lg_timestmpin: new Date().toLocaleString('sv-SE'),
                 Lg_status: 1
             });
+
+            // זימון לפונקציה readByUserId
+            const userId = localStorage.getItem('userId');
+            const userDepartments = await getdepofuser(userId); // המתנה לתוצאה
+            console.log(userDepartments); // או כל פעולה שתבצע עם המידע
+            getreshumotByDep(userDepartments);
         }
     });
-async function loadAllSuppliers(supplierIdField, selectedSupplierId) {
-    try {
-        const suppliers = await getAllSuppliers(); // הנח את ה-URL לפי הצורך
 
-        // ניקוי הסלקטור לפני הוספת ספקים חדשים
-        supplierIdField.innerHTML = '<option value="" disabled selected>בחר ספק</option>';
 
-        suppliers.forEach(supplier => {
-            const option = document.createElement('option');
-            option.value = supplier.SP_id; // שימוש ב-SP_id כערך
-            option.text = `${supplier.SP_id} - ${supplier.SP_name}`; // הצגת SP_id ו-SP_name
-            supplierIdField.add(option);
-        });
+    async function loadAllSuppliers(supplierIdField, selectedSupplierId) {
+        try {
+            const suppliers = await getAllSuppliers(); // הנח את ה-URL לפי הצורך
 
-        // הגדרת הספק הנבחר
-        if (selectedSupplierId) {
-            supplierIdField.value = selectedSupplierId;
+            // ניקוי הסלקטור לפני הוספת ספקים חדשים
+            supplierIdField.innerHTML = '<option value="" disabled selected>בחר ספק</option>';
+
+            suppliers.forEach(supplier => {
+                const option = document.createElement('option');
+                option.value = supplier.SP_id; // שימוש ב-SP_id כערך
+                option.text = `${supplier.SP_id} - ${supplier.SP_name}`; // הצגת SP_id ו-SP_name
+                supplierIdField.add(option);
+            });
+
+            // הגדרת הספק הנבחר
+            if (selectedSupplierId) {
+                supplierIdField.value = selectedSupplierId;
+            }
+        } catch (error) {
+            console.error('Error loading suppliers:', error);
+            showNotification('שגיאה בטעינת ספקים: ' + error.message, 'error');
         }
-    } catch (error) {
-        console.error('Error loading suppliers:', error);
-        showNotification('שגיאה בטעינת ספקים: ' + error.message, 'error');
     }
-}
 
 
     function checkPR() {
